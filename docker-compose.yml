@@ -10,6 +10,8 @@ services:
         privileged: true
         volumes:
             - .:/DeepSpeech/deepspeech-german/
+            - ./DeepSpeech/DeepSpeech.py:/DeepSpeech/
+            - ./DeepSpeech/evaluate.py:/DeepSpeech/
             - ../data_original/:/DeepSpeech/data_original/
             - ../data_prepared/:/DeepSpeech/data_prepared/
             - /tmp/.X11-unix:/tmp/.X11-unix

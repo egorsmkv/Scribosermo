@@ -116,6 +116,42 @@ Build Trie from the generated language model  (Run in docker container):
 native_client/generate_trie deepspeech-german/data/alphabet.txt data_prepared/lm.binary data_prepared/trie
 ```
 
+#### Fix some issues
+
+For me only training with voxforge worked at first. With tuda dataset I got an error: \
+"Invalid argument: Not enough time for target transition sequence"
+
+To fix it you have to follow this [solution](https://github.com/mozilla/DeepSpeech/issues/1629#issuecomment-427423707):
+```
+# Add the parameter "ignore_longer_outputs_than_inputs=True" in DeepSpeech.py (~ line 231)
+
+# Compute the CTC loss using TensorFlow's `ctc_loss`
+total_loss = tfv1.nn.ctc_loss(labels=batch_y, inputs=logits, sequence_length=batch_seq_len, ignore_longer_outputs_than_inputs=True)
+```
+
+<br/>
+
+This will result in another error after some training steps: \
+"Invalid argument: WAV data chunk '[Some strange symbol here]"
+
+Just ignore this in the train steps:
+```
+# Add another exception (tf.errors.InvalidArgumentError) in the training loop in DeepSpeech.py (~ line 602):
+
+try:
+    [...]
+    session.run([train_op, global_step, loss, non_finite_files, step_summaries_op], feed_dict=feed_dict)
+except tf.errors.OutOfRangeError:
+    break
+except tf.errors.InvalidArgumentError as e:
+    print("Ignoring error:", e)
+    continue
+```
+
+<br/>
+
+Add the parameter and the ignored exception in evaluate.py file too (~ lines 73 and 118).
+
 #### Training
 
 Adjust the parameters to your needs (Run in docker container):
@@ -137,7 +173,7 @@ python3 DeepSpeech.py --test_files data_prepared/voxforge/test.csv \
 --alphabet_config_path z_deepspeech/deepspeech-german/data/alphabet.txt --lm_trie_path z_deepspeech/data/trie --lm_binary_path z_deepspeech/data/lm.binary --test_batch_size 48
 ```
 
-Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45 min per epoch. Training until early stop took 21:40 min for 10 epochs.
+Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45 min per epoch. Training until early stop took 22 min for 10 epochs. One epoch in tuda with batch size of 24 needs about 21 min.
 
 ## Results
 
