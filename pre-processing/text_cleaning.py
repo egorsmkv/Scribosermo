@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import string
-import collections
 import re
+import string
 
 import num2words
 

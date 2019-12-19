@@ -2,9 +2,6 @@
 # file name: to_utf8
 # MAINTAINER: Aashish Agarwal
 
-FILES="voxforge/*/etc/prompts-original"
-#FILES="voxforge/*/etc/PROMPTS"
-
 for f in $FILES
 do
   #filename="${f%.*}"

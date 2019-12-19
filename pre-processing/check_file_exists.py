@@ -1,7 +1,7 @@
 # MAINTAINER: Aashish Agarwal
 
-import os
 import csv
+import os
 
 with open('/home/LTLab.lan/agarwal/german-speech-corpus/') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
@@ -10,6 +10,6 @@ with open('/home/LTLab.lan/agarwal/german-speech-corpus/') as csv_file:
         print(row[0])
         exists = os.path.isfile(row[0])
         if exists:
-            temp=1
+            temp = 1
         else:
             print("Does not exist:" + row[0])

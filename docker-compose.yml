@@ -1,0 +1,20 @@
+version: "2.3"
+# runtime: nvidia needs version 2 else change standard runtime at host pc
+
+services:
+
+    deep_speech:
+        image: deep_speech_german
+        network_mode: "host"
+        runtime: nvidia
+        privileged: true
+        volumes:
+            - .:/DeepSpeech/deepspeech-german/
+            - ../data_original/:/DeepSpeech/data_original/
+            - ../data_prepared/:/DeepSpeech/data_prepared/
+            - /tmp/.X11-unix:/tmp/.X11-unix
+        environment:
+            - DISPLAY
+            - QT_X11_NO_MITSHM=1
+            - "PYTHONUNBUFFERED=1"
+        command: /bin/bash -i -c 'sleep infinity'

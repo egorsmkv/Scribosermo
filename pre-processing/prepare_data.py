@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('--voxforge', type=str)
     parser.add_argument('--swc', type=str)
     parser.add_argument('--mailabs', type=str)
-    parser.add_argument('--cv', type=str)
+    parser.add_argument('--common_voice', type=str)
 
     args = parser.parse_args()
 
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     voxforge_path = args.voxforge
     swc_path = args.swc
     mailabs_path = args.mailabs
-    cv_path = args.cv
+    cv_path = args.common_voice
 
     corpora = []
 
@@ -54,12 +54,11 @@ if __name__ == '__main__':
         corpora.append(tuda_corpus)
 
     if voxforge_path is not None:
-        voxforge_corpus = audiomate.Corpus.load(
-            voxforge_path, reader='voxforge')
+        voxforge_corpus = audiomate.Corpus.load(voxforge_path, reader='voxforge')
         corpora.append(voxforge_corpus)
 
     if swc_path is not None:
-        swc_corpus = audiomate.Corpus.load(swc_path, reader='kaldi')
+        swc_corpus = audiomate.Corpus.load(swc_path, reader='swc')
         corpora.append(swc_corpus)
 
     if mailabs_path is not None:
@@ -77,8 +76,7 @@ if __name__ == '__main__':
     clean_transcriptions(merged_corpus)
 
     splitter = subset.Splitter(merged_corpus, random_seed=38)
-    splits = splitter.split_by_length_of_utterances(
-        {'train': 0.7, 'dev': 0.15, 'test': 0.15}, separate_issuers=True)
+    splits = splitter.split({'train': 0.7, 'dev': 0.15, 'test': 0.15}, separate_issuers=True)
 
     merged_corpus.import_subview('train', splits['train'])
     merged_corpus.import_subview('dev', splits['dev'])

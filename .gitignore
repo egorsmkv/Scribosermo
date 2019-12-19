@@ -1,0 +1,7 @@
+*.idea*
+**.pyc
+**__pycache__/*
+.~lock*
+**.log
+**.tmp
+models/*
