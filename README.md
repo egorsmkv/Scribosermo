@@ -78,8 +78,17 @@ python3 deepspeech-german/pre-processing/prepare_data.py --swc data_original/swc
 
 # To combine multiple datasets run the command as follows:
 python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tuda/ --voxforge data_original/voxforge/  data_prepared/tuda_voxforge/
+
+# Or, which is much faster, but only combining train, dev and test csv files, run:
+python3 deepspeech-german/data/combine_datasets.py data_prepared/ --tuda --voxforge
 ```
 
+Preparation times using Intel i7-8700K:
+* voxforge: few minutes
+* tuda: some minutes
+* mailabs: some minutes
+* common_voice: ~6h
+* swc: ~15h
 
 #### Create the language model
 
@@ -153,7 +162,6 @@ Some results with the current code version:
 The DeepSpeech model can be directly re-trained on new dataset. The required dependencies are available at: \
 https://drive.google.com/drive/folders/1nG6xii2FP6PPqmcp4KtNVvUADXxEeakk?usp=sharing
 
-DeepSpeech 0.5-Model: https://drive.google.com/file/d/1VN1xPH0JQNKK6DiSVgyQ4STFyDY_rle3/view
 
 ## Acknowledgments
 * [Prof. Dr.-Ing. Torsten Zesch](https://www.ltl.uni-due.de/team/torsten-zesch) - Co-Author
