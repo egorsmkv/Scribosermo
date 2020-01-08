@@ -84,9 +84,9 @@ python3 deepspeech-german/data/combine_datasets.py data_prepared/ --tuda --voxfo
 ```
 
 Preparation times using Intel i7-8700K:
-* voxforge: few minutes
+* voxforge: some seconds
 * tuda: some minutes
-* mailabs: some minutes
+* mailabs: ~20min
 * common_voice: ~6h
 * swc: ~15h
 
@@ -167,13 +167,21 @@ python3 DeepSpeech.py --train_files data_prepared/voxforge/train.csv --dev_files
 --epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --export_dir deepspeech-german/models --use_allow_growth --use_cudnn_rnn \
 --augmentation_freq_and_time_masking --augmentation_pitch_and_tempo_scaling --augmentation_spec_dropout_keeprate 0.9 --augmentation_speed_up_std 0.2
 
+python3 DeepSpeech.py --train_files data_prepared/tuda/train.csv --dev_files data_prepared/tuda/dev.csv --test_files data_prepared/tuda/test.csv \
+--alphabet_config_path deepspeech-german/data/alphabet.txt --lm_trie_path data_prepared/trie --lm_binary_path data_prepared/lm.binary --test_batch_size 12 --train_batch_size 24 --dev_batch_size 12 \
+--epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --export_dir deepspeech-german/models --use_allow_growth
 
 # Run test only
 python3 DeepSpeech.py --test_files data_prepared/voxforge/test.csv \
 --alphabet_config_path z_deepspeech/deepspeech-german/data/alphabet.txt --lm_trie_path z_deepspeech/data/trie --lm_binary_path z_deepspeech/data/lm.binary --test_batch_size 48
 ```
 
-Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45 min per epoch. Training until early stop took 22 min for 10 epochs. One epoch in tuda with batch size of 24 needs about 21 min.
+Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. Training until early stop took 22min for 10 epochs. 
+
+One epoch in tuda with batch size of 12 on single gpu needs about 1:15h. With both gpus and batch size of 24 for training and 12 for validation and test it takes about 24min. The argument "--use_cudnn_rnn" doesn't work for some reason with this dataset.
+
+One epoch in mailabs with batch size of 24/12/12 needs about 19min, testing about 21 min. \
+One epoch in common_voice with batch size of 24/12/12 needs about 31min, testing needs the same time.
 
 ## Results
 
@@ -191,7 +199,6 @@ Some results from our findings in the paper _(Refer our paper for more informati
 Some results with the current code version:
 - Voxforge --- WER: 0.676611, CER: 0.403916, loss: 82.185226
 - Voxforge with augmentation --- WER: 0.671032, CER: 0.394428, loss: 84.415947
-
 
 #### Trained Language Model, Trie, Speech Model and Checkpoints
 
