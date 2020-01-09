@@ -81,14 +81,18 @@ python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tu
 
 # Or, which is much faster, but only combining train, dev and test csv files, run:
 python3 deepspeech-german/data/combine_datasets.py data_prepared/ --tuda --voxforge
+
+
+# To shuffle and replace "äöü" characters run (for all 3 csv files):
+python3 deepspeech-german/data/dataset_operations.py data_prepared/tuda-voxforge/train.csv data_prepared/tuda-voxforge/train_az.csv --replace --shuffle
 ```
 
 Preparation times using Intel i7-8700K:
 * voxforge: some seconds
 * tuda: some minutes
 * mailabs: ~20min
-* common_voice: ~6h
-* swc: ~15h
+* common_voice: ~3h
+* swc: ~6h
 
 #### Create the language model
 
@@ -101,14 +105,14 @@ gzip -d German_sentences_8mil_filtered_maryfied.txt.gz
 
 
 cd my_deepspeech_folder
-deepspeech-german/pre-processing/prepare_vocab.py data_original/German_sentences_8mil_filtered_maryfied.txt data_prepared/clean_vocab.txt
+python3 deepspeech-german/pre-processing/prepare_vocab.py data_original/German_sentences_8mil_filtered_maryfied.txt data_prepared/clean_vocab.txt
 ```
 
 We used [KenLM](https://github.com/kpu/kenlm.git) toolkit to train a 3-gram language model. It is Language Model inference code by [Kenneth Heafield](https://kheafield.com/). \
 Build the Language Model (Run in docker container):
 ```
-kenlm/build/bin/lmplz --text data_prepared/clean_vocab.txt --arpa data_prepared/words.arpa --o 3    # Add "-S 50%" to only use 50% of memory
-kenlm/build/bin/build_binary -T -s data_prepared/words.arpa data_prepared/lm.binary
+native_client/kenlm/build/bin/lmplz --text data_prepared/clean_vocab.txt --arpa data_prepared/words.arpa --o 3    # Add "-S 50%" to only use 50% of memory
+native_client/kenlm/build/bin/build_binary -T -s data_prepared/words.arpa data_prepared/lm.binary
 ```
 
 Build Trie from the generated language model  (Run in docker container):
@@ -154,6 +158,15 @@ Add the parameter and the ignored exception in evaluate.py file too (~ lines 73 
 
 #### Training
 
+Download pretrained deepspeech checkpoints.
+
+```
+cd data_original
+wget https://github.com/mozilla/DeepSpeech/releases/download/v0.6.0/deepspeech-0.6.0-checkpoint.tar.gz
+tar xvfz deepspeech-0.6.0-checkpoint.tar.gz
+rm deepspeech-0.6.0-checkpoint.tar.gz
+```
+
 Adjust the parameters to your needs (Run in docker container):
 
 ```
@@ -171,6 +184,12 @@ python3 DeepSpeech.py --train_files data_prepared/tuda/train.csv --dev_files dat
 --alphabet_config_path deepspeech-german/data/alphabet.txt --lm_trie_path data_prepared/trie --lm_binary_path data_prepared/lm.binary --test_batch_size 12 --train_batch_size 24 --dev_batch_size 12 \
 --epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --export_dir deepspeech-german/models --use_allow_growth
 
+python3 DeepSpeech.py --train_files data_prepared/tuda-voxforge-swc-mailabs-common_voice/train_az.csv --dev_files data_prepared/tuda-voxforge-swc-mailabs-common_voice/dev_az.csv --test_files data_prepared/tuda-voxforge-swc-mailabs-common_voice/test_az.csv \
+--alphabet_config_path deepspeech-german/data/alphabet_az.txt --lm_trie_path data_prepared/trie_az --lm_binary_path data_prepared/lm_az.binary --test_batch_size 12 --train_batch_size 12 --dev_batch_size 12 \
+--epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --export_dir deepspeech-german/models/tvsmc/ --use_allow_growth  --use_cudnn_rnn --checkpoint_dir data_original/deepspeech-0.6.0-checkpoint/ \
+--augmentation_freq_and_time_masking --augmentation_pitch_and_tempo_scaling --augmentation_spec_dropout_keeprate 0.9 --augmentation_speed_up_std 0.2
+
+
 # Run test only
 python3 DeepSpeech.py --test_files data_prepared/voxforge/test.csv \
 --alphabet_config_path z_deepspeech/deepspeech-german/data/alphabet.txt --lm_trie_path z_deepspeech/data/trie --lm_binary_path z_deepspeech/data/lm.binary --test_batch_size 48
@@ -178,10 +197,11 @@ python3 DeepSpeech.py --test_files data_prepared/voxforge/test.csv \
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. Training until early stop took 22min for 10 epochs. 
 
-One epoch in tuda with batch size of 12 on single gpu needs about 1:15h. With both gpus and batch size of 24 for training and 12 for validation and test it takes about 24min. The argument "--use_cudnn_rnn" doesn't work for some reason with this dataset.
+One epoch in tuda with batch size of 12 on single gpu needs about 1:15h. With both gpus and batch size of 24 for training and 12 for validation and test it takes about 24min. The argument "--use_cudnn_rnn" doesn't work for some reason with this dataset. 
 
 One epoch in mailabs with batch size of 24/12/12 needs about 19min, testing about 21 min. \
-One epoch in common_voice with batch size of 24/12/12 needs about 31min, testing needs the same time.
+One epoch in common_voice with batch size of 24/12/12 needs about 31min, testing needs the same time. Training with augmentation until early stop took 4:20h for 8 epochs. \
+One epoch in swc with batch size of 12/12/12 needs about 1:08h, testing about 17 min.
 
 ## Results
 
@@ -196,9 +216,16 @@ Some results from our findings in the paper _(Refer our paper for more informati
 
 <br/>
 
-Some results with the current code version:
-- Voxforge --- WER: 0.676611, CER: 0.403916, loss: 82.185226
-- Voxforge with augmentation --- WER: 0.671032, CER: 0.394428, loss: 84.415947
+Some results with the current code version: 
+
+| Dataset | Additional Infos | Result |
+|---------|--------|--------|
+| Voxforge | | WER: 0.676611, CER: 0.403916, loss: 82.185226 |
+| Voxforge | with augmentation | WER: 0.671032, CER: 0.394428, loss: 84.415947 |
+| Voxforge | without "äöü" | WER: 0.646702, CER: 0.364471, loss: 82.567413 |
+| Voxforge | 5-gram language model and without "äöü" | WER: 0.665490, CER: 0.394863, loss: 82.016052 |
+| Voxforge | checkpoint from english deepspeech and without "äöü" | WER: 0.394064, CER: 0.190184, loss: 49.066357 |
+| CommonVoice | with augmentation | WER: 0.487191, CER: 0.251260, loss: 44.828957 |
 
 #### Trained Language Model, Trie, Speech Model and Checkpoints
 

@@ -37,7 +37,8 @@ args = parser.parse_args()
 
 index = 0
 
-with open(args.source_path, 'r') as source_file, open(args.target_path, 'w') as target_file:
+with open(args.source_path, 'r', encoding="utf-8") as source_file, open(args.target_path, 'w',
+                                                                        encoding="utf-8") as target_file:
     for index, line in enumerate(source_file):
         cleaned_sentence = text_cleaning.clean_sentence(line)
         target_file.write('{}\n'.format(cleaned_sentence))

@@ -12,7 +12,7 @@ int_pattern = re.compile(r'[0-9]+')
 float_pattern = re.compile(r'[0-9]+[,\.][0-9]+')
 
 #
-#   Allowed characters a-zA-Z'äüö
+#   Allowed characters a-zA-Z' äüö
 #
 allowed = list(string.ascii_lowercase)
 allowed.append("'")
@@ -58,7 +58,8 @@ special_replacers = {
     ' £ ': 'pfund',
     'm³': 'kubikmeter',
     'km²': 'quadratkilometer',
-    'm²': 'quadratmeter'
+    'm²': 'quadratmeter',
+    'co2': 'c o zwei'
 }
 
 replacements = {}
