@@ -5,6 +5,8 @@ import os
 
 import pandas as pd
 
+# ======================================================================================================================
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Combine prepared datasets')
     parser.add_argument('prepared_data_path', type=str)
@@ -42,15 +44,17 @@ if __name__ == '__main__':
     data_train = []
     data_dev = []
     data_test = []
+    data_all = []
     for d in datasets:
         data_train.append(os.path.join(args.prepared_data_path, d, "train.csv"))
         data_dev.append(os.path.join(args.prepared_data_path, d, "dev.csv"))
         data_test.append(os.path.join(args.prepared_data_path, d, "test.csv"))
 
     # Combine all the files
-    combined_csv_train = pd.concat([pd.read_csv(f) for f in data_train])
-    combined_csv_dev = pd.concat([pd.read_csv(f) for f in data_dev])
-    combined_csv_test = pd.concat([pd.read_csv(f) for f in data_test])
+    combined_csv_train = pd.concat([pd.read_csv(f, keep_default_na=False) for f in data_train])
+    combined_csv_dev = pd.concat([pd.read_csv(f, keep_default_na=False) for f in data_dev])
+    combined_csv_test = pd.concat([pd.read_csv(f, keep_default_na=False) for f in data_test])
+    combined_csv_all = pd.concat([combined_csv_train, combined_csv_dev, combined_csv_test])
 
     # Export to csv again
     path = os.path.join(args.prepared_data_path, "-".join(datasets), "")
@@ -59,3 +63,4 @@ if __name__ == '__main__':
     combined_csv_train.to_csv(path + "train.csv", index=False, encoding='utf-8-sig')
     combined_csv_dev.to_csv(path + "dev.csv", index=False, encoding='utf-8-sig')
     combined_csv_test.to_csv(path + "test.csv", index=False, encoding='utf-8-sig')
+    combined_csv_all.to_csv(path + "all.csv", index=False, encoding='utf-8-sig')
