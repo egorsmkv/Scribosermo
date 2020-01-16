@@ -8,17 +8,18 @@ services:
         network_mode: "host"
         runtime: nvidia
         privileged: true
-        shm_size: '16gb'
+        shm_size: '16gb'  # needed?
         volumes:
             - .:/DeepSpeech/deepspeech-german/
             - ../DeepSpeech/DeepSpeech.py:/DeepSpeech/DeepSpeech.py
             - ../DeepSpeech/evaluate.py:/DeepSpeech/evaluate.py
+            - ../checkpoints/:/DeepSpeech/checkpoints/
             - ../data_original/:/DeepSpeech/data_original/
             - ../data_prepared/:/DeepSpeech/data_prepared/
             - /tmp/.X11-unix:/tmp/.X11-unix
         environment:
             - DISPLAY
-            #            - "CUDA_VISIBLE_DEVICES=1"
+            # - "CUDA_VISIBLE_DEVICES=1"
             - QT_X11_NO_MITSHM=1
             - "PYTHONUNBUFFERED=1"
         command: /bin/bash -i -c 'sleep infinity'

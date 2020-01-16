@@ -17,6 +17,7 @@ File structure will look as follows:
 
 ```
 my_deepspeech_folder
+    checkpoints
     data_original
     data_prepared
     DeepSpeech
@@ -47,8 +48,8 @@ docker exec -it deepspeech-german_deep_speech_1 bash    # In a new shell
 * [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~386h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~237h
 
+* Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipline existing
 
-* [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, but no data pipline existing
 <br/>
 
 Download datasets (Run in docker container):
@@ -64,7 +65,7 @@ Extract and move it to datasets directory (data_original/common_voice/)
 
 <br/>
 
-Prepare datasets, this may take some minutes (Run in docker container):
+Prepare datasets, this may take some time (Run in docker container):
 ```
 # Prepare the datasets one by one first to ensure everything is working:
 
@@ -86,6 +87,7 @@ python3 deepspeech-german/data/combine_datasets.py data_prepared/ --tuda --voxfo
 
 # To shuffle and replace "äöü" characters and clean the files run (for all 3 csv files):
 python3 deepspeech-german/data/dataset_operations.py data_prepared/tuda-voxforge/train.csv data_prepared/tuda-voxforge/train_azc.csv --replace --shuffle --clean
+
 
 # To split tuda into the correct train, dev and test splits run: 
 # (you will have to rename the [train/dev/test]_s.csv files before combining them with other datasets)
@@ -164,9 +166,8 @@ Add the parameter and the ignored exception in evaluate.py file too (~ lines 73 
 Download pretrained deepspeech checkpoints.
 
 ```
-cd data_original
-wget https://github.com/mozilla/DeepSpeech/releases/download/v0.6.0/deepspeech-0.6.0-checkpoint.tar.gz
-tar xvfz deepspeech-0.6.0-checkpoint.tar.gz
+wget https://github.com/mozilla/DeepSpeech/releases/download/v0.6.0/deepspeech-0.6.0-checkpoint.tar.gz -P checkpoints/
+tar xvfz checkpoints/deepspeech-0.6.0-checkpoint.tar.gz -C checkpoints/
 # Don't delete the compressed file, you may need it later for a new training as the uncompressed will be overwritten
 ```
 
@@ -177,24 +178,20 @@ Adjust the parameters to your needs (Run in docker container):
 rm -rf /root/.local/share/deepspeech/summaries && rm -rf /root/.local/share/deepspeech/checkpoints
 
 
-# Run training
+# Run training:
 python3 DeepSpeech.py --train_files data_prepared/voxforge/train.csv --dev_files data_prepared/voxforge/dev.csv --test_files data_prepared/voxforge/test.csv \
 --alphabet_config_path deepspeech-german/data/alphabet.txt --lm_trie_path data_prepared/trie --lm_binary_path data_prepared/lm.binary --test_batch_size 48 --train_batch_size 48 --dev_batch_size 48 \
 --epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --export_dir deepspeech-german/models --use_allow_growth --use_cudnn_rnn 
 
-python3 DeepSpeech.py --train_files data_prepared/voxforge/train_azc.csv --dev_files data_prepared/voxforge/dev_azc.csv --test_files data_prepared/voxforge/test_az.csv \
---alphabet_config_path deepspeech-german/data/alphabet_az.txt --lm_trie_path data_prepared/trie_az4 --lm_binary_path data_prepared/lm_az4.binary --test_batch_size 48 --train_batch_size 48 --dev_batch_size 48 \
---epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --export_dir deepspeech-german/models/voxforge/ --use_allow_growth --use_cudnn_rnn --checkpoint_dir data_original/deepspeech-0.6.0-checkpoint/ \
---augmentation_freq_and_time_masking --augmentation_pitch_and_tempo_scaling --augmentation_spec_dropout_keeprate 0.9 --augmentation_speed_up_std 0.2
+# Or adjust the train.sh file and run a training from scratch without using the english checkpoint:
+/bin/bash deepspeech-german/training/train.sh checkpoints/voxforge/ data_prepared/voxforge/train.csv data_prepared/voxforge/dev.csv data_prepared/voxforge/test.csv 1 0
 
-python3 DeepSpeech.py --train_files data_prepared/tuda-voxforge-swc-mailabs-common_voice/train_az.csv --dev_files data_prepared/tuda-voxforge-swc-mailabs-common_voice/dev_az.csv --test_files data_prepared/tuda-voxforge-swc-mailabs-common_voice/test_az.csv \
---alphabet_config_path deepspeech-german/data/alphabet_az.txt --lm_trie_path data_prepared/trie_az --lm_binary_path data_prepared/lm_az.binary --test_batch_size 12 --train_batch_size 12 --dev_batch_size 12 \
---epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --export_dir deepspeech-german/models/tvsmc/ --use_allow_growth  --use_cudnn_rnn --checkpoint_dir data_original/deepspeech-0.6.0-checkpoint/ \
---augmentation_freq_and_time_masking --augmentation_pitch_and_tempo_scaling --augmentation_spec_dropout_keeprate 0.9 --augmentation_speed_up_std 0.2
+# Or to run a stepped training as described in the paper, run:
+python3 deepspeech-german/training/stepped_training.py checkpoints/voxforge/ data_prepared/ _azce --voxforge
 
 
-# Run test only
-python3 DeepSpeech.py --test_files data_prepared/voxforge/test_az.csv \
+# Run test only:
+python3 DeepSpeech.py --test_files data_prepared/voxforge/test_az.csv --checkpoint_dir checkpoints/voxforge/ \
 --alphabet_config_path deepspeech-german/data/alphabet_az.txt --lm_trie_path data_prepared/trie_az --lm_binary_path data_prepared/lm_az.binary --test_batch_size 48
 ```
 
@@ -207,6 +204,8 @@ One epoch in mailabs with batch size of 24/12/12 needs about 19min, testing abou
 One epoch in common_voice with batch size of 24/12/12 needs about 31min, testing needs the same time. Training with augmentation until early stop took 4:20h for 8 epochs. 
 
 One epoch in swc with batch size of 12/12/12 needs about 1:08h, testing about 17 min.
+
+One epoch with all datasets and batch size of 12 needs about 2:40h, testing about 1:20h.
 
 ## Results
 
@@ -226,18 +225,18 @@ Some results with the current code version:
 | Dataset | Additional Infos | Result |
 |---------|------------------|--------|
 | Voxforge | | WER: 0.676611, CER: 0.403916, loss: 82.185226 |
-| Voxforge | with augmentation | WER: 0.671032, CER: 0.394428, loss: 84.415947 |
+| Voxforge | with augmentation | WER: 0.624573, CER: 0.348618, loss: 74.403786 |
 | Voxforge | without "äöü" | WER: 0.646702, CER: 0.364471, loss: 82.567413 |
 | Voxforge | 5-gram language model, without "äöü" | WER: 0.665490, CER: 0.394863, loss: 82.016052 |
 | Voxforge | 4-gram language model, without "äöü" | WER: 0.642716, CER: 0.376940, loss: 80.501076 |
 | Voxforge | cleaned data, without "äöü" | WER: 0.634828, CER: 0.353037, loss: 81.905258 |
 | Voxforge | above checkpoint, tested on not cleaned data | WER: 0.634556, CER: 0.352879, loss: 81.849220 |
 | Voxforge | checkpoint from english deepspeech, without "äöü" | WER: 0.394064, CER: 0.190184, loss: 49.066357 |
-| Voxforge | checkpoint from english deepspeech, with augmentation, 4-gram language model, cleaned train and dev data, without "äöü" | WER: 0.434943, CER: 0.214896, loss: 52.146347 |
+| Voxforge | checkpoint from english deepspeech, with augmentation, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.338685, CER: 0.150972, loss: 42.031754 |
+| Voxforge | checkpoint from english deepspeech, with augmentation, 4-gram language model, cleaned train and dev data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.345403, CER: 0.151561, loss: 43.307995 |
 | Tuda | without "äöü", cleaned train and dev data | WER: 0.412830, CER: 0.236580, loss: 121.374710 |
 | Tuda | without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.436935, CER: 0.230252, loss: 132.031647 |
 | Tuda | correct train/dev/test splitting, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.683900, CER: 0.394106, loss: 167.296478 |
-| CommonVoice | with augmentation, dataset with 325h validated | WER: 0.487191, CER: 0.251260, loss: 44.828957 |
 | Tuda + Voxforge | without "äöü", checkpoint from english deepspeech, cleaned train and dev data | WER: 0.740130, CER: 0.462036, loss: 156.115921 |
 | Tuda + Voxforge | first tuda then voxforge, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.653841, CER: 0.384577, loss: 159.509476 |
 

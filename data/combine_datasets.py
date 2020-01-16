@@ -44,7 +44,6 @@ if __name__ == '__main__':
     data_train = []
     data_dev = []
     data_test = []
-    data_all = []
     for d in datasets:
         data_train.append(os.path.join(args.prepared_data_path, d, "train.csv"))
         data_dev.append(os.path.join(args.prepared_data_path, d, "dev.csv"))
