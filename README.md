@@ -239,6 +239,7 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 | Tuda | without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.436935, CER: 0.230252, loss: 132.031647 |
 | Tuda | correct train/dev/test splitting, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.683900, CER: 0.394106, loss: 167.296478 |
 | Tuda | with augmentation, correct train/dev/test splitting, without "äöü", cleaned data | WER: 0.811079, CER: 0.518419, loss: 194.365875 |
+| Tuda | 10 stepped training, correct train/dev/test splitting, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001, (best WER 0.684 after 5 steps) | WER: 0.741811, CER: 0.364413, loss: 287.959686 |
 | Tuda + Voxforge | without "äöü", checkpoint from english deepspeech, cleaned train and dev data | WER: 0.740130, CER: 0.462036, loss: 156.115921 |
 | Tuda + Voxforge | first tuda then voxforge, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.653841, CER: 0.384577, loss: 159.509476 |
 
