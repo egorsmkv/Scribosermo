@@ -86,7 +86,7 @@ python3 deepspeech-german/data/combine_datasets.py data_prepared/ --tuda --voxfo
 
 
 # To shuffle and replace "äöü" characters and clean the files run (for all 3 csv files):
-python3 deepspeech-german/data/dataset_operations.py data_prepared/tuda-voxforge/train.csv data_prepared/tuda-voxforge/train_azc.csv --replace --shuffle --clean
+python3 deepspeech-german/data/dataset_operations.py data_prepared/tuda-voxforge/train.csv data_prepared/tuda-voxforge/train_azce.csv --replace --shuffle --clean --exclude
 
 
 # To split tuda into the correct train, dev and test splits run: 
@@ -197,7 +197,7 @@ python3 DeepSpeech.py --test_files data_prepared/voxforge/test_az.csv --checkpoi
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. Training until early stop took 22min for 10 epochs. 
 
-One epoch in tuda with batch size of 12 on single gpu needs about 1:15h. With both gpus it takes about 26min. 
+One epoch in tuda with batch size of 12 on single gpu needs about 1:15h. With both gpus it takes about 26min. For 10 stepped training with early stops it took about 15h.
 
 One epoch in mailabs with batch size of 24/12/12 needs about 19min, testing about 21 min. 
 
@@ -220,7 +220,7 @@ Some results from the findings in the paper [German End-to-end Speech Recognitio
 
 <br/>
 
-Some results with the current code version: 
+Some results with the current code version (Default dropout is 0.4, learning rate 0.0005): 
 
 | Dataset | Additional Infos | Result |
 |---------|------------------|--------|
@@ -235,8 +235,10 @@ Some results with the current code version:
 | Voxforge | checkpoint from english deepspeech, with augmentation, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.338685, CER: 0.150972, loss: 42.031754 |
 | Voxforge | checkpoint from english deepspeech, with augmentation, 4-gram language model, cleaned train and dev data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.345403, CER: 0.151561, loss: 43.307995 |
 | Tuda | without "äöü", cleaned train and dev data | WER: 0.412830, CER: 0.236580, loss: 121.374710 |
+| Tuda | checkpoint from english deepspeech, with augmentation, correct train/dev/test splitting, without "äöü", cleaned data | WER: 0.971418, CER: 0.827650, loss: 331.872253 |
 | Tuda | without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.436935, CER: 0.230252, loss: 132.031647 |
 | Tuda | correct train/dev/test splitting, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.683900, CER: 0.394106, loss: 167.296478 |
+| Tuda | with augmentation, correct train/dev/test splitting, without "äöü", cleaned data | WER: 0.811079, CER: 0.518419, loss: 194.365875 |
 | Tuda + Voxforge | without "äöü", checkpoint from english deepspeech, cleaned train and dev data | WER: 0.740130, CER: 0.462036, loss: 156.115921 |
 | Tuda + Voxforge | first tuda then voxforge, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.653841, CER: 0.384577, loss: 159.509476 |
 
