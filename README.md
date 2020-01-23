@@ -42,11 +42,11 @@ docker exec -it deepspeech-german_deep_speech_1 bash    # In a new shell
 
 #### Download and prepare voice data
 
-* [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~108h
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~325h
-* [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~35h
-* [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~386h
-* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~237h
+* [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~506h
+* [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
+* [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
+* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
 
 * Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipline existing
 
@@ -98,7 +98,7 @@ Preparation times using Intel i7-8700K:
 * voxforge: some seconds
 * tuda: some minutes
 * mailabs: ~20min
-* common_voice: ~3h
+* common_voice: ~12h
 * swc: ~6h
 
 #### Create the language model
