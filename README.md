@@ -186,8 +186,8 @@ python3 DeepSpeech.py --train_files data_prepared/voxforge/train.csv --dev_files
 # Or adjust the train.sh file and run a training from scratch without using the english checkpoint:
 /bin/bash deepspeech-german/training/train.sh checkpoints/voxforge/ data_prepared/voxforge/train.csv data_prepared/voxforge/dev.csv data_prepared/voxforge/test.csv 1 0
 
-# Or to run a stepped training as described in the paper, run:
-python3 deepspeech-german/training/stepped_training.py checkpoints/voxforge/ data_prepared/ _azce --voxforge
+# Or to run a cycled training as described in the paper, run:
+python3 deepspeech-german/training/cycled_training.py checkpoints/voxforge/ data_prepared/ _azce --voxforge
 
 
 # Run test only:
@@ -197,7 +197,7 @@ python3 DeepSpeech.py --test_files data_prepared/voxforge/test_az.csv --checkpoi
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. Training until early stop took 22min for 10 epochs. 
 
-One epoch in tuda with batch size of 12 on single gpu needs about 1:15h. With both gpus it takes about 26min. For 10 stepped training with early stops it took about 15h.
+One epoch in tuda with batch size of 12 on single gpu needs about 1:15h. With both gpus it takes about 26min. For 10 cycled training with early stops it took about 15h.
 
 One epoch in mailabs with batch size of 24/12/12 needs about 19min, testing about 21 min. 
 
@@ -234,12 +234,14 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 | Voxforge | checkpoint from english deepspeech, without "äöü" | WER: 0.394064, CER: 0.190184, loss: 49.066357 |
 | Voxforge | checkpoint from english deepspeech, with augmentation, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.338685, CER: 0.150972, loss: 42.031754 |
 | Voxforge | checkpoint from english deepspeech, with augmentation, 4-gram language model, cleaned train and dev data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.345403, CER: 0.151561, loss: 43.307995 |
+| Voxforge | 5 cycled training, checkpoint from english deepspeech, with augmentation, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.335572, CER: 0.150674, loss: 41.277363 |
 | Tuda | without "äöü", cleaned train and dev data | WER: 0.412830, CER: 0.236580, loss: 121.374710 |
 | Tuda | checkpoint from english deepspeech, with augmentation, correct train/dev/test splitting, without "äöü", cleaned data | WER: 0.971418, CER: 0.827650, loss: 331.872253 |
+| Tuda | checkpoint from english deepspeech, with augmentation, correct train/dev/test splitting, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001 | WER: 0.558924, CER: 0.304138, loss: 128.076614 |
 | Tuda | without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.436935, CER: 0.230252, loss: 132.031647 |
 | Tuda | correct train/dev/test splitting, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.683900, CER: 0.394106, loss: 167.296478 |
 | Tuda | with augmentation, correct train/dev/test splitting, without "äöü", cleaned data | WER: 0.811079, CER: 0.518419, loss: 194.365875 |
-| Tuda | 10 stepped training, correct train/dev/test splitting, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001, (best WER 0.684 after 5 steps) | WER: 0.741811, CER: 0.364413, loss: 287.959686 |
+| Tuda | 10 cycled training, correct train/dev/test splitting, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001, (best WER 0.684 after 5 steps) | WER: 0.741811, CER: 0.364413, loss: 287.959686 |
 | Tuda + Voxforge | without "äöü", checkpoint from english deepspeech, cleaned train and dev data | WER: 0.740130, CER: 0.462036, loss: 156.115921 |
 | Tuda + Voxforge | first tuda then voxforge, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.653841, CER: 0.384577, loss: 159.509476 |
 

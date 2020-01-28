@@ -16,7 +16,7 @@ start_with_english_checkpoint = 1
 # ======================================================================================================================
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Combine prepared datasets')
+    parser = argparse.ArgumentParser(description='Run cycled training')
     parser.add_argument('checkpoint_path', type=str)
     parser.add_argument('prepared_data_path', type=str)
     parser.add_argument('data_appendix', type=str)
@@ -47,14 +47,14 @@ if __name__ == '__main__':
     data_train_all = None
     data_dev_all = None
     data_test_all = None
-    data_path_stepped = os.path.join(args.prepared_data_path, "stepped_data")
-    data_train_path_stepped = os.path.join(data_path_stepped, "train.csv")
-    data_dev_path_stepped = os.path.join(data_path_stepped, "dev.csv")
-    data_test_path_stepped = os.path.join(data_path_stepped, "test.csv")
+    data_path_cycled = os.path.join(args.prepared_data_path, "cycled_data")
+    data_train_path_cycled = os.path.join(data_path_cycled, "train.csv")
+    data_dev_path_cycled = os.path.join(data_path_cycled, "dev.csv")
+    data_test_path_cycled = os.path.join(data_path_cycled, "test.csv")
 
-    if (os.path.isdir(data_path_stepped)):
-        shutil.rmtree(data_path_stepped)
-    os.mkdir(data_path_stepped)
+    if (os.path.isdir(data_path_cycled)):
+        shutil.rmtree(data_path_cycled)
+    os.mkdir(data_path_cycled)
 
     # Create dev and test dataset
     for d in datasets:
@@ -76,10 +76,10 @@ if __name__ == '__main__':
     data_dev_all = data_dev_all.iloc[np.random.permutation(len(data_dev_all))]
     data_test_all = data_test_all.iloc[np.random.permutation(len(data_test_all))]
     # And save them to a file
-    data_dev_all.to_csv(data_dev_path_stepped, index=False, encoding='utf-8-sig')
-    data_test_all.to_csv(data_test_path_stepped, index=False, encoding='utf-8-sig')
+    data_dev_all.to_csv(data_dev_path_cycled, index=False, encoding='utf-8-sig')
+    data_test_all.to_csv(data_test_path_cycled, index=False, encoding='utf-8-sig')
 
-    # Run the stepped training
+    # Run the cycled training
     for d in datasets:
         data_train_path = os.path.join(args.prepared_data_path, d, "train" + args.data_appendix + ".csv")
         data_train = pd.read_csv(data_train_path, keep_default_na=False)
@@ -100,10 +100,10 @@ if __name__ == '__main__':
 
             # Shuffle and save as file
             data_train_all = data_train_all.iloc[np.random.permutation(len(data_train_all))]
-            data_train_all.to_csv(data_train_path_stepped, index=False, encoding='utf-8-sig')
+            data_train_all.to_csv(data_train_path_cycled, index=False, encoding='utf-8-sig')
 
             cmd = "/bin/bash deepspeech-german/training/train.sh " + args.checkpoint_path + " " + \
-                  data_train_path_stepped + " " + data_dev_path_stepped + " " + data_test_path_stepped + \
+                  data_train_path_cycled + " " + data_dev_path_cycled + " " + data_test_path_cycled + \
                   " 0 " + str(start_with_english_checkpoint)
 
             if (start_with_english_checkpoint == 1):
