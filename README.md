@@ -161,6 +161,26 @@ except tf.errors.InvalidArgumentError as e:
 
 Add the parameter and the ignored exception in evaluate.py file too (~ lines 73 and 118).
 
+<br/>
+
+To filter the files causing infinite loss:
+
+```
+# Below this lines (DeepSpeech.py ~ line 620):
+
+problem_files = [f.decode('utf8') for f in problem_files[..., 0]]
+log_error('The following files caused an infinite (or NaN) '
+          'loss: {}'.format(','.join(problem_files)))
+
+
+# Add the following to save the files to excluded_files.json and stop training
+
+sys.path.append("/DeepSpeech/deepspeech-german/training/")
+from filter_invalid_files import add_files_to_excluded
+add_files_to_excluded(problem_files)
+sys.exit(1)
+```
+
 #### Training
 
 Download pretrained deepspeech checkpoints.
