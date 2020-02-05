@@ -49,6 +49,7 @@ docker exec -it deepspeech-german_deep_speech_1 bash    # In a new shell
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
 
 * Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipline existing
+* Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
 
 <br/>
 
@@ -103,6 +104,33 @@ Preparation times using Intel i7-8700K:
 * mailabs: ~20min
 * common_voice: ~12h
 * swc: ~6h
+
+<br/>
+
+Download and extract noise data (You have to merge https://github.com/mozilla/DeepSpeech/pull/2622 for that):
+
+```
+cd data_original/noise/
+wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_test.zip?download=1 -O FSDKaggle2019.audio_test.zip
+wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_curated.zip?download=1 -O FSDKaggle2019.audio_train_curated.zip
+wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.z01?download=1 -O FSDKaggle2019.audio_train_noisy.z01
+wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.z02?download=1 -O FSDKaggle2019.audio_train_noisy.z02
+wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.z03?download=1 -O FSDKaggle2019.audio_train_noisy.z03
+wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.z04?download=1 -O FSDKaggle2019.audio_train_noisy.z04
+wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.z05?download=1 -O FSDKaggle2019.audio_train_noisy.z05
+wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.z06?download=1 -O FSDKaggle2019.audio_train_noisy.z06
+wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.zip?download=1 -O FSDKaggle2019.audio_train_noisy.zip
+
+# Merge the seven parts
+zip -s 0 FSDKaggle2019.audio_train_noisy.zip --out unsplit.zip
+
+unzip FSDKaggle2019.audio_test.zip
+unzip FSDKaggle2019.audio_train_curated.zip
+unzip unsplit.zip
+
+rm *.zip
+rm *.z0*
+```
 
 #### Create the language model
 
@@ -256,6 +284,8 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 | Voxforge | checkpoint from english deepspeech, with augmentation, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.338685, CER: 0.150972, loss: 42.031754 |
 | Voxforge | checkpoint from english deepspeech, with augmentation, 4-gram language model, cleaned train and dev data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.345403, CER: 0.151561, loss: 43.307995 |
 | Voxforge | 5 cycled training, checkpoint from english deepspeech, with augmentation, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.335572, CER: 0.150674, loss: 41.277363 |
+| Voxforge | with noise augmentation, batch size 12, checkpoint from english deepspeech, with augmentation, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.357961, CER: 0.164604, loss: 42.993477 |
+| Voxforge |like above, but without noise augmentation | WER: 0.352649, CER: 0.158205, loss: 42.623463 |
 | Tuda | without "äöü", cleaned train and dev data | WER: 0.412830, CER: 0.236580, loss: 121.374710 |
 | Tuda | checkpoint from english deepspeech, with augmentation, correct train/dev/test splitting, without "äöü", cleaned data | WER: 0.971418, CER: 0.827650, loss: 331.872253 |
 | Tuda | checkpoint from english deepspeech, with augmentation, correct train/dev/test splitting, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001 | WER: 0.558924, CER: 0.304138, loss: 128.076614 |

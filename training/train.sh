@@ -33,11 +33,13 @@ if [ "${USE_AUGMENTATION}" = "1" ]; then
                        --augmentation_pitch_and_tempo_scaling_max_pitch 1.2 \
                        --augmentation_pitch_and_tempo_scaling_max_tempo 1.2"
     AUG_SPEC_DROP="--augmentation_spec_dropout_keeprate 0.9"
+    AUG_NOISE="--audio_aug_mix_noise_walk_dirs data_original/noise/"
 else
     AUG_AUDIO=""
     AUG_FREQ_TIME=""
     AUG_PITCH_TEMPO=""
     AUG_SPEC_DROP=""
+    AUG_NOISE=""
 fi;
 
 DSARGS="--train_files ${TRAIN_FILE} \
@@ -61,7 +63,8 @@ DSARGS="--train_files ${TRAIN_FILE} \
         ${AUG_FREQ_TIME} \
         ${AUG_PITCH_TEMPO} \
         ${AUG_SPEC_DROP} \
-        --show_progressbar True"
+        --show_progressbar True \
+        ${AUG_NOISE}"
 
 echo ""
 echo ""

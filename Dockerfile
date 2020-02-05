@@ -13,6 +13,7 @@ RUN pip3 install --no-cache-dir --upgrade \
 RUN pip3 install gast==0.2.2
 
 RUN apt-get update && apt-get install -y file
+RUN apt-get update && apt-get install -y zip
 
 # Install audiomate
 RUN pip3 install git+https://github.com/danbmh/audiomate
