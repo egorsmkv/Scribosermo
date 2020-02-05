@@ -458,5 +458,10 @@
   "/DeepSpeech/data_prepared/swc/audio/00000087_0000001031_1979670_1981700.wav",
   "/DeepSpeech/data_prepared/swc/audio/00000022_0000000029_1918890_1920970.wav",
   "/DeepSpeech/data_prepared/swc/audio/00000119_0000000174_1455440_1456570.wav",
-  "/DeepSpeech/data_prepared/swc/audio/00000028_0000000479_1352940_1355020.wav"
+  "/DeepSpeech/data_prepared/swc/audio/00000028_0000000479_1352940_1355020.wav",
+  "/DeepSpeech/data_prepared/swc/audio/00000434_0000000912_2843440_2847320.wav",
+  "/DeepSpeech/data_prepared/swc/audio/00000100_0000000144_669500_671050.wav",
+  "/DeepSpeech/data_prepared/swc/audio/00000553_0000001097_2131540_2132690.wav",
+  "/DeepSpeech/data_prepared/swc/audio/00000193_0000000421_381470_383040.wav",
+  "/DeepSpeech/data_prepared/swc/audio/00000092_0000000713_489250_490380.wav"
 ]

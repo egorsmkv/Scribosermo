@@ -1,10 +1,8 @@
 FROM mozilla_deep_speech:latest
 ARG DEBIAN_FRONTEND=noninteractive
 
-## Install kenlm
-#RUN git clone https://github.com/kpu/kenlm.git
-#RUN cd kenlm; mkdir -p build
-#RUN cd kenlm/build; cmake ..; make -j `nproc`
+# Update pip
+RUN pip install --upgrade pip
 
 # Install python packages
 RUN pip install --no-cache-dir --upgrade \

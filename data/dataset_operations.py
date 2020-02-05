@@ -13,7 +13,15 @@ import pandas as pd
 replacer = {
     "ä": "ae",
     "ö": "oe",
-    "ü": "ue"
+    "ü": "ue",
+
+    "eins punkt null null null punkt null null null punkt null null null": "eine milliarde",
+    "punkt null null null punkt null null null punkt null null null": "milliarden",
+    "eins punkt null null null punkt null null null": "eine million",
+    "punkt null null null punkt null null null": "millionen",
+    "eins punkt null null null": "ein tausend",
+    "punkt null null null": "tausend",
+    "punkt null": ""
 }
 
 file_path = os.path.dirname(os.path.realpath(__file__)) + "/"

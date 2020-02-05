@@ -50,6 +50,7 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --train_batch_size ${BATCH_SIZE} \
         --dev_batch_size ${BATCH_SIZE} \
         --epochs 100 \
+        --es_steps 4 \
         --learning_rate 0.0001 \
         --dropout_rate 0.25 \
         --use_allow_growth  \

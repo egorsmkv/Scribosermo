@@ -6,7 +6,7 @@ _Original paper code can be found [here](https://github.com/AASHISHAG/deepspeech
 This project aims to develop a working Speech to Text module using [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech), which can be used for any Audio processing pipeline. [Mozillla DeepSpeech](https://github.com/mozilla/DeepSpeech) is a state-of-the-art open-source automatic speech recognition (ASR) toolkit. DeepSpeech is using a model trained by machine learning techniques based on [Baidu's Deep Speech](https://gigaom2.files.wordpress.com/2014/12/deep_speech3_12_17.pdf) research paper. Project DeepSpeech uses Google's TensorFlow to make the implementation easier.
 
 <p align="center">
-    <img src="media/deep-speech-v3-1.png" align="center" title="DeepSpeech Graph" />
+    <img src="media/deep_speech_architecture.png" align="center" title="DeepSpeech Graph" />
 </p>
 
 ## Usage
@@ -83,6 +83,9 @@ python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tu
 
 # Or, which is much faster, but only combining train, dev, test and all csv files, run:
 python3 deepspeech-german/data/combine_datasets.py data_prepared/ --tuda --voxforge
+
+# Or to combine specific csv files:
+python3 deepspeech-german/data/combine_datasets.py "" --files_output data_prepared/tuda-voxforge-swc-mailabs-common_voice/train_mix.csv --files "data_prepared/tuda/train.csv data_prepared/voxforge/all.csv data_prepared/swc/all.csv data_prepared/mailabs/all.csv data_prepared/common_voice/train.csv"
 
 
 # To shuffle and replace "äöü" characters and clean the files run (for all 3 csv files):
@@ -221,11 +224,9 @@ One epoch in tuda with batch size of 12 on single gpu needs about 1:15h. With bo
 
 One epoch in mailabs with batch size of 24/12/12 needs about 19min, testing about 21 min. 
 
-One epoch in common_voice with batch size of 24/12/12 needs about 31min, testing needs the same time. Training with augmentation until early stop took 4:20h for 8 epochs. 
-
 One epoch in swc with batch size of 12/12/12 needs about 1:08h, testing about 17 min.
 
-One epoch with all datasets and batch size of 12 needs about 2:40h, testing about 1:20h.
+One epoch with all datasets and batch size of 12 needs about 2:50h, testing about 1:30h. Training until early stop took 37h for 11 epochs.
 
 ## Results
 
@@ -264,6 +265,7 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 | Tuda | 10 cycled training, correct train/dev/test splitting, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001, (best WER 0.684 after 5 steps) | WER: 0.741811, CER: 0.364413, loss: 287.959686 |
 | Tuda + Voxforge | without "äöü", checkpoint from english deepspeech, cleaned train and dev data | WER: 0.740130, CER: 0.462036, loss: 156.115921 |
 | Tuda + Voxforge | first tuda then voxforge, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.653841, CER: 0.384577, loss: 159.509476 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | checkpoint from english deepspeech, with augmentation, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001 | WER: 0.306061, CER: 0.151266, loss: 33.218510 |
 
 #### Trained Language Model, Trie, Speech Model and Checkpoints
 TODO
