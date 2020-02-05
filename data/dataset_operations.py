@@ -3,10 +3,15 @@
 import argparse
 import json
 import os
+import sys
 
 import librosa
 import numpy as np
 import pandas as pd
+
+file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
+sys.path.append(file_path + '../pre-processing/')
+import text_cleaning
 
 # ======================================================================================================================
 
@@ -145,6 +150,8 @@ if __name__ == '__main__':
         data = data.reindex(np.random.permutation(data.index))
 
     if (args.replace):
+        data["transcript"] = data["transcript"].str.lower()
+        data["transcript"] = data["transcript"].apply(lambda x: text_cleaning.clean_sentence(x))
         data["transcript"] = data["transcript"].replace(replacer, regex=True)
 
     if (args.clean and not args.nostats):

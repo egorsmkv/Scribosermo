@@ -5,3 +5,4 @@
 **.log
 **.tmp
 models/*
+data/google_application_credentials.json

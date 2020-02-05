@@ -5,8 +5,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN pip install --upgrade pip
 
 # Install python packages
-RUN pip install --no-cache-dir --upgrade \
-    num2words
+RUN pip3 install --no-cache-dir --upgrade \
+    num2words \
+    google-cloud-texttospeech
 
 # Fix error: AttributeError: module 'gast' has no attribute 'Num'
 RUN pip3 install gast==0.2.2
