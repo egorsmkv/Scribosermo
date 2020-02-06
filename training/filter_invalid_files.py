@@ -1,13 +1,14 @@
 import json
 import os
 import subprocess
+import time
 
 # ======================================================================================================================
 
 checkpoint_path = "checkpoints/tfsmc/"
-data_train_path = "data_prepared/tuda-voxforge-swc-mailabs-common_voice/all_azce.csv"
-data_dev_path = "data_prepared/voxforge/dev_azce.csv"
-data_test_path = "data_prepared/voxforge/test_azce.csv"
+data_train_path = "data_prepared/tuda-voxforge-swc-mailabs-common_voice/train_azcem.csv"
+data_dev_path = "data_prepared/tuda-voxforge-swc-mailabs-common_voice/dev_azcem.csv"
+data_test_path = "data_prepared/tuda-voxforge-swc-mailabs-common_voice/test_azcem.csv"
 
 exluded_path = os.path.dirname(os.path.realpath(__file__)) + "/../data/excluded_files.json"
 
@@ -34,7 +35,8 @@ def main():
         sp.wait()
 
         # Run training
-        cmd = "/bin/bash deepspeech-german/training/train.sh " + checkpoint_path + " " + \
+        check_path = checkpoint_path + str(int(time.time())) + "/"
+        cmd = "/bin/bash deepspeech-german/training/train.sh " + check_path + " " + \
               data_train_path + " " + data_dev_path + " " + data_test_path + " 0 1"
 
         sp = subprocess.Popen(['/bin/bash', '-c', cmd])

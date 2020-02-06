@@ -465,5 +465,8 @@
     "/DeepSpeech/data_prepared/swc/audio/00000193_0000000421_381470_383040.wav",
     "/DeepSpeech/data_prepared/swc/audio/00000092_0000000713_489250_490380.wav",
     "/DeepSpeech/data_prepared/common_voice/audio/common_voice_de_20204063.wav",
-    "/DeepSpeech/data_prepared/swc/audio/00000106_0000000888_101420_102860.wav"
+    "/DeepSpeech/data_prepared/swc/audio/00000106_0000000888_101420_102860.wav",
+    "/DeepSpeech/data_original/mailabs/by_book/by_book/female/angela_merkel/merkel_alone/wavs/Kanzlerin_15_17_f000019.wav",
+    "/DeepSpeech/data_prepared/swc/audio/00000106_0000000523_1102200_1103230.wav",
+    "/DeepSpeech/data_prepared/swc/audio/00000300_0000000539_148550_149770.wav"
 ]

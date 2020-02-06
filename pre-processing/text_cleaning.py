@@ -5,23 +5,18 @@ import string
 
 import num2words
 
-#
-#   Number patterns
-#
+# ======================================================================================================================
+
+# Number patterns
 int_pattern = re.compile(r'[0-9]+')
 float_pattern = re.compile(r'[0-9]+[,\.][0-9]+')
 
-#
-#   Allowed characters a-zA-Z' äüö
-#
+# Allowed characters a-zA-Z '
 allowed = list(string.ascii_lowercase)
 allowed.append("'")
 allowed.append(' ')
-allowed.extend(list('äöü'))
 
-#
-#   Replacement characters
-#
+# Replacement characters
 replacer = {
     'àáâãåāăąǟǡǻȁȃȧ': 'a',
     'æǣǽ': 'ä',
@@ -46,13 +41,13 @@ replacer = {
     'ýÿŷ': 'y',
     'źżžȥ': 'z',
     'ß': 'ss',
-    '-­': ' '
+    '-­': ' ',
+    'ä': 'ae',
+    'ö': 'oe',
+    'ü': 'ue',
 }
 
-#
-#   Various replacement rules
-#
-
+# Various replacement rules
 special_replacers = {
     ' $ ': 'dollar',
     ' £ ': 'pfund',
@@ -70,9 +65,7 @@ for all, replacement in replacer.items():
         replacements[to_replace] = replacement
 
 
-#
-#   Utils
-#
+# ======================================================================================================================
 
 def replace_symbols(word):
     """ Apply all replacement characters/rules to the given word. """
@@ -83,6 +76,8 @@ def replace_symbols(word):
 
     return result
 
+
+# ======================================================================================================================
 
 def remove_symbols(word):
     """ Remove all symbols that are not allowed. """
@@ -98,6 +93,8 @@ def remove_symbols(word):
 
     return result
 
+
+# ======================================================================================================================
 
 def word_to_num(word):
     """ Replace numbers with their written representation. """
@@ -124,6 +121,8 @@ def word_to_num(word):
     return result
 
 
+# ======================================================================================================================
+
 def get_bad_character(text):
     """ Return all characters in the text that are not allowed. """
     bad_characters = set()
@@ -134,6 +133,8 @@ def get_bad_character(text):
 
     return bad_characters
 
+
+# ======================================================================================================================
 
 def clean_word(word):
     """
@@ -156,6 +157,8 @@ def clean_word(word):
 
     return word
 
+
+# ======================================================================================================================
 
 def clean_sentence(sentence):
     """

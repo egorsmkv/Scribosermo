@@ -46,8 +46,8 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --dev_files ${DEV_FILE} \
         --test_files ${TEST_FILE} \
         --alphabet_config_path deepspeech-german/data/alphabet_az.txt \
-        --lm_trie_path data_prepared/trie_az \
-        --lm_binary_path data_prepared/lm_az.binary \
+        --lm_trie_path data_prepared/trie_azwtd \
+        --lm_binary_path data_prepared/lm_azwtd.binary \
         --test_batch_size ${BATCH_SIZE} \
         --train_batch_size ${BATCH_SIZE} \
         --dev_batch_size ${BATCH_SIZE} \
