@@ -15,6 +15,7 @@ services:
             - ../DeepSpeech/evaluate.py:/DeepSpeech/evaluate.py
             - ../DeepSpeech/util/feeding.py:/DeepSpeech/util/feeding.py
             - ../DeepSpeech/util/evaluate_tools.py:/DeepSpeech/util/evaluate_tools.py
+            - ../DeepSpeech/util/flags.py:/DeepSpeech/util/flags.py
             - ../checkpoints/:/DeepSpeech/checkpoints/
             - ../data_original/:/DeepSpeech/data_original/
             - ../data_prepared/:/DeepSpeech/data_prepared/

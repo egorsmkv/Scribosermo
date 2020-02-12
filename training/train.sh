@@ -1,22 +1,22 @@
 #! /bin/bash
 
 CHECKPOINT_DIR=${1:-"checkpoints/voxforge/"}
-TRAIN_FILE=${2:-"data_prepared/voxforge/train_az.csv"}
-DEV_FILE=${3:-"data_prepared/voxforge/dev_az.csv"}
-TEST_FILE=${4:-"data_prepared/voxforge/test_az.csv"}
+TRAIN_FILE=${2:-"data_prepared/voxforge/train_azce.csv"}
+DEV_FILE=${3:-"data_prepared/voxforge/dev_azce.csv"}
+TEST_FILE=${4:-"data_prepared/voxforge/test_azce.csv"}
 
 DELETE_OLD_CHECKPOINTS=${5:-0}
-START_FROM_ENGLISH_CHECKPOINT=${6:-0}
+START_FROM_CHECKPOINT=${6-"checkpoints/deepspeech-0.6.0-checkpoint/"}
 
 BATCH_SIZE=12
 USE_AUGMENTATION=1
 
-if [ "${DELETE_OLD_CHECKPOINTS}" = "1" ] || [ "${START_FROM_ENGLISH_CHECKPOINT}" = "1" ]; then
+if [ "${DELETE_OLD_CHECKPOINTS}" = "1" ] || [ "${START_FROM_CHECKPOINT}" != "" ]; then
     rm -rf ${CHECKPOINT_DIR}
 fi;
 
-if [ "${START_FROM_ENGLISH_CHECKPOINT}" = "1" ]; then
-    cp -r "checkpoints/deepspeech-0.6.0-checkpoint/" ${CHECKPOINT_DIR}
+if [ "${START_FROM_CHECKPOINT}" != "" ]; then
+    cp -r ${START_FROM_CHECKPOINT} ${CHECKPOINT_DIR}
 fi;
 
 if [ "${USE_AUGMENTATION}" = "1" ]; then
@@ -46,13 +46,12 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --dev_files ${DEV_FILE} \
         --test_files ${TEST_FILE} \
         --alphabet_config_path deepspeech-german/data/alphabet_az.txt \
-        --lm_trie_path data_prepared/trie_azwtd \
-        --lm_binary_path data_prepared/lm_azwtd.binary \
+        --lm_trie_path data_prepared/trie_az \
+        --lm_binary_path data_prepared/lm_az.binary \
         --test_batch_size ${BATCH_SIZE} \
         --train_batch_size ${BATCH_SIZE} \
         --dev_batch_size ${BATCH_SIZE} \
         --epochs 100 \
-        --es_steps 4 \
         --learning_rate 0.0001 \
         --dropout_rate 0.25 \
         --use_allow_growth  \
@@ -63,7 +62,6 @@ DSARGS="--train_files ${TRAIN_FILE} \
         ${AUG_FREQ_TIME} \
         ${AUG_PITCH_TEMPO} \
         ${AUG_SPEC_DROP} \
-        --show_progressbar True \
         ${AUG_NOISE}"
 
 echo ""

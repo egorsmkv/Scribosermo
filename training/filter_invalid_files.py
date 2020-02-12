@@ -6,6 +6,7 @@ import time
 # ======================================================================================================================
 
 checkpoint_path = "checkpoints/tfsmc/"
+pretrained_checkpoint = "checkpoints/deepspeech-0.6.0-checkpoint/"
 data_train_path = "data_prepared/tuda-voxforge-swc-mailabs-common_voice/train_azcem.csv"
 data_dev_path = "data_prepared/tuda-voxforge-swc-mailabs-common_voice/dev_azcem.csv"
 data_test_path = "data_prepared/tuda-voxforge-swc-mailabs-common_voice/test_azcem.csv"
@@ -37,7 +38,7 @@ def main():
         # Run training
         check_path = checkpoint_path + str(int(time.time())) + "/"
         cmd = "/bin/bash deepspeech-german/training/train.sh " + check_path + " " + \
-              data_train_path + " " + data_dev_path + " " + data_test_path + " 0 1"
+              data_train_path + " " + data_dev_path + " " + data_test_path + " 0 " + pretrained_checkpoint
 
         sp = subprocess.Popen(['/bin/bash', '-c', cmd])
         sp.wait()

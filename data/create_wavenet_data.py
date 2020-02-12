@@ -30,7 +30,7 @@ data_directory = "/DeepSpeech/data_original/google_wavenet/"
 audio_path = data_directory + "audio/"
 csv_path = data_directory + "all.csv"
 
-max_allowed_chars = 170000
+max_allowed_chars = 520000
 
 
 # ======================================================================================================================
@@ -85,8 +85,8 @@ if (__name__ == "__main__"):
         text_data = [x.strip() for x in text_data]
 
     # Select only some part of the data
-    line_start = 1000
-    line_end = 2000
+    line_start = 3000
+    line_end = 6000
     text_data = text_data[line_start:line_end]
 
     num_of_chars = sum(len(i) for i in text_data)
