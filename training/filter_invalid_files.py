@@ -5,7 +5,7 @@ import time
 
 # ======================================================================================================================
 
-checkpoint_path = "checkpoints/tfsmc/"
+checkpoint_path = "checkpoints/tvsmc/"
 pretrained_checkpoint = "checkpoints/deepspeech-0.6.0-checkpoint/"
 data_train_path = "data_prepared/tuda-voxforge-swc-mailabs-common_voice/train_azcem.csv"
 data_dev_path = "data_prepared/tuda-voxforge-swc-mailabs-common_voice/dev_azcem.csv"

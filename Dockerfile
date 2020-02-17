@@ -15,6 +15,10 @@ RUN pip3 install gast==0.2.2
 RUN apt-get update && apt-get install -y file
 RUN apt-get update && apt-get install -y zip
 
+# Dependencies for noise normalization
+RUN apt-get update && install -y ffmpeg
+RUN pip install --no-cache-dir --upgrade pydub
+
 # Install audiomate
 RUN pip3 install git+https://github.com/danbmh/audiomate
 

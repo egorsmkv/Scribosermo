@@ -51,6 +51,7 @@ docker exec -it deepspeech-german_deep_speech_1 bash    # In a new shell
 
 * Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipline existing
 * Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
+* Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
 
 <br/>
 
@@ -108,10 +109,12 @@ Preparation times using Intel i7-8700K:
 
 <br/>
 
-Download and extract noise data (You have to merge https://github.com/mozilla/DeepSpeech/pull/2622 for that):
+Download and extract noise data (You have to merge https://github.com/mozilla/DeepSpeech/pull/2622 for that, run in container):
 
 ```
 cd data_original/noise/
+
+# Download freesound data:
 wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_test.zip?download=1 -O FSDKaggle2019.audio_test.zip
 wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_curated.zip?download=1 -O FSDKaggle2019.audio_train_curated.zip
 wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.z01?download=1 -O FSDKaggle2019.audio_train_noisy.z01
@@ -122,7 +125,7 @@ wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.z05
 wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.z06?download=1 -O FSDKaggle2019.audio_train_noisy.z06
 wget https://zenodo.org/record/3612637/files/FSDKaggle2019.audio_train_noisy.zip?download=1 -O FSDKaggle2019.audio_train_noisy.zip
 
-# Merge the seven parts
+# Merge the seven parts:
 zip -s 0 FSDKaggle2019.audio_train_noisy.zip --out unsplit.zip
 
 unzip FSDKaggle2019.audio_test.zip
@@ -131,6 +134,15 @@ unzip unsplit.zip
 
 rm *.zip
 rm *.z0*
+
+# Download rnnoise data:
+wget https://people.xiph.org/~jm/demo/rnnoise/rnnoise_contributions.tar.gz
+tar -xvzf rnnoise_contributions.tar.gz
+rm rnnoise_contributions.tar.gz
+
+# Normalize all the audio files:
+cd /DeepSpeech/
+python deepspeech-german/data/normalize_noise_audio.py --from_dir data_original/noise/ --to_dir data_prepared/noise/ --max_sec 45
 ```
 
 #### Create the language model
@@ -285,7 +297,7 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 | Voxforge | checkpoint from english deepspeech, with augmentation, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.338685, CER: 0.150972, loss: 42.031754 |
 | Voxforge | checkpoint from english deepspeech, with augmentation, 4-gram language model, cleaned train and dev data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.345403, CER: 0.151561, loss: 43.307995 |
 | Voxforge | 5 cycled training, checkpoint from english deepspeech, with augmentation, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.335572, CER: 0.150674, loss: 41.277363 |
-| Voxforge | with noise augmentation, batch size 12, checkpoint from english deepspeech, with augmentation, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.357961, CER: 0.164604, loss: 42.993477 |
+| Voxforge | with noise augmentation (not normalized), batch size 12, checkpoint from english deepspeech, with augmentation, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.357961, CER: 0.164604, loss: 42.993477 |
 | Voxforge | like above, but without noise augmentation | WER: 0.352649, CER: 0.158205, loss: 42.623463 |
 | Voxforge | like above, reduce learning rate on plateau, batch size 48 | WER: 0.316826, CER: 0.126658, loss: 39.371483 |
 | Voxforge | reduce learning rate on plateau, with noise and standard augmentation, checkpoint from english deepspeech, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001, batch size 48 | WER: 0.320507, CER: 0.131948, loss: 39.923031 |
@@ -303,7 +315,7 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 | GoogleWavenet + Voxforge | training on GoogleWavenet, dev and test from Voxforge, reduce learning rate on plateau, with noise and standard augmentation, checkpoint from english deepspeech, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001, batch size 12 | WER: 0.628605, CER: 0.307585, loss: 89.224144 |
 | GoogleWavenet + Voxforge | test checkpoint from english deepspeech with Voxforge test data, batch size 12 | WER: 1.000000, CER: 0.611753, loss: 153.330109 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | checkpoint from english deepspeech, with augmentation, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001 | WER: 0.306061, CER: 0.151266, loss: 33.218510 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | with noise augmentation, test only with Tuda + CommonVoice others completely for training, language model with training transcriptions too, rest like above | WER: 0.330230, CER: 0.181170, loss: 43.302132 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | with noise augmentation (not normalized), test only with Tuda + CommonVoice others completely for training, language model with training transcriptions too, rest like above | WER: 0.330230, CER: 0.181170, loss: 43.302132 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | above checkpoint tested on Tuda only | WER: 0.410886, CER: 0.209664, loss: 90.873703 |
 
 #### Trained Language Model, Trie, Speech Model and Checkpoints
