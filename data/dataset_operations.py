@@ -8,6 +8,8 @@ import sys
 import librosa
 import numpy as np
 import pandas as pd
+import scipy.io.wavfile as wav
+from python_speech_features import mfcc
 
 file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
 sys.path.append(file_path + '../pre-processing/')
@@ -32,6 +34,44 @@ replacer = {
 file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
 with open(file_path + "excluded_files.json") as json_file:
     excluded = json.load(json_file)
+
+
+# ======================================================================================================================
+
+
+def audiofile_to_input_vector(audio_filename, numcep, numcontext):
+    """ Given a WAV audio file at ``audio_filename``, calculates ``numcep`` MFCC features
+    at every 0.01s time step with a window length of 0.025s. Appends ``numcontext``
+    context frames to the left and right of each time step, and returns this data
+    in a numpy array.
+    Taken from: https://github.com/mozilla/DeepSpeech/blob/v0.4.1/util/audio.py
+    """
+
+    fs, audio = wav.read(audio_filename)
+
+    # Get mfcc coefficients
+    features = mfcc(audio, samplerate=fs, numcep=numcep, winlen=0.032, winstep=0.02, winfunc=np.hamming)
+
+    # Add empty initial and final contexts
+    empty_context = np.zeros((numcontext, numcep), dtype=features.dtype)
+    features = np.concatenate((empty_context, features, empty_context))
+
+    return features
+
+
+# ======================================================================================================================
+
+def mfcc_matching_transcript(filename, transcript):
+    n_context = 9
+    aftiv_length = audiofile_to_input_vector(filename, 26, n_context).shape[0]
+
+    # Remove the length of the context frames with were added in audiofile_to_input_vector
+    aftiv_length = aftiv_length - 2 * n_context
+
+    trans_length = len(transcript)
+    is_ok = aftiv_length > trans_length
+
+    return is_ok
 
 
 # ======================================================================================================================
@@ -117,12 +157,13 @@ def clean(data):
 # ======================================================================================================================
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Combine prepared datasets')
+    parser = argparse.ArgumentParser(description='Clean and shuffle datasets')
     parser.add_argument('input_csv_path', type=str)
     parser.add_argument('output_csv_path', type=str)
     parser.add_argument('--shuffle', action='store_true')
     parser.add_argument('--replace', action='store_true')
     parser.add_argument('--clean', action='store_true')
+    parser.add_argument('--mfcc_filter', action='store_true')
     parser.add_argument('--exclude', action='store_true')
     parser.add_argument('--nostats', action='store_true')
     args = parser.parse_args()
@@ -156,6 +197,13 @@ if __name__ == '__main__':
 
     if (args.clean and not args.nostats):
         data = clean(data)
+
+    if (args.mfcc_filter):
+        # Filter files by comparing mfcc features with transcript length
+        # See: https://github.com/AASHISHAG/deepspeech-german/issues/3#issuecomment-590128100
+        length_old = len(data)
+        data = data[data.apply(lambda x: mfcc_matching_transcript(x.wav_filename, x.transcript), axis=1)]
+        print("Excluded", length_old - len(data), "files by comparing mfcc features with transcript length")
 
     if (not args.nostats):
         # Print statistics again, save end size and duration and drop temporary columns
