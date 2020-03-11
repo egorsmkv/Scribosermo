@@ -319,8 +319,8 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 Some results with the current code version: \
 (Default values: batch size 12, dropout 0.25, learning rate 0.0001, without "äöü", cleaned data , checkpoint from english deepspeech, reduce learning rate on plateau, evaluation with scorer and top-500k words)
 
-| Dataset | Additional Infos | Losses | Result | Training epochs of best model |
-|---------|------------------|--------|--------|-------------------------------|
+| Dataset | Additional Infos | Losses | Training epochs of best model | Result |
+|---------|------------------|--------|-------------------------------|--------|
 | Tuda | correct train/dev/test splitting, language model with training transcriptions, with augmentation | Test: 134.608658, Validation: 132.243965 | 7 | WER: 0.546816, CER: 0.274361 |
 | Tuda | above checkpoint tested on full voxforge dataset | Test: 63.265324 | | WER: 0.580528, CER: 0.293526 |
 | GoogleWavenet | language model with training transcriptions, with augmentation | Test: 5.169167, Validation: 4.953885 | 21 | WER: 0.017136, CER: 0.002391 |
