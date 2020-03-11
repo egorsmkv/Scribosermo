@@ -266,6 +266,8 @@ One epoch in swc with batch size of 12/12/12 needs about 1:08h, testing about 17
 
 One epoch with all datasets and batch size of 12 needs about 2:50h, testing about 1:30h. Training until early stop took 37h for 11 epochs.
 
+One epoch with all datasets and only Tuda + CommonVoice as testset needs about 3:30h. Training for 55 epochs took 8d 6h, testing about 1h.
+
 ## Results
 
 Some results from the findings in the paper [German End-to-end Speech Recognition based on DeepSpeech](https://www.researchgate.net/publication/336532830_German_End-to-end_Speech_Recognition_based_on_DeepSpeech):
@@ -286,8 +288,6 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 | Voxforge | | WER: 0.676611, CER: 0.403916, loss: 82.185226 |
 | Voxforge | with augmentation | WER: 0.624573, CER: 0.348618, loss: 74.403786 |
 | Voxforge | without "äöü" | WER: 0.646702, CER: 0.364471, loss: 82.567413 |
-| Voxforge | 5-gram language model, without "äöü" | WER: 0.665490, CER: 0.394863, loss: 82.016052 |
-| Voxforge | 4-gram language model, without "äöü" | WER: 0.642716, CER: 0.376940, loss: 80.501076 |
 | Voxforge | cleaned data, without "äöü" | WER: 0.634828, CER: 0.353037, loss: 81.905258 |
 | Voxforge | above checkpoint, tested on not cleaned data | WER: 0.634556, CER: 0.352879, loss: 81.849220 |
 | Voxforge | checkpoint from english deepspeech, without "äöü" | WER: 0.394064, CER: 0.190184, loss: 49.066357 |
@@ -310,10 +310,26 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 | Tuda + Voxforge | without "äöü", checkpoint from english deepspeech, cleaned train and dev data | WER: 0.740130, CER: 0.462036, loss: 156.115921 |
 | Tuda + Voxforge | first Tuda then Voxforge, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.653841, CER: 0.384577, loss: 159.509476 |
 | GoogleWavenet + Voxforge | training on GoogleWavenet, dev and test from Voxforge, reduce learning rate on plateau, with noise and standard augmentation, checkpoint from english deepspeech, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001, batch size 12 | WER: 0.628605, CER: 0.307585, loss: 89.224144 |
-| GoogleWavenet + Voxforge | test checkpoint from english deepspeech with Voxforge test data, batch size 12 | WER: 1.000000, CER: 0.611753, loss: 153.330109 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | checkpoint from english deepspeech, with augmentation, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001 | WER: 0.306061, CER: 0.151266, loss: 33.218510 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | with noise augmentation (not normalized), test only with Tuda + CommonVoice others completely for training, language model with training transcriptions too, rest like above | WER: 0.330230, CER: 0.181170, loss: 43.302132 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | above checkpoint tested on Tuda only | WER: 0.410886, CER: 0.209664, loss: 90.873703 |
+
+
+
+Some results with the current code version: \
+(Default values: batch size 12, dropout 0.25, learning rate 0.0001, without "äöü", cleaned data , checkpoint from english deepspeech, reduce learning rate on plateau, evaluation with scorer and top-500k words)
+
+| Dataset | Additional Infos | Result | Losses | Training epochs of best model |
+|---------|------------------|--------|--------|-------------------------------|
+| Tuda | correct train/dev/test splitting, language model with training transcriptions, with augmentation | WER: 0.546816, CER: 0.274361 | Test: 134.608658, Validation: 132.243965 | 7 |
+| Tuda | above checkpoint tested on full voxforge dataset | WER: 0.580528, CER: 0.293526 | Test: 63.265324 | |
+| GoogleWavenet | language model with training transcriptions, with augmentation | WER: 0.017136, CER: 0.002391 | Test: 5.169167, Validation: 4.953885 | 21 |
+| GoogleWavenet | above checkpoint tested on full voxforge dataset, language model with training transcriptions | WER: 0.892200, CER: 0.519469 | Test: 141.759476 | |
+| GoogleWavenet | test checkpoint from english deepspeech with full voxforge dataset, language model with training transcriptions | WER: 1.000000, CER: 0.728374 | Test: 160.486893 | |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | test only with Tuda + CommonVoice others completely for training, language model with training transcriptions, with augmentation | WER: 0.190189, CER: 0.091737 | Test: 29.363405, Validation: 23.509546 | 55 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested with 3-gram language model | WER: 0.199709, CER: 0.095318 | Test: 29.363405 | |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested on Tuda only | WER: 0.378379, CER: 0.167380 | Test: 87.074394 | |
+
 
 #### Trained Language Model, Trie, Speech Model and Checkpoints
 TODO
