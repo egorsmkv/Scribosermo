@@ -319,16 +319,16 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 Some results with the current code version: \
 (Default values: batch size 12, dropout 0.25, learning rate 0.0001, without "äöü", cleaned data , checkpoint from english deepspeech, reduce learning rate on plateau, evaluation with scorer and top-500k words)
 
-| Dataset | Additional Infos | Result | Losses | Training epochs of best model |
+| Dataset | Additional Infos | Losses | Result | Training epochs of best model |
 |---------|------------------|--------|--------|-------------------------------|
-| Tuda | correct train/dev/test splitting, language model with training transcriptions, with augmentation | WER: 0.546816, CER: 0.274361 | Test: 134.608658, Validation: 132.243965 | 7 |
-| Tuda | above checkpoint tested on full voxforge dataset | WER: 0.580528, CER: 0.293526 | Test: 63.265324 | |
-| GoogleWavenet | language model with training transcriptions, with augmentation | WER: 0.017136, CER: 0.002391 | Test: 5.169167, Validation: 4.953885 | 21 |
-| GoogleWavenet | above checkpoint tested on full voxforge dataset, language model with training transcriptions | WER: 0.892200, CER: 0.519469 | Test: 141.759476 | |
-| GoogleWavenet | test checkpoint from english deepspeech with full voxforge dataset, language model with training transcriptions | WER: 1.000000, CER: 0.728374 | Test: 160.486893 | |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | test only with Tuda + CommonVoice others completely for training, language model with training transcriptions, with augmentation | WER: 0.190189, CER: 0.091737 | Test: 29.363405, Validation: 23.509546 | 55 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested with 3-gram language model | WER: 0.199709, CER: 0.095318 | Test: 29.363405 | |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested on Tuda only | WER: 0.378379, CER: 0.167380 | Test: 87.074394 | |
+| Tuda | correct train/dev/test splitting, language model with training transcriptions, with augmentation | Test: 134.608658, Validation: 132.243965 | 7 | WER: 0.546816, CER: 0.274361 |
+| Tuda | above checkpoint tested on full voxforge dataset | Test: 63.265324 | | WER: 0.580528, CER: 0.293526 |
+| GoogleWavenet | language model with training transcriptions, with augmentation | Test: 5.169167, Validation: 4.953885 | 21 | WER: 0.017136, CER: 0.002391 |
+| GoogleWavenet | above checkpoint tested on full voxforge dataset, language model with training transcriptions | Test: 141.759476 | | WER: 0.892200, CER: 0.519469 |
+| GoogleWavenet | test checkpoint from english deepspeech with full voxforge dataset, language model with training transcriptions | Test: 160.486893 | | WER: 1.000000, CER: 0.728374 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | test only with Tuda + CommonVoice others completely for training, language model with training transcriptions, with augmentation | Test: 29.363405, Validation: 23.509546 | 55 | WER: 0.190189, CER: 0.091737 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested with 3-gram language model | Test: 29.363405 | | WER: 0.199709, CER: 0.095318 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested on Tuda only | Test: 87.074394 | | WER: 0.378379, CER: 0.167380 |
 
 
 #### Trained Language Model, Trie, Speech Model and Checkpoints
