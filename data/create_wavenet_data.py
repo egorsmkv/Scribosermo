@@ -30,7 +30,7 @@ data_directory = "/DeepSpeech/data_original/google_wavenet/"
 audio_path = data_directory + "audio/"
 csv_path = data_directory + "all.csv"
 
-max_allowed_chars = 520000
+max_allowed_chars = 1000000
 
 
 # ======================================================================================================================
@@ -43,11 +43,14 @@ def download(text, path):
     # Build the voice request
     voice = texttospeech.types.VoiceSelectionParams(
         language_code='de-DE',
-        name=speaker)
+        name=speaker
+    )
 
     # Select the type of audio file you want returned
     audio_config = texttospeech.types.AudioConfig(
-        audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16)
+        audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16,
+        sample_rate_hertz=16000
+    )
 
     # Perform the text-to-speech request
     response = client.synthesize_speech(synthesis_input, voice, audio_config)
@@ -85,8 +88,8 @@ if (__name__ == "__main__"):
         text_data = [x.strip() for x in text_data]
 
     # Select only some part of the data
-    line_start = 3000
-    line_end = 6000
+    line_start = 60000
+    line_end = 60000
     text_data = text_data[line_start:line_end]
 
     num_of_chars = sum(len(i) for i in text_data)

@@ -69,6 +69,7 @@ for all, replacement in replacer.items():
 
 def replace_symbols(word):
     """ Apply all replacement characters/rules to the given word. """
+
     result = word
 
     for to_replace, replacement in replacements.items():
@@ -81,6 +82,7 @@ def replace_symbols(word):
 
 def remove_symbols(word):
     """ Remove all symbols that are not allowed. """
+
     result = word
     bad_characters = []
 
@@ -98,8 +100,8 @@ def remove_symbols(word):
 
 def word_to_num(word):
     """ Replace numbers with their written representation. """
-    result = word
 
+    result = word
     match = float_pattern.search(result)
 
     while match is not None:
@@ -125,6 +127,7 @@ def word_to_num(word):
 
 def get_bad_character(text):
     """ Return all characters in the text that are not allowed. """
+
     bad_characters = set()
 
     for c in text:
@@ -144,6 +147,7 @@ def clean_word(word):
     2. character/rule replacements
     3. delete disallowed symbols
     """
+
     word = word.lower()
     word = word_to_num(word)
     word = replace_symbols(word)
@@ -170,6 +174,7 @@ def clean_sentence(sentence):
     4. delete disallowed symbols
     4. join with spaces
     """
+
     words = sentence.strip().split(' ')
     cleaned_words = []
 

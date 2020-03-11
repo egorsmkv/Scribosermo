@@ -47,7 +47,7 @@ docker exec -it deepspeech-german_deep_speech_1 bash    # In a new shell
 * [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
 * [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
-* GoogleWavenet ~18h, artificial training data generated with the google text to speech service
+* GoogleWavenet ~165h, artificial training data generated with the google text to speech service
 
 * Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipline existing
 * Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
