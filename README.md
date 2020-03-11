@@ -158,15 +158,13 @@ cd my_deepspeech_folder
 python3 deepspeech-german/pre-processing/prepare_vocab.py data_original/German_sentences_8mil_filtered_maryfied.txt data_prepared/clean_vocab.txt
 ```
 
-Build the Language Model with [KenLM](https://github.com/kpu/kenlm.git) (Run in docker container):
-```
-native_client/kenlm/build/bin/lmplz --text data_prepared/clean_vocab.txt --arpa data_prepared/words.arpa --o 3    # Add "-S 50%" to only use 50% of memory
-native_client/kenlm/build/bin/build_binary -T -s data_prepared/words.arpa data_prepared/lm.binary
-```
+Generate scorer (Run in docker container):
+```bash
+mkdir data_prepared/lm/
 
-Build Trie from the generated language model  (Run in docker container):
-```
-native_client/generate_trie deepspeech-german/data/alphabet.txt data_prepared/lm.binary data_prepared/trie
+python3 data/lm/generate_lm.py --input_txt data_prepared/clean_vocab_azwtd.txt --output_dir data_prepared/lm/
+
+python3 data/lm/generate_package.py --alphabet deepspeech-german/data/alphabet_az.txt --lm data_prepared/lm/lm.binary --vocab data_prepared/lm/vocab-500000.txt --package data_prepared/lm/kenlm_azwtd.scorer
 ```
 
 #### Fix some issues
@@ -232,7 +230,7 @@ Download pretrained deepspeech checkpoints.
 ```
 wget https://github.com/mozilla/DeepSpeech/releases/download/v0.6.0/deepspeech-0.6.0-checkpoint.tar.gz -P checkpoints/
 tar xvfz checkpoints/deepspeech-0.6.0-checkpoint.tar.gz -C checkpoints/
-# Don't delete the compressed file, you may need it later for a new training as the uncompressed will be overwritten
+rm checkpoints/deepspeech-0.6.0-checkpoint.tar.gz
 ```
 
 Adjust the parameters to your needs (Run in docker container):
@@ -255,8 +253,7 @@ python3 deepspeech-german/training/cycled_training.py checkpoints/voxforge/ data
 
 
 # Run test only:
-python3 DeepSpeech.py --test_files data_prepared/voxforge/test_az.csv --checkpoint_dir checkpoints/voxforge/ \
---alphabet_config_path deepspeech-german/data/alphabet_az.txt --lm_trie_path data_prepared/trie_az --lm_binary_path data_prepared/lm_az.binary --test_batch_size 48
+python3 DeepSpeech.py --test_files data_prepared/voxforge/test_az.csv --checkpoint_dir checkpoints/voxforge/ --scorer_path data_prepared/lm/kenlm_azwtd.scorer --test_batch_size 12
 ```
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. Training until early stop took 22min for 10 epochs. 

@@ -21,7 +21,7 @@ def add_files_to_excluded(problem_files):
         excluded = json.load(json_file)
     excluded.extend(problem_files)
     with open(exluded_path, "w+") as json_file:
-        json.dump(excluded, json_file, indent=4)
+        json.dump(excluded, json_file, indent=2)
 
 
 # ======================================================================================================================

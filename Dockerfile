@@ -2,7 +2,7 @@ FROM mozilla_deep_speech:latest
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Update pip
-RUN pip install --upgrade pip
+RUN pip3 install --upgrade pip
 
 # Install python packages
 RUN pip3 install --no-cache-dir --upgrade \
@@ -16,8 +16,11 @@ RUN apt-get update && apt-get install -y file
 RUN apt-get update && apt-get install -y zip
 
 # Dependencies for noise normalization
-RUN apt-get update && install -y ffmpeg
+RUN apt-get update && apt-get install -y ffmpeg
 RUN pip install --no-cache-dir --upgrade pydub
+
+# Tool to convert output graph for inference
+RUN python3 util/taskcluster.py --source tensorflow --artifact convert_graphdef_memmapped_format --branch r1.15 --target .
 
 # Install audiomate
 RUN pip3 install git+https://github.com/danbmh/audiomate

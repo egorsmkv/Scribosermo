@@ -11,16 +11,16 @@ START_FROM_CHECKPOINT=${6:-"checkpoints/deepspeech-0.6.0-checkpoint/"}
 BATCH_SIZE=12
 USE_AUGMENTATION=1
 
-if [ "${DELETE_OLD_CHECKPOINTS}" = "1" ] || [ "${START_FROM_CHECKPOINT}" != "" ]; then
+if [[ "${DELETE_OLD_CHECKPOINTS}" = "1" ]] || [[ "${START_FROM_CHECKPOINT}" != "" ]]; then
     rm -rf ${CHECKPOINT_DIR}
     mkdir -p ${CHECKPOINT_DIR}
 fi;
 
-if [ "${START_FROM_CHECKPOINT}" != "" ]; then
+if [[ "${START_FROM_CHECKPOINT}" != "" ]]; then
     cp -a ${START_FROM_CHECKPOINT}"." ${CHECKPOINT_DIR}
 fi;
 
-if [ "${USE_AUGMENTATION}" = "1" ]; then
+if [[ "${USE_AUGMENTATION}" = "1" ]]; then
     AUG_AUDIO="--data_aug_features_additive 0.2 \
                  --data_aug_features_multiplicative 0.2 \
                  --augmentation_speed_up_std 0.2"
@@ -46,9 +46,8 @@ fi;
 DSARGS="--train_files ${TRAIN_FILE} \
         --dev_files ${DEV_FILE} \
         --test_files ${TEST_FILE} \
+        --scorer data_prepared/lm/kenlm_azwtd.scorer
         --alphabet_config_path deepspeech-german/data/alphabet_az.txt \
-        --lm_trie_path data_prepared/trie_az \
-        --lm_binary_path data_prepared/lm_az.binary \
         --test_batch_size ${BATCH_SIZE} \
         --train_batch_size ${BATCH_SIZE} \
         --dev_batch_size ${BATCH_SIZE} \
@@ -56,9 +55,11 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --learning_rate 0.0001 \
         --dropout_rate 0.25 \
         --use_allow_growth  \
-        --use_cudnn_rnn \
+        --train_cudnn \
         --export_dir ${CHECKPOINT_DIR} \
         --checkpoint_dir ${CHECKPOINT_DIR} \
+        --summary_dir ${CHECKPOINT_DIR} \
+        --max_to_keep 3 \
         ${AUG_AUDIO} \
         ${AUG_FREQ_TIME} \
         ${AUG_PITCH_TEMPO} \
@@ -71,3 +72,11 @@ echo "Running training with arguments:" ${DSARGS}
 echo ""
 echo ""
 python3 -u DeepSpeech.py ${DSARGS}
+
+# Convert output graph for inference
+if [[ -f ${CHECKPOINT_DIR}"output_graph.pb" ]]; then
+  echo ""
+  echo "Converting output graph for inference:"
+  echo ""
+  ./convert_graphdef_memmapped_format --in_graph=${CHECKPOINT_DIR}"output_graph.pb" --out_graph=${CHECKPOINT_DIR}"output_graph.pbmm"
+fi;

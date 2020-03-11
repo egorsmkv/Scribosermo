@@ -16,6 +16,8 @@ services:
             - ../DeepSpeech/util/feeding.py:/DeepSpeech/util/feeding.py
             - ../DeepSpeech/util/evaluate_tools.py:/DeepSpeech/util/evaluate_tools.py
             - ../DeepSpeech/util/flags.py:/DeepSpeech/util/flags.py
+            - ../DeepSpeech/data/lm/generate_lm.py:/DeepSpeech/data/lm/generate_lm.py
+            - ../DeepSpeech/data/lm/generate_package.py:/DeepSpeech/data/lm/generate_package.py
             - ../checkpoints/:/DeepSpeech/checkpoints/
             - ../data_original/:/DeepSpeech/data_original/
             - ../data_prepared/:/DeepSpeech/data_prepared/
