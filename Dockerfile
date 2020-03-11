@@ -25,7 +25,4 @@ RUN python3 util/taskcluster.py --source tensorflow --artifact convert_graphdef_
 # Install audiomate
 RUN pip3 install git+https://github.com/danbmh/audiomate
 
-# Using mfcc to find invalid files
-RUN pip3 install --no-cache-dir --upgrade python_speech_features
-
 CMD ["/bin/bash"]
