@@ -123,7 +123,6 @@ if __name__ == '__main__':
     parser.add_argument('--shuffle', action='store_true')
     parser.add_argument('--replace', action='store_true')
     parser.add_argument('--clean', action='store_true')
-    parser.add_argument('--mfcc_filter', action='store_true')
     parser.add_argument('--exclude', action='store_true')
     parser.add_argument('--nostats', action='store_true')
     args = parser.parse_args()
@@ -157,13 +156,6 @@ if __name__ == '__main__':
 
     if (args.clean and not args.nostats):
         data = clean(data)
-
-    if (args.mfcc_filter):
-        # Filter files by comparing mfcc features with transcript length
-        # See: https://github.com/AASHISHAG/deepspeech-german/issues/3#issuecomment-590128100
-        length_old = len(data)
-        data = data[data.apply(lambda x: mfcc_matching_transcript(x.wav_filename, x.transcript), axis=1)]
-        print("Excluded", length_old - len(data), "files by comparing mfcc features with transcript length")
 
     if (not args.nostats):
         # Print statistics again, save end size and duration and drop temporary columns
