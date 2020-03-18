@@ -31,13 +31,11 @@ git clone https://github.com/mozilla/DeepSpeech.git
 docker build -t mozilla_deep_speech DeepSpeech/
 ```
 
-Build, run and connect to our docker container:
+Build and run our docker container:
 ```
-cd deepspeech-german
-docker build -t deep_speech_german .
+docker build -t deep_speech_german deepspeech-german/
 
-docker-compose -f docker-compose.yml up
-docker exec -it deepspeech-german_deep_speech_1 bash    # In a new shell
+./deepspeech-german/run_container.sh
 ```
 
 #### Download and prepare voice data
@@ -49,7 +47,10 @@ docker exec -it deepspeech-german_deep_speech_1 bash    # In a new shell
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
 * GoogleWavenet ~165h, artificial training data generated with the google text to speech service
 
-* Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipline existing
+* Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipeline existing
+* Not used: [Zamia](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~18h
+* Not used: [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~?h
+* Not used: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~?h
 * Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
 * Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
 
@@ -97,7 +98,7 @@ python3 deepspeech-german/data/dataset_operations.py data_prepared/tuda-voxforge
 
 # To split tuda into the correct train, dev and test splits run: 
 # (you will have to rename the [train/dev/test]_s.csv files before combining them with other datasets)
-python3 deepspeech-german/data/split_tuda.py data_prepared/tuda/ _s
+python3 deepspeech-german/data/split_dataset.py data_prepared/tuda/ --tuda --file_appendix _s
 ```
 
 Preparation times using Intel i7-8700K:
@@ -267,6 +268,8 @@ One epoch with all datasets and only Tuda + CommonVoice as testset needs about 3
 
 ## Results
 
+#### Paper
+
 Some results from the findings in the paper [German End-to-end Speech Recognition based on DeepSpeech](https://www.researchgate.net/publication/336532830_German_End-to-end_Speech_Recognition_based_on_DeepSpeech):
 
 - Mozilla 79.7%
@@ -276,9 +279,31 @@ Some results from the findings in the paper [German End-to-end Speech Recognitio
 - Tuda-De+Voxforge 15.1%
 - Tuda-De+Voxforge+Mozilla 21.5%
 
+To test their uploaded checkpoint you have to add a file `best_dev_checkpoint` next to the checkpoint files. 
+Insert following content:
+```text
+model_checkpoint_path: "best_dev-22218"
+all_model_checkpoint_paths: "best_dev-22218"
+``` 
+Switch the DeepSpeech repository back to tag `v0.5.0` and build a new docker image. 
+Don't forget to fix the above issue in _evaluate.py_ again.
+Mount the checkpoint and data directories and run:
+```bash
+python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/voxforge/test_azce.csv --checkpoint_dir /DeepSpeech/checkpoints/dsg05_models/checkpoints/ \
+--alphabet_config_path /DeepSpeech/checkpoints/dsg05_models/alphabet.txt --lm_trie_path /DeepSpeech/checkpoints/dsg05_models/trie --lm_binary_path /DeepSpeech/checkpoints/dsg05_models/lm.binary --test_batch_size 48
+```
+
+| Dataset | Additional Infos | Losses | Training epochs of best model | Result |
+|---------|------------------|--------|-------------------------------|--------|
+| Tuda + CommonVoice | used newer CommonVoice version, there may be overlaps between test and training data because of random splitting | Test: 105.747589 | | WER: 0.683802, CER: 0.386331 |
+| Tuda | correct tuda test split, there may be overlaps between test and training data because of random splitting | Test: 402.696991 | | WER: 0.785655, CER: 0.428786 |
+
+
 <br/>
 
-Some results with the current code version (Default dropout is 0.4, learning rate 0.0005): 
+#### This repo
+
+Some results with some older code version (Default dropout is 0.4, learning rate 0.0005): 
 
 | Dataset | Additional Infos | Result |
 |---------|------------------|--------|
@@ -311,13 +336,15 @@ Some results with the current code version (Default dropout is 0.4, learning rat
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | with noise augmentation (not normalized), test only with Tuda + CommonVoice others completely for training, language model with training transcriptions too, rest like above | WER: 0.330230, CER: 0.181170, loss: 43.302132 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | above checkpoint tested on Tuda only | WER: 0.410886, CER: 0.209664, loss: 90.873703 |
 
-
+<br/>
 
 Some results with the current code version: \
 (Default values: batch size 12, dropout 0.25, learning rate 0.0001, without "äöü", cleaned data , checkpoint from english deepspeech, reduce learning rate on plateau, evaluation with scorer and top-500k words)
 
 | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
 |---------|------------------|--------|-------------------------------|--------|
+| Voxforge | training from scratch, automatic mixed precision, batch size 48 | Test: 75.728592, Validation: 78.673026 | 17 | WER: 0.591745, CER: 0.293495 |
+| Voxforge | batch size 48 | Test: 46.919662, Validation: 50.588260 | 25 | WER: 0.383673, CER: 0.156278 |
 | Tuda | correct train/dev/test splitting, language model with training transcriptions, with augmentation | Test: 134.608658, Validation: 132.243965 | 7 | WER: 0.546816, CER: 0.274361 |
 | Tuda | above checkpoint tested on full voxforge dataset | Test: 63.265324 | | WER: 0.580528, CER: 0.293526 |
 | GoogleWavenet | language model with training transcriptions, with augmentation | Test: 5.169167, Validation: 4.953885 | 21 | WER: 0.017136, CER: 0.002391 |

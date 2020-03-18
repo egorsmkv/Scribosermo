@@ -11,42 +11,45 @@ START_FROM_CHECKPOINT=${6:-"checkpoints/deepspeech-0.6.0-checkpoint/"}
 BATCH_SIZE=12
 USE_AUGMENTATION=1
 
-if [[ "${DELETE_OLD_CHECKPOINTS}" = "1" ]] || [[ "${START_FROM_CHECKPOINT}" != "" ]]; then
-    rm -rf ${CHECKPOINT_DIR}
-    mkdir -p ${CHECKPOINT_DIR}
-fi;
+if [[ "${DELETE_OLD_CHECKPOINTS}" == "1" ]] || [[ "${START_FROM_CHECKPOINT}" != "" ]]; then
+  rm -rf ${CHECKPOINT_DIR}
+  mkdir -p ${CHECKPOINT_DIR}
+fi
 
 if [[ "${START_FROM_CHECKPOINT}" != "" ]]; then
-    cp -a ${START_FROM_CHECKPOINT}"." ${CHECKPOINT_DIR}
-fi;
+  cp -a ${START_FROM_CHECKPOINT}"." ${CHECKPOINT_DIR}
+fi
 
-if [[ "${USE_AUGMENTATION}" = "1" ]]; then
-    AUG_AUDIO="--data_aug_features_additive 0.2 \
+if [[ "${USE_AUGMENTATION}" == "1" ]]; then
+  AUG_AUDIO="--data_aug_features_additive 0.2 \
                  --data_aug_features_multiplicative 0.2 \
                  --augmentation_speed_up_std 0.2"
-    AUG_FREQ_TIME="--augmentation_freq_and_time_masking \
+  AUG_FREQ_TIME="--augmentation_freq_and_time_masking \
                      --augmentation_freq_and_time_masking_freq_mask_range 5 \
                      --augmentation_freq_and_time_masking_number_freq_masks 3 \
                      --augmentation_freq_and_time_masking_time_mask_range 2 \
                      --augmentation_freq_and_time_masking_number_time_masks 3"
-    AUG_PITCH_TEMPO="--augmentation_pitch_and_tempo_scaling \
+  AUG_PITCH_TEMPO="--augmentation_pitch_and_tempo_scaling \
                        --augmentation_pitch_and_tempo_scaling_min_pitch 0.95 \
                        --augmentation_pitch_and_tempo_scaling_max_pitch 1.2 \
                        --augmentation_pitch_and_tempo_scaling_max_tempo 1.2"
-    AUG_SPEC_DROP="--augmentation_spec_dropout_keeprate 0.9"
-    AUG_NOISE="--audio_aug_mix_noise_walk_dirs data_prepared/noise/"
+  AUG_SPEC_DROP="--augmentation_spec_dropout_keeprate 0.9"
+#  AUG_NOISE="--audio_aug_mix_noise_train_dirs_or_files /DeepSpeech/data_prepared/voxforge/train_azce.csv \
+#              --audio_aug_mix_noise_dev_dirs_or_files /DeepSpeech/data_prepared/voxforge/dev_azce.csv \
+#              --audio_aug_mix_noise_test_dirs_or_files /DeepSpeech/data_prepared/voxforge/test_azce.csv"
+  AUG_NOISE=""
 else
-    AUG_AUDIO=""
-    AUG_FREQ_TIME=""
-    AUG_PITCH_TEMPO=""
-    AUG_SPEC_DROP=""
-    AUG_NOISE=""
-fi;
+  AUG_AUDIO=""
+  AUG_FREQ_TIME=""
+  AUG_PITCH_TEMPO=""
+  AUG_SPEC_DROP=""
+  AUG_NOISE=""
+fi
 
 DSARGS="--train_files ${TRAIN_FILE} \
         --dev_files ${DEV_FILE} \
         --test_files ${TEST_FILE} \
-        --scorer data_prepared/lm/kenlm_azwtd.scorer
+        --scorer data_prepared/lm/kenlm_az.scorer
         --alphabet_config_path deepspeech-german/data/alphabet_az.txt \
         --test_batch_size ${BATCH_SIZE} \
         --train_batch_size ${BATCH_SIZE} \
@@ -79,4 +82,4 @@ if [[ -f ${CHECKPOINT_DIR}"output_graph.pb" ]]; then
   echo "Converting output graph for inference:"
   echo ""
   ./convert_graphdef_memmapped_format --in_graph=${CHECKPOINT_DIR}"output_graph.pb" --out_graph=${CHECKPOINT_DIR}"output_graph.pbmm"
-fi;
+fi

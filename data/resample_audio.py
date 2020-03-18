@@ -45,8 +45,7 @@ def main():
 
     tqdm.tqdm.pandas()
 
-    data["wav_filesize"] = data["wav_filename"].progress_apply(
-        lambda x: resample_file(x, audio_dir, args.output_rate))
+    data["wav_filesize"] = data["wav_filename"].progress_apply(lambda x: resample_file(x, audio_dir, args.output_rate))
     data["wav_filename"] = data["wav_filename"].apply(lambda x: input_to_output_path(x, audio_dir))
 
     output_path = os.path.basename(args.input_csv_path)
