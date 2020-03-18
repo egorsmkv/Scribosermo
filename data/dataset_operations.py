@@ -4,10 +4,13 @@ import argparse
 import json
 import os
 import sys
+import time
 
 import librosa
 import numpy as np
 import pandas as pd
+
+from pandarallel import pandarallel
 
 file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
 sys.path.append(file_path + '../pre-processing/')
@@ -15,11 +18,14 @@ import text_cleaning
 
 # ======================================================================================================================
 
-replacer = {
+umlaut_replacers = {
     "ä": "ae",
     "ö": "oe",
     "ü": "ue",
+    "ß": "ss"
+}
 
+replacer = {
     "eins punkt null null null punkt null null null punkt null null null": "eine milliarde",
     "punkt null null null punkt null null null punkt null null null": "milliarden",
     "eins punkt null null null punkt null null null": "eine million",
@@ -29,9 +35,14 @@ replacer = {
     "punkt null": ""
 }
 
+# Combine replacers
+replacer.update(umlaut_replacers)
+
 file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
 with open(file_path + "excluded_files.json") as json_file:
     excluded = json.load(json_file)
+
+pandarallel.initialize()
 
 
 # ======================================================================================================================
@@ -57,8 +68,8 @@ def seconds_to_hours(secs):
 def add_statistics_columns(data):
     """ Create some temporary columns """
 
-    data["duration"] = data.apply(lambda x: get_duration(x.wav_filename), axis=1)
-    data["text_length"] = data.apply(lambda x: len(x.transcript), axis=1)
+    data["duration"] = data.parallel_apply(lambda x: get_duration(x.wav_filename), axis=1)
+    data["text_length"] = data.parallel_apply(lambda x: len(x.transcript), axis=1)
     data["avg_time_per_char"] = data["duration"] / data["text_length"]
 
     return data
@@ -131,6 +142,8 @@ if __name__ == '__main__':
         print("No operation given")
         exit()
 
+    start_time = time.time()
+
     # Keep the german 0 as "null" string
     data = pd.read_csv(args.input_csv_path, keep_default_na=False)
 
@@ -151,7 +164,7 @@ if __name__ == '__main__':
 
     if (args.replace):
         data["transcript"] = data["transcript"].str.lower()
-        data["transcript"] = data["transcript"].apply(lambda x: text_cleaning.clean_sentence(x))
+        data["transcript"] = data["transcript"].parallel_apply(lambda x: text_cleaning.clean_sentence(x))
         data["transcript"] = data["transcript"].replace(replacer, regex=True)
 
     if (args.clean and not args.nostats):
@@ -174,3 +187,5 @@ if __name__ == '__main__':
         print("Your dataset now has {} files and a duration of {} hours\n".format(size_end, seconds_to_hours(time_end)))
 
     data.to_csv(args.output_csv_path, index=False, encoding='utf-8-sig')
+    end_time = time.time()
+    print("Preparation took {} hours\n".format(seconds_to_hours(end_time - start_time)))

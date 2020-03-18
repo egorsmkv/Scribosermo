@@ -22,6 +22,8 @@ from audiomate.corpus import subset
 import text_cleaning
 
 
+# ======================================================================================================================
+
 def clean_transcriptions(corpus):
     for utterance in corpus.utterances.values():
         ll = utterance.label_lists[audiomate.corpus.LL_WORD_TRANSCRIPT]
@@ -30,7 +32,9 @@ def clean_transcriptions(corpus):
             label.value = text_cleaning.clean_sentence(label.value)
 
 
-if __name__ == '__main__':
+# ======================================================================================================================
+
+def main():
     parser = argparse.ArgumentParser(description='Prepare data for training.')
     parser.add_argument('target_path', type=str)
     parser.add_argument('--tuda', type=str)
@@ -84,3 +88,9 @@ if __name__ == '__main__':
 
     deepspeech_writer = io.MozillaDeepSpeechWriter()
     deepspeech_writer.save(merged_corpus, args.target_path)
+
+
+# ======================================================================================================================
+
+if __name__ == '__main__':
+    main()

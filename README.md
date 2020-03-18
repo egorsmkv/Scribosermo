@@ -72,7 +72,7 @@ Prepare datasets, this may take some time (Run in docker container):
 ```
 # Prepare the datasets one by one first to ensure everything is working:
 
-deepspeech-german/pre-processing/run_to_utf_8.sh "../../data_original/voxforge/*/etc/prompts-original"
+./deepspeech-german/pre-processing/run_to_utf_8.sh "/DeepSpeech/data_original/voxforge/*/etc/prompts-original"
 python3 deepspeech-german/pre-processing/prepare_data.py --voxforge data_original/voxforge/  data_prepared/voxforge/
 
 python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tuda/  data_prepared/tuda/
@@ -149,13 +149,10 @@ python deepspeech-german/data/normalize_noise_audio.py --from_dir data_original/
 
 Download and prepare the open-source [German Speech Corpus](http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz):
 ```
-cd data_original
-wget http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz
-gzip -d German_sentences_8mil_filtered_maryfied.txt.gz
+wget http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz -O data_original/sentences.txt.gz
+gzip -d data_original/sentences.txt.gz
 
-
-cd my_deepspeech_folder
-python3 deepspeech-german/pre-processing/prepare_vocab.py data_original/German_sentences_8mil_filtered_maryfied.txt data_prepared/clean_vocab.txt
+python3 deepspeech-german/pre-processing/prepare_vocab.py data_original/sentences.txt data_prepared/clean_vocab_az.txt --replace_umlauts
 ```
 
 Generate scorer (Run in docker container):

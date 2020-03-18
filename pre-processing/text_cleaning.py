@@ -11,10 +11,14 @@ import num2words
 int_pattern = re.compile(r'[0-9]+')
 float_pattern = re.compile(r'[0-9]+[,\.][0-9]+')
 
-# Allowed characters a-zA-Z '
+# Allowed characters a-zA-Z 'äöüß
 allowed = list(string.ascii_lowercase)
 allowed.append("'")
 allowed.append(' ')
+allowed.append('ä')
+allowed.append('ö')
+allowed.append('ü')
+allowed.append('ß')
 
 # Replacement characters
 replacer = {
@@ -40,17 +44,16 @@ replacer = {
     'ŵ': 'w',
     'ýÿŷ': 'y',
     'źżžȥ': 'z',
-    'ß': 'ss',
     '-­': ' ',
-    'ä': 'ae',
-    'ö': 'oe',
-    'ü': 'ue',
 }
 
 # Various replacement rules
 special_replacers = {
-    ' $ ': 'dollar',
-    ' £ ': 'pfund',
+    '€': 'euro',
+    '$': 'dollar',
+    '£': 'pfund',
+    '%': 'prozent',
+    '&': 'und',
     'm³': 'kubikmeter',
     'km²': 'quadratkilometer',
     'm²': 'quadratmeter',
