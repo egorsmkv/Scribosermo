@@ -357,6 +357,6 @@ Some results with the current code version: \
 
 #### Language Model and Checkpoints
 
-Scorer with training transcriptions: [Link](https://megastore.uni-augsburg.de/get/llDtPTBNQ1/kenlm_azwtd.scorer.gz)
-Checkpoints TVSMC training with 0.19 WER: [Link](https://megastore.uni-augsburg.de/get/lseBk3Xk9v/tvsmc_0190_ckpt.tar.gz)
+Scorer with training transcriptions: [Link](https://megastore.uni-augsburg.de/get/llDtPTBNQ1/kenlm_azwtd.scorer.gz) \
+Checkpoints TVSMC training with 0.19 WER: [Link](https://megastore.uni-augsburg.de/get/lseBk3Xk9v/tvsmc_0190_ckpt.tar.gz) \
 Graph model for above checkpoint: [Link](https://megastore.uni-augsburg.de/get/QmFBEI5s4K/tvsmc_graphs.tar.gz)
