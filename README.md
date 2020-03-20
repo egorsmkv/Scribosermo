@@ -243,15 +243,16 @@ python3 DeepSpeech.py --train_files data_prepared/voxforge/train.csv --dev_files
 --alphabet_config_path deepspeech-german/data/alphabet.txt --lm_trie_path data_prepared/trie --lm_binary_path data_prepared/lm.binary --test_batch_size 48 --train_batch_size 48 --dev_batch_size 48 \
 --epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --export_dir deepspeech-german/models --use_allow_growth --use_cudnn_rnn 
 
-# Or adjust the train.sh file and run a training from scratch without using the english checkpoint:
-/bin/bash deepspeech-german/training/train.sh checkpoints/voxforge/ data_prepared/voxforge/train.csv data_prepared/voxforge/dev.csv data_prepared/voxforge/test.csv 1 0
+# Or adjust the train.sh file and run a training using the english checkpoint:
+/bin/bash deepspeech-german/training/train.sh checkpoints/voxforge/ data_prepared/voxforge/train_azce.csv data_prepared/voxforge/dev_azce.csv data_prepared/voxforge/test_azce.csv 1 checkpoints/deepspeech-0.6.0-checkpoint/
 
 # Or to run a cycled training as described in the paper, run:
 python3 deepspeech-german/training/cycled_training.py checkpoints/voxforge/ data_prepared/ _azce --voxforge
 
 
-# Run test only:
-python3 DeepSpeech.py --test_files data_prepared/voxforge/test_az.csv --checkpoint_dir checkpoints/voxforge/ --scorer_path data_prepared/lm/kenlm_azwtd.scorer --test_batch_size 12
+# Run test only (The use_allow_growth flag fixes "cuDNN failed to initialize" error):
+# Don't forget to add the noise augmentation flags if testing with noise
+python3 DeepSpeech.py --test_files data_prepared/voxforge/test_azce.csv --checkpoint_dir checkpoints/voxforge/ --scorer_path data_prepared/lm/kenlm_az.scorer --test_batch_size 12 --use_allow_growth
 ```
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. Training until early stop took 22min for 10 epochs. 
@@ -316,9 +317,6 @@ Some results with some older code version (Default dropout is 0.4, learning rate
 | Voxforge | checkpoint from english deepspeech, with augmentation, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.338685, CER: 0.150972, loss: 42.031754 |
 | Voxforge | checkpoint from english deepspeech, with augmentation, 4-gram language model, cleaned train and dev data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.345403, CER: 0.151561, loss: 43.307995 |
 | Voxforge | 5 cycled training, checkpoint from english deepspeech, with augmentation, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.335572, CER: 0.150674, loss: 41.277363 |
-| Voxforge | with noise augmentation (not normalized), batch size 12, checkpoint from english deepspeech, with augmentation, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.357961, CER: 0.164604, loss: 42.993477 |
-| Voxforge | like above, but without noise augmentation | WER: 0.352649, CER: 0.158205, loss: 42.623463 |
-| Voxforge | like above, reduce learning rate on plateau, batch size 48 | WER: 0.316826, CER: 0.126658, loss: 39.371483 |
 | Voxforge | reduce learning rate on plateau, with noise and standard augmentation, checkpoint from english deepspeech, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001, batch size 48 | WER: 0.320507, CER: 0.131948, loss: 39.923031 |
 | Voxforge | above with learning rate 0.00001 | WER: 0.350903, CER: 0.147837, loss: 43.451263 |
 | Voxforge | above with learning rate 0.001 | WER: 0.518670, CER: 0.252510, loss: 62.927200 |
@@ -333,8 +331,6 @@ Some results with some older code version (Default dropout is 0.4, learning rate
 | Tuda + Voxforge | first Tuda then Voxforge, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.653841, CER: 0.384577, loss: 159.509476 |
 | GoogleWavenet + Voxforge | training on GoogleWavenet, dev and test from Voxforge, reduce learning rate on plateau, with noise and standard augmentation, checkpoint from english deepspeech, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001, batch size 12 | WER: 0.628605, CER: 0.307585, loss: 89.224144 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | checkpoint from english deepspeech, with augmentation, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001 | WER: 0.306061, CER: 0.151266, loss: 33.218510 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | with noise augmentation (not normalized), test only with Tuda + CommonVoice others completely for training, language model with training transcriptions too, rest like above | WER: 0.330230, CER: 0.181170, loss: 43.302132 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above checkpoint tested on Tuda only | WER: 0.410886, CER: 0.209664, loss: 90.873703 |
 
 <br/>
 
@@ -345,6 +341,10 @@ Some results with the current code version: \
 |---------|------------------|--------|-------------------------------|--------|
 | Voxforge | training from scratch, automatic mixed precision, batch size 48 | Test: 75.728592, Validation: 78.673026 | 17 | WER: 0.591745, CER: 0.293495 |
 | Voxforge | batch size 48 | Test: 46.919662, Validation: 50.588260 | 25 | WER: 0.383673, CER: 0.156278 |
+| Voxforge | batch size 36, changed augmentation parameters | Test: 46.309738, Validation: 50.323496 | 12 | WER: 0.343841, CER: 0.134452 |
+| Voxforge | above checkpoint tested with cocktail party augmentation | Test: 118.516922 | | WER: 0.689503, CER: 0.359209 |
+| Voxforge | like above, cocktail party augmentation with same dataset | Test: 53.604279, Validation: 55.484096 | 22 | WER: 0.426425, CER: 0.212265 |
+| Voxforge | above checkpoint tested without cocktail party augmentation | Test: 63.336746 | | WER: 0.431053, CER: 0.249465 |
 | Tuda | correct train/dev/test splitting, language model with training transcriptions, with augmentation | Test: 134.608658, Validation: 132.243965 | 7 | WER: 0.546816, CER: 0.274361 |
 | Tuda | above checkpoint tested on full voxforge dataset | Test: 63.265324 | | WER: 0.580528, CER: 0.293526 |
 | GoogleWavenet | language model with training transcriptions, with augmentation | Test: 5.169167, Validation: 4.953885 | 21 | WER: 0.017136, CER: 0.002391 |
@@ -355,5 +355,8 @@ Some results with the current code version: \
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested on Tuda only | Test: 87.074394 | | WER: 0.378379, CER: 0.167380 |
 
 
-#### Trained Language Model, Trie, Speech Model and Checkpoints
-TODO
+#### Language Model and Checkpoints
+
+Scorer with training transcriptions: [Link](https://megastore.uni-augsburg.de/get/llDtPTBNQ1/kenlm_azwtd.scorer.gz)
+Checkpoints TVSMC training with 0.19 WER: [Link](https://megastore.uni-augsburg.de/get/lseBk3Xk9v/tvsmc_0190_ckpt.tar.gz)
+Graph model for above checkpoint: [Link](https://megastore.uni-augsburg.de/get/QmFBEI5s4K/tvsmc_graphs.tar.gz)

@@ -5,14 +5,15 @@
 #SBATCH --cpus-per-task 64
 #SBATCH --ntasks 1
 #SBATCH --mem 262144
-#SBATCH --time=07:00:00 # Time after which the job will be aborted
+#SBATCH --time=1000:00:00 # Time after which the job will be aborted
 #
-# Actual singularity call with nvidia capabilities, amounted folder and the url to the docker container + python call and script
+# Actual singularity call with nvidia capabilities, amounted folder and call to script
 singularity exec --nv \
--B /cfs/share/cache/db_xds/checkpoints/:/DeepSpeech/checkpoints/ \
--B /cfs/share/cache/db_xds/data_original/:/DeepSpeech/data_original/ \
--B /cfs/share/cache/db_xds/data_prepared/:/DeepSpeech/data_prepared/ \
--B /cfs/share/cache/db_xds/tests/evaluate.py:/DeepSpeech/evaluate.py \
-/cfs/share/cache/db_xds/images/mds05.sif \
-python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/tuda-voxforge-swc-mailabs-common_voice/test_mix.csv --checkpoint_dir /DeepSpeech/checkpoints/dsg05_models/checkpoints/ --alphabet_config_path /DeepSpeech/checkpoints/dsg05_models/alphabet.txt --lm_trie_path /DeepSpeech/checkpoints/dsg05_models/trie --lm_binary_path /DeepSpeech/checkpoints/dsg05_models/lm.binary --test_batch_size 36
-
+  -B /cfs/share/cache/db_xds/checkpoints/:/DeepSpeech/checkpoints/ \
+  -B /cfs/share/cache/db_xds/data_original/:/DeepSpeech/data_original/ \
+  -B /cfs/share/cache/db_xds/data_prepared/:/DeepSpeech/data_prepared/ \
+  -B /cfs/share/cache/db_xds/deepspeech-german/:/DeepSpeech/deepspeech-german/ \
+  -B /cfs/share/cache/db_xds/DeepSpeech/evaluate.py:/DeepSpeech/evaluate.py \
+  -B /cfs/share/cache/db_xds/DeepSpeech/DeepSpeech.py:/DeepSpeech/DeepSpeech.py \
+  /cfs/share/cache/db_xds/images/deep_speech_german.sif \
+  /bin/bash deepspeech-german/training/train.sh checkpoints/voxforge/ data_prepared/voxforge/train_azce.csv data_prepared/voxforge/dev_azce.csv data_prepared/voxforge/test_azce.csv 1 --
