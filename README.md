@@ -46,10 +46,10 @@ docker build -t deep_speech_german deepspeech-german/
 * [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
 * GoogleWavenet ~165h, artificial training data generated with the google text to speech service
+* [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
 
 * Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipeline existing
 * Not used: [Zamia](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~18h
-* Not used: [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~?h
 * Not used: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~?h
 * Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
 * Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
@@ -62,6 +62,7 @@ python3 deepspeech-german/data/download_data.py --tuda data_original/
 python3 deepspeech-german/data/download_data.py --voxforge data_original/
 python3 deepspeech-german/data/download_data.py --mailabs data_original/
 python3 deepspeech-german/data/download_data.py --swc data_original/
+python3 deepspeech-german/data/download_data.py --tatoeba data_original/
 ```
 
 Download common voice dataset: https://voice.mozilla.org/en/datasets \
@@ -80,6 +81,7 @@ python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tu
 python3 deepspeech-german/pre-processing/prepare_data.py --common_voice data_original/common_voice/  data_prepared/common_voice/
 python3 deepspeech-german/pre-processing/prepare_data.py --mailabs data_original/mailabs/  data_prepared/mailabs/
 python3 deepspeech-german/pre-processing/prepare_data.py --swc data_original/swc/  data_prepared/swc/
+python3 deepspeech-german/pre-processing/prepare_data.py --tatoeba data_original/tatoeba/  data_prepared/tatoeba/
 
 
 # To combine multiple datasets run the command as follows:

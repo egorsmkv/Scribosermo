@@ -32,8 +32,13 @@ RUN pip3 install --no-cache-dir pandarallel
 # Upgrade setuptools for tensorboard
 RUN pip3 install --upgrade --no-cache-dir setuptools
 
+# Update pandas version to fix an error
+RUN pip3 install --upgrade --no-cache-dir pandas
+
 # Install audiomate
-#RUN pip3 install git+https://github.com/danbmh/audiomate
-RUN pip3 install --no-cache-dir audiomate
+RUN pip3 install git+https://github.com/danbmh/audiomate.git@show_progress_and_changed_label
+#RUN pip3 install --no-cache-dir audiomate
+
+COPY . /DeepSpeech/deepspeech-german/
 
 CMD ["/bin/bash"]
