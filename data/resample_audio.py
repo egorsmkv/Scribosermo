@@ -50,7 +50,7 @@ def main():
 
     output_path = os.path.basename(args.input_csv_path)
     output_path = os.path.join(args.output_dir_path, output_path)
-    data.to_csv(output_path, index=False, encoding='utf-8-sig')
+    data.to_csv(output_path, index=False, encoding='utf-8')
 
 
 # ======================================================================================================================

@@ -186,6 +186,6 @@ if __name__ == '__main__':
             seconds_to_hours(time_diff), seconds_to_hours(duration_start), time_diff / duration_start * 100))
         print("Your dataset now has {} files and a duration of {} hours\n".format(size_end, seconds_to_hours(time_end)))
 
-    data.to_csv(args.output_csv_path, index=False, encoding='utf-8-sig')
+    data.to_csv(args.output_csv_path, index=False, encoding='utf-8')
     end_time = time.time()
     print("Preparation took {} hours\n".format(seconds_to_hours(end_time - start_time)))

@@ -38,6 +38,6 @@ if __name__ == '__main__':
     print("Length of train, dev and test files:", len(data_train), len(data_dev), len(data_test))
 
     outpath = os.path.dirname(args.all_csv_path)
-    data_train.to_csv(os.path.join(outpath, "train" + args.file_appendix + ".csv"), index=False, encoding='utf-8-sig')
-    data_dev.to_csv(os.path.join(outpath, "dev" + args.file_appendix + ".csv"), index=False, encoding='utf-8-sig')
-    data_test.to_csv(os.path.join(outpath, "test" + args.file_appendix + ".csv"), index=False, encoding='utf-8-sig')
+    data_train.to_csv(os.path.join(outpath, "train" + args.file_appendix + ".csv"), index=False, encoding='utf-8')
+    data_dev.to_csv(os.path.join(outpath, "dev" + args.file_appendix + ".csv"), index=False, encoding='utf-8')
+    data_test.to_csv(os.path.join(outpath, "test" + args.file_appendix + ".csv"), index=False, encoding='utf-8')

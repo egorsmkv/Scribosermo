@@ -51,13 +51,13 @@ if __name__ == '__main__':
         path = os.path.join(args.prepared_data_path, "-".join(datasets), "")
         if not os.path.exists(path):
             os.mkdir(path)
-        combined_csv_train.to_csv(path + "train.csv", index=False, encoding='utf-8-sig')
-        combined_csv_dev.to_csv(path + "dev.csv", index=False, encoding='utf-8-sig')
-        combined_csv_test.to_csv(path + "test.csv", index=False, encoding='utf-8-sig')
-        combined_csv_all.to_csv(path + "all.csv", index=False, encoding='utf-8-sig')
+        combined_csv_train.to_csv(path + "train.csv", index=False, encoding='utf-8')
+        combined_csv_dev.to_csv(path + "dev.csv", index=False, encoding='utf-8')
+        combined_csv_test.to_csv(path + "test.csv", index=False, encoding='utf-8')
+        combined_csv_all.to_csv(path + "all.csv", index=False, encoding='utf-8')
 
     elif (args.files != "" and args.files_output != ""):
         files = args.files.split(" ")
 
         combined_csv = pd.concat([pd.read_csv(f, keep_default_na=False) for f in files])
-        combined_csv.to_csv(args.files_output, index=False, encoding='utf-8-sig')
+        combined_csv.to_csv(args.files_output, index=False, encoding='utf-8')

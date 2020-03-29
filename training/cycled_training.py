@@ -76,8 +76,8 @@ if __name__ == '__main__':
     data_dev_all = data_dev_all.iloc[np.random.permutation(len(data_dev_all))]
     data_test_all = data_test_all.iloc[np.random.permutation(len(data_test_all))]
     # And save them to a file
-    data_dev_all.to_csv(data_dev_path_cycled, index=False, encoding='utf-8-sig')
-    data_test_all.to_csv(data_test_path_cycled, index=False, encoding='utf-8-sig')
+    data_dev_all.to_csv(data_dev_path_cycled, index=False, encoding='utf-8')
+    data_test_all.to_csv(data_test_path_cycled, index=False, encoding='utf-8')
 
     # Run the cycled training
     for d in datasets:
@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
             # Shuffle and save as file
             data_train_all = data_train_all.iloc[np.random.permutation(len(data_train_all))]
-            data_train_all.to_csv(data_train_path_cycled, index=False, encoding='utf-8-sig')
+            data_train_all.to_csv(data_train_path_cycled, index=False, encoding='utf-8')
 
             cmd = "/bin/bash deepspeech-german/training/train.sh " + args.checkpoint_path + " " + \
                   data_train_path_cycled + " " + data_dev_path_cycled + " " + data_test_path_cycled + \
