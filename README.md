@@ -162,9 +162,9 @@ Generate scorer (Run in docker container):
 ```bash
 mkdir data_prepared/lm/
 
-python3 data/lm/generate_lm.py --input_txt data_prepared/clean_vocab_azwtd.txt --output_dir data_prepared/lm/
+python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/clean_vocab_az.txt --output_dir /DeepSpeech/data_prepared/lm/
 
-python3 data/lm/generate_package.py --alphabet deepspeech-german/data/alphabet_az.txt --lm data_prepared/lm/lm.binary --vocab data_prepared/lm/vocab-500000.txt --package data_prepared/lm/kenlm_azwtd.scorer
+python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-german/data/alphabet_az.txt --lm /DeepSpeech/data_prepared/lm/lm.binary --vocab /DeepSpeech/data_prepared/lm/vocab-500000.txt --package /DeepSpeech/data_prepared/lm/kenlm_az.scorer
 ```
 
 #### Fix some issues
@@ -246,7 +246,7 @@ python3 DeepSpeech.py --train_files data_prepared/voxforge/train.csv --dev_files
 --epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --export_dir deepspeech-german/models --use_allow_growth --use_cudnn_rnn 
 
 # Or adjust the train.sh file and run a training using the english checkpoint:
-/bin/bash deepspeech-german/training/train.sh checkpoints/voxforge/ data_prepared/voxforge/train_azce.csv data_prepared/voxforge/dev_azce.csv data_prepared/voxforge/test_azce.csv 1 checkpoints/deepspeech-0.6.0-checkpoint/
+/bin/bash /DeepSpeech/deepspeech-german/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/train_azce.csv /DeepSpeech/data_prepared/voxforge/dev_azce.csv /DeepSpeech/data_prepared/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.6.0-checkpoint/
 
 # Or to run a cycled training as described in the paper, run:
 python3 deepspeech-german/training/cycled_training.py checkpoints/voxforge/ data_prepared/ _azce --voxforge

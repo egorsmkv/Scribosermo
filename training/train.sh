@@ -26,16 +26,16 @@ if [[ "${USE_AUGMENTATION}" == "1" ]]; then
                        --augmentation_pitch_and_tempo_scaling_max_pitch 1.1 \
                        --augmentation_pitch_and_tempo_scaling_max_tempo 1.2"
   AUG_SPEC_DROP="--augmentation_spec_dropout_keeprate 0.9"
-  AUG_NOISE="--audio_aug_mix_noise_train_dirs_or_files /DeepSpeech/data_prepared/voxforge/train_azce.csv \
-                --audio_aug_mix_noise_dev_dirs_or_files /DeepSpeech/data_prepared/voxforge/dev_azce.csv \
-                --audio_aug_mix_noise_test_dirs_or_files /DeepSpeech/data_prepared/voxforge/test_azce.csv \
-                --audio_aug_mix_noise_min_audio_dbfs -5 \
-                --audio_aug_mix_noise_max_audio_dbfs -30 \
-                --audio_aug_mix_noise_min_snr_db 10 \
-                --audio_aug_mix_noise_max_snr_db 30 \
-                --audio_aug_mix_noise_limit_audio_peak_dbfs 7.0 \
-                --audio_aug_mix_noise_limit_noise_peak_dbfs 5.0"
-  #  AUG_NOISE=""
+#  AUG_NOISE="--train_augmentation_files /DeepSpeech/data_prepared/voxforge/train_azce.csv \
+#                --dev_augmentation_files /DeepSpeech/data_prepared/voxforge/dev_azce.csv \
+#                --test_augmentation_files /DeepSpeech/data_prepared/voxforge/test_azce.csv \
+#                --audio_aug_min_audio_dbfs -5 \
+#                --audio_aug_max_audio_dbfs -30 \
+#                --audio_aug_min_snr_db 10 \
+#                --audio_aug_max_snr_db 30 \
+#                --audio_aug_limit_audio_peak_dbfs 7.0 \
+#                --audio_aug_limit_noise_peak_dbfs 3.0"
+  AUG_NOISE=""
   AUG_FREQ_TIME=""
 else
   AUG_PITCH_TEMPO=""
@@ -61,7 +61,7 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --checkpoint_dir ${CHECKPOINT_DIR} \
         --summary_dir ${CHECKPOINT_DIR} \
         --max_to_keep 3 \
-        --augmentation_review_audio_steps 0 \
+        --review_audio_steps 0 \
         --automatic_mixed_precision False \
         ${AUG_FREQ_TIME} \
         ${AUG_PITCH_TEMPO} \

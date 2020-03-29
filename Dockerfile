@@ -1,4 +1,5 @@
-FROM mozilla_deep_speech:latest
+# FROM mozilla_deep_speech:latest
+FROM mds_slurm:latest
 ARG DEBIAN_FRONTEND=noninteractive
 
 # Update pip

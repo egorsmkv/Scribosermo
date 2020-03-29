@@ -1,0 +1,15 @@
+FROM nvcr.io/nvidia/tensorflow:18.10-py3
+WORKDIR /DeepSpeech/
+
+RUN apt-get update && apt-get install -y --no-install-recommends sox
+RUN apt-get update && apt-get install -y --no-install-recommends libsox-dev
+
+RUN pip install --upgrade pip
+RUN pip3 install --upgrade --no-cache-dir setuptools
+COPY ./requirements.txt /DeepSpeech/requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY . /DeepSpeech/
+RUN pip3 install $(python3 /DeepSpeech/util/taskcluster.py --decoder)
+
+CMD ["/bin/bash"]

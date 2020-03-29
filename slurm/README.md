@@ -20,14 +20,37 @@ scancel JOBID
 
 <br/>
 
-#### Use docker images:
+Test gpu availabiltiy (edit run_training.sh and execute follow):
+```bash
+python3 -c "import tensorflow as tf; sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))"
+```
+
+Convert image.sif to sandbox folder (if local /tmp directory is to small). In commands simply exchange image.sif with sandbox directory:
+```bash
+singularity build --sandbox dsgs_sandbox/ deep_speech_german_slurm.sif
+```
+
+
+<br/>
+
+#### Use docker/podman images:
 
 * Install singularity on your local pc: [Instructions](https://sylabs.io/guides/3.5/user-guide/quick_start.html#quick-installation-steps)
 
-* Convert your docker images to compressed singularity images:
+* Build images:
 
     ```bash
-    ./deepspeech-german/slurm/convert_to_sifgz.sh deep_speech_german
+    podman build -f DeepSpeech/Dockerfile_slurm -t mds_slurm DeepSpeech/
+    podman build -t deep_speech_german_slurm deepspeech-german/
+    ```
+
+* Convert your images to compressed singularity images:
+
+    ```bash
+    # docker
+    ./deepspeech-german/slurm/convert_to_sifgz.sh d deep_speech_german_slurm    
+    # podman
+    ./deepspeech-german/slurm/convert_to_sifgz.sh p deep_speech_german_slurm
     ```
   
 * Upload and decompress the singularity image

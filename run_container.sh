@@ -1,7 +1,8 @@
 #! /bin/bash
 
-docker run \
-  --gpus all \
+# Add "--gpus all" to use with docker + gpu (its not working with podman)
+
+podman run \
   --network host \
   --name dsg_container \
   --rm \
@@ -11,10 +12,8 @@ docker run \
   --mount type=bind,src="$(pwd)"/data_prepared/,dst=/DeepSpeech/data_prepared/ \
   --mount type=bind,src="$(pwd)"/DeepSpeech/DeepSpeech.py,dst=/DeepSpeech/DeepSpeech.py \
   --mount type=bind,src="$(pwd)"/DeepSpeech/evaluate.py,dst=/DeepSpeech/evaluate.py \
-  --mount type=bind,src="$(pwd)"/DeepSpeech/util/feeding.py,dst=/DeepSpeech/util/feeding.py \
-  --mount type=bind,src="$(pwd)"/DeepSpeech/util/evaluate_tools.py,dst=/DeepSpeech/util/evaluate_tools.py \
-  --mount type=bind,src="$(pwd)"/DeepSpeech/util/flags.py,dst=/DeepSpeech/util/flags.py \
+  --mount type=bind,src="$(pwd)"/DeepSpeech/util/,dst=/DeepSpeech/util/ \
   --mount type=bind,src="$(pwd)"/DeepSpeech/data/lm/generate_lm.py,dst=/DeepSpeech/data/lm/generate_lm.py \
   --mount type=bind,src="$(pwd)"/DeepSpeech/data/lm/generate_package.py,dst=/DeepSpeech/data/lm/generate_package.py \
-  -it deep_speech_german \
+  -it deep_speech_german_slurm \
   bash
