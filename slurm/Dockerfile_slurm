@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/tensorflow:18.10-py3
+FROM nvcr.io/nvidia/tensorflow:20.03-tf1-py3
 WORKDIR /DeepSpeech/
 
 RUN apt-get update && apt-get install -y --no-install-recommends sox
