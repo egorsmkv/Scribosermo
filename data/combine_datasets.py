@@ -15,6 +15,8 @@ if __name__ == '__main__':
     parser.add_argument('--swc', action='store_true')
     parser.add_argument('--mailabs', action='store_true')
     parser.add_argument('--common_voice', action='store_true')
+    parser.add_argument('--google_wavenet', action='store_true')
+    parser.add_argument('--data_appendix', type=str, default="")
     parser.add_argument('--files', type=str, default="", help="List of files, separated with a space")
     parser.add_argument('--files_output', type=str, default="", help="Output path for combined list of files")
 
@@ -31,15 +33,17 @@ if __name__ == '__main__':
         datasets.append("mailabs")
     if args.common_voice:
         datasets.append("common_voice")
+    if args.google_wavenet:
+        datasets.append("google_wavenet")
 
     if (len(datasets) > 0):
         data_train = []
         data_dev = []
         data_test = []
         for d in datasets:
-            data_train.append(os.path.join(args.prepared_data_path, d, "train.csv"))
-            data_dev.append(os.path.join(args.prepared_data_path, d, "dev.csv"))
-            data_test.append(os.path.join(args.prepared_data_path, d, "test.csv"))
+            data_train.append(os.path.join(args.prepared_data_path, d, "train" + args.data_appendix + ".csv"))
+            data_dev.append(os.path.join(args.prepared_data_path, d, "dev" + args.data_appendix + ".csv"))
+            data_test.append(os.path.join(args.prepared_data_path, d, "test" + args.data_appendix + ".csv"))
 
         # Combine all the files
         combined_csv_train = pd.concat([pd.read_csv(f, keep_default_na=False) for f in data_train])
@@ -51,10 +55,10 @@ if __name__ == '__main__':
         path = os.path.join(args.prepared_data_path, "-".join(datasets), "")
         if not os.path.exists(path):
             os.mkdir(path)
-        combined_csv_train.to_csv(path + "train.csv", index=False, encoding='utf-8')
-        combined_csv_dev.to_csv(path + "dev.csv", index=False, encoding='utf-8')
-        combined_csv_test.to_csv(path + "test.csv", index=False, encoding='utf-8')
-        combined_csv_all.to_csv(path + "all.csv", index=False, encoding='utf-8')
+        combined_csv_train.to_csv(path + "train" + args.data_appendix + ".csv", index=False, encoding='utf-8')
+        combined_csv_dev.to_csv(path + "dev" + args.data_appendix + ".csv", index=False, encoding='utf-8')
+        combined_csv_test.to_csv(path + "test" + args.data_appendix + ".csv", index=False, encoding='utf-8')
+        combined_csv_all.to_csv(path + "all" + args.data_appendix + ".csv", index=False, encoding='utf-8')
 
     elif (args.files != "" and args.files_output != ""):
         files = args.files.split(" ")

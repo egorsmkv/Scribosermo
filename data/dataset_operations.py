@@ -9,7 +9,6 @@ import time
 import librosa
 import numpy as np
 import pandas as pd
-
 from pandarallel import pandarallel
 
 file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
@@ -37,12 +36,6 @@ replacer = {
 
 # Combine replacers
 replacer.update(umlaut_replacers)
-
-file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
-with open(file_path + "excluded_files.json") as json_file:
-    excluded = json.load(json_file)
-
-pandarallel.initialize()
 
 
 # ======================================================================================================================
@@ -127,16 +120,23 @@ def clean(data):
 
 # ======================================================================================================================
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Clean and shuffle datasets')
     parser.add_argument('input_csv_path', type=str)
     parser.add_argument('output_csv_path', type=str)
     parser.add_argument('--shuffle', action='store_true')
+    parser.add_argument('--sort', action='store_true', help='Sort dataset by filesize')
     parser.add_argument('--replace', action='store_true')
     parser.add_argument('--clean', action='store_true')
     parser.add_argument('--exclude', action='store_true')
     parser.add_argument('--nostats', action='store_true')
     args = parser.parse_args()
+
+    pandarallel.initialize()
+
+    file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
+    with open(file_path + "excluded_files.json") as json_file:
+        excluded = json.load(json_file)
 
     if (not (args.shuffle or args.replace or args.clean or args.exclude)):
         print("No operation given")
@@ -161,6 +161,10 @@ if __name__ == '__main__':
 
     if (args.shuffle):
         data = data.reindex(np.random.permutation(data.index))
+
+    if (args.sort):
+        data = data.sort_values("wav_filesize")
+        data = data.reset_index(drop=True)
 
     if (args.replace):
         data["transcript"] = data["transcript"].str.lower()
@@ -189,3 +193,9 @@ if __name__ == '__main__':
     data.to_csv(args.output_csv_path, index=False, encoding='utf-8')
     end_time = time.time()
     print("Preparation took {} hours\n".format(seconds_to_hours(end_time - start_time)))
+
+
+# ======================================================================================================================
+
+if __name__ == '__main__':
+    main()

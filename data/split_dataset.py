@@ -8,7 +8,7 @@ import pandas as pd
 # ======================================================================================================================
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Combine prepared datasets')
+    parser = argparse.ArgumentParser(description='Split dataset into parts')
     parser.add_argument('all_csv_path', type=str)
     parser.add_argument('--file_appendix', type=str, default="")
     parser.add_argument('--tuda', action='store_true', help="Split into correct tuda parts")
@@ -16,7 +16,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Keep the german 0 as "null" string
-    data = pd.read_csv(os.path.join(args.all_csv_path), keep_default_na=False)
+    data = pd.read_csv(args.all_csv_path, keep_default_na=False)
 
     if (args.tuda):
         data_train = data[data["wav_filename"].str.contains("/train/")]
