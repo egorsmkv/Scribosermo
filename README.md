@@ -28,6 +28,9 @@ Clone DeepSpeech and build docker container:
 
 ```
 git clone https://github.com/mozilla/DeepSpeech.git
+# or
+git clone https://github.com/DanBmh/DeepSpeech.git
+
 docker build -t mozilla_deep_speech DeepSpeech/
 ```
 
@@ -95,7 +98,7 @@ python3 deepspeech-german/data/combine_datasets.py "" --files_output data_prepar
 
 
 # To shuffle and replace "äöü" characters and clean the files run (for all 3 csv files):
-python3 deepspeech-german/data/dataset_operations.py data_prepared/tuda-voxforge/train.csv data_prepared/tuda-voxforge/train_azce.csv --replace --shuffle --clean --exclude
+python3 /DeepSpeech/deepspeech-german/data/dataset_operations.py /DeepSpeech/data_prepared/tuda-voxforge/train.csv /DeepSpeech/data_prepared/tuda-voxforge/train_azce.csv --replace --shuffle --clean --exclude
 
 
 # To split tuda into the correct train, dev and test splits run: 
@@ -249,12 +252,12 @@ python3 DeepSpeech.py --train_files data_prepared/voxforge/train.csv --dev_files
 /bin/bash /DeepSpeech/deepspeech-german/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/train_azce.csv /DeepSpeech/data_prepared/voxforge/dev_azce.csv /DeepSpeech/data_prepared/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.6.0-checkpoint/
 
 # Or to run a cycled training as described in the paper, run:
-python3 deepspeech-german/training/cycled_training.py checkpoints/voxforge/ data_prepared/ _azce --voxforge
+python3 /DeepSpeech/deepspeech-german/training/cycled_training.py /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/ _azce --voxforge
 
 
 # Run test only (The use_allow_growth flag fixes "cuDNN failed to initialize" error):
 # Don't forget to add the noise augmentation flags if testing with noise
-python3 DeepSpeech.py --test_files data_prepared/voxforge/test_azce.csv --checkpoint_dir checkpoints/voxforge/ --scorer_path data_prepared/lm/kenlm_az.scorer --test_batch_size 12 --use_allow_growth
+python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/voxforge/test_azce.csv --checkpoint_dir /DeepSpeech/checkpoints/voxforge/ --scorer_path /DeepSpeech/data_prepared/lm/kenlm_az.scorer --alphabet_config_path /DeepSpeech/deepspeech-german/data/alphabet_az.txt --test_batch_size 36 --use_allow_growth
 ```
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. Training until early stop took 22min for 10 epochs. 
@@ -296,17 +299,16 @@ python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/voxforg
 --alphabet_config_path /DeepSpeech/checkpoints/dsg05_models/alphabet.txt --lm_trie_path /DeepSpeech/checkpoints/dsg05_models/trie --lm_binary_path /DeepSpeech/checkpoints/dsg05_models/lm.binary --test_batch_size 48
 ```
 
-| Dataset | Additional Infos | Losses | Training epochs of best model | Result |
-|---------|------------------|--------|-------------------------------|--------|
-| Tuda + CommonVoice | used newer CommonVoice version, there may be overlaps between test and training data because of random splitting | Test: 105.747589 | | WER: 0.683802, CER: 0.386331 |
-| Tuda | correct tuda test split, there may be overlaps between test and training data because of random splitting | Test: 402.696991 | | WER: 0.785655, CER: 0.428786 |
-
+| Dataset | Additional Infos | Losses | Result |
+|---------|------------------|--------|--------|
+| Tuda + CommonVoice | used newer CommonVoice version, there may be overlaps between test and training data because of random splitting | Test: 105.747589 | WER: 0.683802, CER: 0.386331 |
+| Tuda | correct tuda test split, there may be overlaps between test and training data because of random splitting | Test: 402.696991 | WER: 0.785655, CER: 0.428786 |
 
 <br/>
 
 #### This repo
 
-Some results with some older code version (Default dropout is 0.4, learning rate 0.0005): 
+Some results with a old code version (Default dropout is 0.4, learning rate 0.0005): 
 
 | Dataset | Additional Infos | Result |
 |---------|------------------|--------|
@@ -317,44 +319,54 @@ Some results with some older code version (Default dropout is 0.4, learning rate
 | Voxforge | above checkpoint, tested on not cleaned data | WER: 0.634556, CER: 0.352879, loss: 81.849220 |
 | Voxforge | checkpoint from english deepspeech, without "äöü" | WER: 0.394064, CER: 0.190184, loss: 49.066357 |
 | Voxforge | checkpoint from english deepspeech, with augmentation, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.338685, CER: 0.150972, loss: 42.031754 |
-| Voxforge | checkpoint from english deepspeech, with augmentation, 4-gram language model, cleaned train and dev data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.345403, CER: 0.151561, loss: 43.307995 |
-| Voxforge | 5 cycled training, checkpoint from english deepspeech, with augmentation, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.335572, CER: 0.150674, loss: 41.277363 |
 | Voxforge | reduce learning rate on plateau, with noise and standard augmentation, checkpoint from english deepspeech, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001, batch size 48 | WER: 0.320507, CER: 0.131948, loss: 39.923031 |
 | Voxforge | above with learning rate 0.00001 | WER: 0.350903, CER: 0.147837, loss: 43.451263 |
 | Voxforge | above with learning rate 0.001 | WER: 0.518670, CER: 0.252510, loss: 62.927200 |
-| Tuda | without "äöü", cleaned train and dev data | WER: 0.412830, CER: 0.236580, loss: 121.374710 |
-| Tuda | checkpoint from english deepspeech, with augmentation, correct train/dev/test splitting, without "äöü", cleaned data | WER: 0.971418, CER: 0.827650, loss: 331.872253 |
-| Tuda | checkpoint from english deepspeech, with augmentation, correct train/dev/test splitting, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001 | WER: 0.558924, CER: 0.304138, loss: 128.076614 |
-| Tuda | without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.436935, CER: 0.230252, loss: 132.031647 |
-| Tuda | correct train/dev/test splitting, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.683900, CER: 0.394106, loss: 167.296478 |
-| Tuda | with augmentation, correct train/dev/test splitting, without "äöü", cleaned data | WER: 0.811079, CER: 0.518419, loss: 194.365875 |
-| Tuda | 10 cycled training, correct train/dev/test splitting, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001, (best WER 0.684 after 5 steps) | WER: 0.741811, CER: 0.364413, loss: 287.959686 |
 | Tuda + Voxforge | without "äöü", checkpoint from english deepspeech, cleaned train and dev data | WER: 0.740130, CER: 0.462036, loss: 156.115921 |
 | Tuda + Voxforge | first Tuda then Voxforge, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.653841, CER: 0.384577, loss: 159.509476 |
-| GoogleWavenet + Voxforge | training on GoogleWavenet, dev and test from Voxforge, reduce learning rate on plateau, with noise and standard augmentation, checkpoint from english deepspeech, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001, batch size 12 | WER: 0.628605, CER: 0.307585, loss: 89.224144 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | checkpoint from english deepspeech, with augmentation, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001 | WER: 0.306061, CER: 0.151266, loss: 33.218510 |
 
 <br/>
 
-Some results with the current code version: \
-(Default values: batch size 12, dropout 0.25, learning rate 0.0001, without "äöü", cleaned data , checkpoint from english deepspeech, reduce learning rate on plateau, evaluation with scorer and top-500k words)
+Some results with some older code version: \
+(Default values: batch size 12, dropout 0.25, learning rate 0.0001, without "äöü", cleaned data , checkpoint from english deepspeech, early stopping, reduce learning rate on plateau, evaluation with scorer and top-500k words)
 
 | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
 |---------|------------------|--------|-------------------------------|--------|
-| Voxforge | training from scratch, automatic mixed precision, batch size 48 | Test: 75.728592, Validation: 78.673026 | 17 | WER: 0.591745, CER: 0.293495 |
-| Voxforge | batch size 48 | Test: 46.919662, Validation: 50.588260 | 25 | WER: 0.383673, CER: 0.156278 |
-| Voxforge | batch size 36, changed augmentation parameters | Test: 46.309738, Validation: 50.323496 | 12 | WER: 0.343841, CER: 0.134452 |
+| Voxforge | batch size 36 | Test: 46.309738, Validation: 50.323496 | 12 | WER: 0.343841, CER: 0.134452 |
 | Voxforge | above checkpoint tested with cocktail party augmentation | Test: 118.516922 | | WER: 0.689503, CER: 0.359209 |
 | Voxforge | like above, cocktail party augmentation with same dataset | Test: 53.604279, Validation: 55.484096 | 22 | WER: 0.426425, CER: 0.212265 |
 | Voxforge | above checkpoint tested without cocktail party augmentation | Test: 63.336746 | | WER: 0.431053, CER: 0.249465 |
-| Tuda | correct train/dev/test splitting, language model with training transcriptions, with augmentation | Test: 134.608658, Validation: 132.243965 | 7 | WER: 0.546816, CER: 0.274361 |
-| Tuda | above checkpoint tested on full voxforge dataset | Test: 63.265324 | | WER: 0.580528, CER: 0.293526 |
-| GoogleWavenet | language model with training transcriptions, with augmentation | Test: 5.169167, Validation: 4.953885 | 21 | WER: 0.017136, CER: 0.002391 |
-| GoogleWavenet | above checkpoint tested on full voxforge dataset, language model with training transcriptions | Test: 141.759476 | | WER: 0.892200, CER: 0.519469 |
-| GoogleWavenet | test checkpoint from english deepspeech with full voxforge dataset, language model with training transcriptions | Test: 160.486893 | | WER: 1.000000, CER: 0.728374 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice  | test only with Tuda + CommonVoice others completely for training, language model with training transcriptions, with augmentation | Test: 29.363405, Validation: 23.509546 | 55 | WER: 0.190189, CER: 0.091737 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested with 3-gram language model | Test: 29.363405 | | WER: 0.199709, CER: 0.095318 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested on Tuda only | Test: 87.074394 | | WER: 0.378379, CER: 0.167380 |
+
+<br/>
+
+Some results with the current code version: \
+(Default values: batch size 36, dropout 0.25, learning rate 0.0001, without "äöü", cleaned data , checkpoint from english deepspeech, early stopping, reduce learning rate on plateau, evaluation with scorer and top-500k words, data augmentation)
+
+| Dataset | Additional Infos | Losses | Training epochs of best model | Result |
+|---------|------------------|--------|-------------------------------|--------|
+| Voxforge | training from scratch | Test: 79.124008, Validation: 81.982976 | 29 | WER: 0.603879, CER: 0.298139 |
+| Voxforge | | Test: 44.312195, Validation: 47.915317 | 21 | WER: 0.343973, CER: 0.140119 |
+| Voxforge | dropped last layer | Test: 49.844028, Validation: 52.722362 | 21 | WER: 0.389327, CER: 0.170563 |
+| Voxforge | 5 cycled training | Test: 42.973358 | | WER: 0.353841, CER: 0.158554 |
+||
+| Tuda | training from scratch, correct train/dev/test splitting | Test: 149.653427, Validation: 137.645307 | 9 | WER: 0.606629, CER: 0.296630 |
+| Tuda | correct train/dev/test splitting | Test: 103.179092, Validation: 132.243965 | 3 | WER: 0.436074, CER: 0.208135 |
+| Tuda | dropped last layer, correct train/dev/test splitting | Test: 107.047821, Validation: 101.219325 | 6 | WER: 0.431361, CER: 0.195361 |
+| Tuda | dropped last two layers, correct train/dev/test splitting | Test: 110.523621, Validation: 103.844562 | 5 | WER: 0.442421, CER: 0.204504 |
+| Tuda | checkpoint from Voxforge with WER 0.344, correct train/dev/test splitting | Test: 100.846367, Validation: 95.410456 | 3 | WER: 0.416950, CER: 0.198177 |
+| Tuda | 10 cycled training, checkpoint from Voxforge with WER 0.344, correct train/dev/test splitting | Test: 98.007607 | | WER: 0.410520, CER: 0.194091 |
+| Tuda | random dataset splitting, checkpoint from Voxforge with WER 0.344 <br> Important Note: These results are not meaningful, because same transcriptions can occur in train and test set, only recorded with different microphones | Test: 23.322618, Validation: 23.094230 | 27 | WER: 0.090285, CER: 0.036212 |
+||
+| Tuda + GoogleWavenet | added GoogleWavenet to train data, dev/test from Tuda, checkpoint from Voxforge with WER 0.344 | Test: 95.555939,  Validation: 90.392490 | 3 | WER: 0.390291, CER: 0.178549 |
+| Tuda + GoogleWavenet | GoogleWavenet as train data, dev/test from Tuda | Test: 346.486420,  Validation: 326.615474 | 0 | WER: 0.865683, CER: 0.517528 |
+| Tuda + GoogleWavenet | GoogleWavenet as train/dev data, test from Tuda | Test: 477.049591,  Validation: 3.320163 | 23 | WER: 0.923973, CER: 0.601015 |
+| Tuda + GoogleWavenet | above checkpoint tested with GoogleWavenet | Test: 3.406022 | | WER: 0.012919, CER: 0.001724 |
+| Tuda + GoogleWavenet | checkpoint from english deepspeech tested with Tuda | Test: 402.102661 | | WER: 0.985554, CER: 0.752787 |
+| Voxforge + GoogleWavenet | added GoogleWavenet to train data, dev/test from Voxforge | Test: 45.643063,  Validation: 49.620488 | 28 | WER: 0.349552, CER: 0.143108 |
 
 
 #### Language Model and Checkpoints

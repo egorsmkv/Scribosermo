@@ -11,7 +11,7 @@ START_FROM_CHECKPOINT=${6:-"/DeepSpeech/checkpoints/deepspeech-0.6.0-checkpoint/
 BATCH_SIZE=36
 USE_AUGMENTATION=1
 
-if [[ "${DELETE_OLD_CHECKPOINTS}" == "1" ]] || [[ "${START_FROM_CHECKPOINT}" != "" ]]; then
+if [[ "${DELETE_OLD_CHECKPOINTS}" == "1" ]] || [[ "${START_FROM_CHECKPOINT}" != "--" ]]; then
   rm -rf ${CHECKPOINT_DIR}
   mkdir -p ${CHECKPOINT_DIR}
 fi
@@ -52,17 +52,22 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --test_batch_size ${BATCH_SIZE} \
         --train_batch_size ${BATCH_SIZE} \
         --dev_batch_size ${BATCH_SIZE} \
-        --epochs 1 \
+        --epochs 100 \
+        --early_stop True \
+        --es_epochs 7 \
+        --reduce_lr_on_plateau True \
+        --plateau_epochs 3 \
+        --force_initialize_learning_rate True \
         --learning_rate 0.0001 \
         --dropout_rate 0.25 \
         --use_allow_growth  \
+        --drop_source_layers 0 \
         --train_cudnn \
         --export_dir ${CHECKPOINT_DIR} \
         --checkpoint_dir ${CHECKPOINT_DIR} \
         --summary_dir ${CHECKPOINT_DIR} \
         --max_to_keep 3 \
-        --review_audio_steps 0 \
-        --automatic_mixed_precision False \
+        --review_audio_steps 7 \
         ${AUG_FREQ_TIME} \
         ${AUG_PITCH_TEMPO} \
         ${AUG_SPEC_DROP} \

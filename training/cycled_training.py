@@ -11,11 +11,11 @@ import pandas as pd
 # ======================================================================================================================
 
 steps_per_dataset = 5
-start_with_english_checkpoint = 1
+start_with_checkpoint = "/DeepSpeech/checkpoints/deepspeech-0.6.0-checkpoint/"
 
 # ======================================================================================================================
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Run cycled training')
     parser.add_argument('checkpoint_path', type=str)
     parser.add_argument('prepared_data_path', type=str)
@@ -80,10 +80,15 @@ if __name__ == '__main__':
     data_test_all.to_csv(data_test_path_cycled, index=False, encoding='utf-8')
 
     # Run the cycled training
-    for d in datasets:
+    for j, d in enumerate(datasets):
         data_train_path = os.path.join(args.prepared_data_path, d, "train" + args.data_appendix + ".csv")
         data_train = pd.read_csv(data_train_path, keep_default_na=False)
         print("\nStarted to add a new dataset with {} entries".format(len(data_train)))
+
+        # Sort the dataset before splitting and rebuild the index
+        # that the training starts with the shorter samples (easier samples) first
+        data_train = data_train.sort_values("wav_filesize")
+        data_train = data_train.reset_index(drop=True)
 
         for i in range(steps_per_dataset):
             split_size = int(len(data_train) / steps_per_dataset)
@@ -98,17 +103,27 @@ if __name__ == '__main__':
             else:
                 data_train_all = pd.concat([data_train_all, data_train_split])
 
-            # Shuffle and save as file
-            data_train_all = data_train_all.iloc[np.random.permutation(len(data_train_all))]
+            # Sort again and save as file
+            data_train_all = data_train_all.sort_values("wav_filesize")
+            data_train_all = data_train_all.reset_index(drop=True)
             data_train_all.to_csv(data_train_path_cycled, index=False, encoding='utf-8')
 
-            cmd = "/bin/bash deepspeech-german/training/train.sh " + args.checkpoint_path + " " + \
+            cmd = "/bin/bash /DeepSpeech/deepspeech-german/training/train.sh " + args.checkpoint_path + " " + \
                   data_train_path_cycled + " " + data_dev_path_cycled + " " + data_test_path_cycled + \
-                  " 0 " + str(start_with_english_checkpoint)
+                  " 0 " + start_with_checkpoint
 
-            if (start_with_english_checkpoint == 1):
-                start_with_english_checkpoint = 0
+            if (start_with_checkpoint != "--"):
+                start_with_checkpoint = "--"
 
-            print("\nRunning next trainstep with {} training instances".format(len(data_train_all)))
+            # Use echo instead of print to fix incorrect logging order with slurm execution
+            loginfo = "\nDataset {}/{} - Cycle {}/{}".format(j + 1, len(datasets), i, steps_per_dataset)
+            loginfo += "\nRunning next trainstep with {} training samples".format(len(data_train_all))
+            cmd = "echo -e '{}' && ".format(loginfo) + cmd 
             sp = subprocess.Popen(['/bin/bash', '-c', cmd])
             sp.wait()
+
+
+# ======================================================================================================================
+
+if __name__ == '__main__':
+    main()
