@@ -9,19 +9,36 @@ import pandas as pd
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Split dataset into parts')
-    parser.add_argument('all_csv_path', type=str)
+    parser.add_argument('csv_to_split_path', type=str)
     parser.add_argument('--file_appendix', type=str, default="")
     parser.add_argument('--tuda', action='store_true', help="Split into correct tuda parts")
+    parser.add_argument('--common_voice', action='store_true', help="Remove test samples where transcript also in trainset")
     parser.add_argument('--split', type=str, default="", help="Split into parts. Argument usage: --split '70|15|15'")
     args = parser.parse_args()
 
-    # Keep the german 0 as "null" string
-    data = pd.read_csv(args.all_csv_path, keep_default_na=False)
+    if(args.tuda or args.split != ""):
+        # Keep the german 0 as "null" string
+        data = pd.read_csv(args.csv_to_split_path, keep_default_na=False)
 
     if (args.tuda):
         data_train = data[data["wav_filename"].str.contains("/train/")]
         data_dev = data[data["wav_filename"].str.contains("/dev/")]
         data_test = data[data["wav_filename"].str.contains("/test/")]
+
+    elif (args.common_voice):
+        data_test = pd.read_csv(args.csv_to_split_path, keep_default_na=False)
+        data_dev = pd.read_csv(args.csv_to_split_path.replace("test","dev"), keep_default_na=False)
+        data_train = pd.read_csv(args.csv_to_split_path.replace("test","train"), keep_default_na=False)
+
+        # Move samples with same transcription from devset to trainset
+        overlap_td = set(data_train["transcript"]).intersection(data_dev["transcript"])
+        data_train = pd.concat([data_train, data_dev[data_dev["transcript"].isin(overlap_td)]])
+        data_dev = data_dev[~data_dev["transcript"].isin(overlap_td)]
+
+        # Move samples with same transcription from testset to trainset
+        overlap_tt = set(data_train["transcript"]).intersection(data_test["transcript"])
+        data_train = pd.concat([data_train, data_test[data_test["transcript"].isin(overlap_tt)]])
+        data_test = data_test[~data_test["transcript"].isin(overlap_tt)]
 
     elif (args.split != ""):
         splits = [int(s) for s in args.split.split("|")]
@@ -37,7 +54,7 @@ if __name__ == '__main__':
 
     print("Length of train, dev and test files:", len(data_train), len(data_dev), len(data_test))
 
-    outpath = os.path.dirname(args.all_csv_path)
+    outpath = os.path.dirname(args.csv_to_split_path)
     data_train.to_csv(os.path.join(outpath, "train" + args.file_appendix + ".csv"), index=False, encoding='utf-8')
     data_dev.to_csv(os.path.join(outpath, "dev" + args.file_appendix + ".csv"), index=False, encoding='utf-8')
     data_test.to_csv(os.path.join(outpath, "test" + args.file_appendix + ".csv"), index=False, encoding='utf-8')
