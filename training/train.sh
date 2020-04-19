@@ -22,20 +22,30 @@ fi
 
 if [[ "${USE_AUGMENTATION}" == "1" ]]; then
   AUG_PITCH_TEMPO="--augmentation_pitch_and_tempo_scaling \
-                       --augmentation_pitch_and_tempo_scaling_min_pitch 0.98 \
-                       --augmentation_pitch_and_tempo_scaling_max_pitch 1.1 \
-                       --augmentation_pitch_and_tempo_scaling_max_tempo 1.2"
+                   --augmentation_pitch_and_tempo_scaling_min_pitch 0.98 \
+                   --augmentation_pitch_and_tempo_scaling_max_pitch 1.1 \
+                   --augmentation_pitch_and_tempo_scaling_max_tempo 1.2"
   AUG_SPEC_DROP="--augmentation_spec_dropout_keeprate 0.9"
-#  AUG_NOISE="--train_augmentation_files /DeepSpeech/data_prepared/voxforge/train_azce.csv \
-#                --dev_augmentation_files /DeepSpeech/data_prepared/voxforge/dev_azce.csv \
-#                --test_augmentation_files /DeepSpeech/data_prepared/voxforge/test_azce.csv \
-#                --audio_aug_min_audio_dbfs -5 \
-#                --audio_aug_max_audio_dbfs -30 \
-#                --audio_aug_min_snr_db 10 \
-#                --audio_aug_max_snr_db 30 \
-#                --audio_aug_limit_audio_peak_dbfs 7.0 \
-#                --audio_aug_limit_noise_peak_dbfs 3.0"
-  AUG_NOISE=""
+  AUG_NOISE="--train_augmentation_noise_files /DeepSpeech/data_prepared/voxforge/train_azce.csv \
+             --dev_augmentation_noise_files /DeepSpeech/data_prepared/voxforge/dev_azce.csv \
+             --test_augmentation_noise_files /DeepSpeech/data_prepared/voxforge/test_azce.csv \
+             --train_augmentation_speech_files /DeepSpeech/data_prepared/voxforge/train_azce.csv \
+             --dev_augmentation_speech_files /DeepSpeech/data_prepared/voxforge/dev_azce.csv \
+             --test_augmentation_speech_files /DeepSpeech/data_prepared/voxforge/test_azce.csv \
+             --audio_aug_max_audio_dbfs -5 \
+             --audio_aug_min_audio_dbfs -30 \
+             --audio_aug_min_noise_snr_db 3 \
+             --audio_aug_max_noise_snr_db 30 \
+             --audio_aug_min_speech_snr_db 10 \
+             --audio_aug_max_speech_snr_db 30 \
+             --audio_aug_limit_audio_peak_dbfs 7.0 \
+             --audio_aug_limit_noise_peak_dbfs 3.0 \
+             --audio_aug_limit_speech_peak_dbfs 3.0 \
+             --audio_aug_min_n_noises 1 \
+             --audio_aug_max_n_noises 2 \
+             --audio_aug_min_n_speakers 0 \
+             --audio_aug_max_n_speakers 2"
+#  AUG_NOISE=""
   AUG_FREQ_TIME=""
 else
   AUG_PITCH_TEMPO=""

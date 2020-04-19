@@ -1,10 +1,10 @@
 #!/bin/sh
 #SBATCH --partition=gpu # Name of cluster partition; default: big-cpu
-#SBATCH --gres=gpu:8 # Number of GPUs to allocate
+#SBATCH --gres=gpu:4 # Number of GPUs to allocate
 #SBATCH --job-name DSG # Job Name
-#SBATCH --cpus-per-task 64
+#SBATCH --cpus-per-task 36
 #SBATCH --ntasks 1
-#SBATCH --mem 262144
+#SBATCH --mem 128000
 #SBATCH --time=1000:00:00 # Time after which the job will be aborted
 #
 #

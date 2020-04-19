@@ -25,7 +25,7 @@ else
 fi
 
 echo "Compressing singularity image ..."
-gzip -9 "$2".sif
+gzip -9 -f "$2".sif
 
 echo "Deleting tmp files ..."
 rm -rf /tmp/sing/

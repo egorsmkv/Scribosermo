@@ -165,9 +165,9 @@ Generate scorer (Run in docker container):
 ```bash
 mkdir data_prepared/lm/
 
-python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/clean_vocab_az.txt --output_dir /DeepSpeech/data_prepared/lm/
+python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/clean_vocab_az.txt --output_dir /DeepSpeech/data_prepared/lm/ --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie
 
-python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-german/data/alphabet_az.txt --lm /DeepSpeech/data_prepared/lm/lm.binary --vocab /DeepSpeech/data_prepared/lm/vocab-500000.txt --package /DeepSpeech/data_prepared/lm/kenlm_az.scorer
+python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-german/data/alphabet_az.txt --lm /DeepSpeech/data_prepared/lm/lm.binary --vocab /DeepSpeech/data_prepared/lm/vocab-500000.txt --package /DeepSpeech/data_prepared/lm/kenlm_az.scorer --default_alpha 0.75 --default_beta 1.85
 ```
 
 #### Fix some issues
@@ -350,6 +350,7 @@ Some results with the current code version: \
 |---------|------------------|--------|-------------------------------|--------|
 | Voxforge | training from scratch | Test: 79.124008, Validation: 81.982976 | 29 | WER: 0.603879, CER: 0.298139 |
 | Voxforge | | Test: 44.312195, Validation: 47.915317 | 21 | WER: 0.343973, CER: 0.140119 |
+| Voxforge | without reduce learning rate on plateau | Test: 46.160049, Validation: 48.926518 | 13 | WER: 0.367125, CER: 0.163931 |
 | Voxforge | dropped last layer | Test: 49.844028, Validation: 52.722362 | 21 | WER: 0.389327, CER: 0.170563 |
 | Voxforge | 5 cycled training | Test: 42.973358 | | WER: 0.353841, CER: 0.158554 |
 ||
@@ -361,13 +362,20 @@ Some results with the current code version: \
 | Tuda | 10 cycled training, checkpoint from Voxforge with WER 0.344, correct train/dev/test splitting | Test: 98.007607 | | WER: 0.410520, CER: 0.194091 |
 | Tuda | random dataset splitting, checkpoint from Voxforge with WER 0.344 <br> Important Note: These results are not meaningful, because same transcriptions can occur in train and test set, only recorded with different microphones | Test: 23.322618, Validation: 23.094230 | 27 | WER: 0.090285, CER: 0.036212 |
 ||
+| CommonVoice | checkpoint from Tuda with WER 0.417 | Test: 24.688297, Validation: 17.460029 | 35 | WER: 0.217124, CER: 0.085427 |
+| CommonVoice | above tested with reduced testset where transcripts occurring in trainset were removed,  | Test: 33.376812 |  | WER: 0.211668, CER: 0.079157 |
+| CommonVoice + GoogleWavenet | above tested with GoogleWavenet | Test: 17.653290 | | WER: 0.035807, CER: 0.007342 |
+| CommonVoice | checkpoint from Voxforge with WER 0.344 | Test: 23.460932, Validation: 16.641201 | 35 | WER: 0.215584, CER: 0.084932 |
+| CommonVoice | dropped last layer | Test: 24.480028, Validation: 17.505738 | 36 | WER: 0.220435, CER: 0.086921 |
+||
 | Tuda + GoogleWavenet | added GoogleWavenet to train data, dev/test from Tuda, checkpoint from Voxforge with WER 0.344 | Test: 95.555939,  Validation: 90.392490 | 3 | WER: 0.390291, CER: 0.178549 |
 | Tuda + GoogleWavenet | GoogleWavenet as train data, dev/test from Tuda | Test: 346.486420,  Validation: 326.615474 | 0 | WER: 0.865683, CER: 0.517528 |
 | Tuda + GoogleWavenet | GoogleWavenet as train/dev data, test from Tuda | Test: 477.049591,  Validation: 3.320163 | 23 | WER: 0.923973, CER: 0.601015 |
 | Tuda + GoogleWavenet | above checkpoint tested with GoogleWavenet | Test: 3.406022 | | WER: 0.012919, CER: 0.001724 |
 | Tuda + GoogleWavenet | checkpoint from english deepspeech tested with Tuda | Test: 402.102661 | | WER: 0.985554, CER: 0.752787 |
-| Voxforge + GoogleWavenet | added GoogleWavenet to train data, dev/test from Voxforge | Test: 45.643063,  Validation: 49.620488 | 28 | WER: 0.349552, CER: 0.143108 |
-
+| Voxforge + GoogleWavenet | added all of GoogleWavenet to train data, dev/test from Voxforge | Test: 45.643063,  Validation: 49.620488 | 28 | WER: 0.349552, CER: 0.143108 |
+| CommonVoice + GoogleWavenet | added all of GoogleWavenet to train data, dev/test from CommonVoice | Test: 25.029057,  Validation: 17.511973 | 35 | WER: 0.214689, CER: 0.084206 |
+| CommonVoice + GoogleWavenet | above tested with reduced testset | Test: 34.191067 | | WER: 0.213164, CER: 0.079121 |
 
 #### Language Model and Checkpoints
 
