@@ -19,7 +19,7 @@ COPY . /DeepSpeech/
 RUN pip3 install --no-cache-dir /DeepSpeech/
 
 # Tool to convert output graph for inference
-RUN python3 /DeepSpeech/util/taskcluster.py --source tensorflow --artifact convert_graphdef_memmapped_format --branch r1.15 --target .
+RUN python3 /DeepSpeech/util/taskcluster.py --source tensorflow --artifact convert_graphdef_memmapped_format --branch r1.15 --target /DeepSpeech/
 
 WORKDIR /DeepSpeech/
 CMD ["/bin/bash"]
