@@ -24,14 +24,15 @@ my_deepspeech_folder
     deepspeech-german    <- This repositiory
 ```
 
-Clone DeepSpeech and build docker container:
+Clone DeepSpeech and build container:
 
 ```bash
 git clone https://github.com/mozilla/DeepSpeech.git
 # or
 git clone https://github.com/DanBmh/DeepSpeech.git
 
-docker build -t mozilla_deep_speech DeepSpeech/
+cd DeepSpeech && make Dockerfile.train && cd ..
+docker build -f DeepSpeech/Dockerfile.train -t mozilla_deep_speech DeepSpeech/
 ```
 
 Build and run our docker container:
@@ -97,7 +98,7 @@ python3 deepspeech-german/preprocessing/combine_datasets.py data_prepared/ --tud
 python3 deepspeech-german/preprocessing/combine_datasets.py "" --files_output data_prepared/tuda-voxforge-swc-mailabs-common_voice/train_mix.csv --files "data_prepared/tuda/train.csv data_prepared/voxforge/all.csv data_prepared/swc/all.csv data_prepared/mailabs/all.csv data_prepared/common_voice/train.csv"
 
 
-# To shuffle and replace "äöü" characters and clean the files run (for all 3 csv files):
+# To shuffle and replace "äöü" characters and clean the files run (repeat for all 3 csv files):
 python3 /DeepSpeech/deepspeech-german/preprocessing/dataset_operations.py /DeepSpeech/data_prepared/tuda-voxforge/train.csv /DeepSpeech/data_prepared/tuda-voxforge/train_azce.csv --replace --shuffle --clean --exclude
 
 

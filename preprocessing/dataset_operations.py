@@ -139,9 +139,10 @@ def main():
     args = parser.parse_args()
 
     pandarallel.initialize()
+    print("This may take a few minutes ... ")
 
     file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
-    with open(file_path + "excluded_files.json") as json_file:
+    with open(file_path + "../data/excluded_files.json") as json_file:
         excluded = json.load(json_file)
 
     if not (args.shuffle or args.replace or args.clean or args.exclude):

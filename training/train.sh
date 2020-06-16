@@ -6,10 +6,10 @@ DEV_FILE=${3:-"/DeepSpeech/data_prepared/voxforge/dev_azce.csv"}
 TEST_FILE=${4:-"/DeepSpeech/data_prepared/voxforge/test_azce.csv"}
 
 DELETE_OLD_CHECKPOINTS=${5:-0}
-START_FROM_CHECKPOINT=${6:-"/DeepSpeech/checkpoints/deepspeech-0.6.0-checkpoint/"}
+START_FROM_CHECKPOINT=${6:-"/DeepSpeech/checkpoints/deepspeech-0.7.3-checkpoint/"}
 
-BATCH_SIZE=60
-USE_AUGMENTATION=1
+BATCH_SIZE=36
+USE_AUGMENTATION=0
 
 if [[ "${DELETE_OLD_CHECKPOINTS}" == "1" ]] || [[ "${START_FROM_CHECKPOINT}" != "--" ]]; then
   rm -rf ${CHECKPOINT_DIR}
@@ -27,36 +27,15 @@ if [[ "${USE_AUGMENTATION}" == "1" ]]; then
                    --augmentation_pitch_and_tempo_scaling_max_tempo 1.2"
   AUG_ADD_DROP="--data_aug_features_additive 0.2 \
                 --augmentation_spec_dropout_keeprate 0.95"
-  AUG_NOISE="--train_augmentation_noise_files /DeepSpeech/data_prepared/voxforge/train_azce.csv \
-             --dev_augmentation_noise_files /DeepSpeech/data_prepared/voxforge/dev_azce.csv \
-             --test_augmentation_noise_files /DeepSpeech/data_prepared/voxforge/test_azce.csv \
-             --train_augmentation_speech_files /DeepSpeech/data_prepared/voxforge/train_azce.csv \
-             --dev_augmentation_speech_files /DeepSpeech/data_prepared/voxforge/dev_azce.csv \
-             --test_augmentation_speech_files /DeepSpeech/data_prepared/voxforge/test_azce.csv \
-             --audio_aug_max_audio_dbfs -5 \
-             --audio_aug_min_audio_dbfs -40 \
-             --audio_aug_min_noise_snr_db 3 \
-             --audio_aug_max_noise_snr_db 30 \
-             --audio_aug_min_speech_snr_db 10 \
-             --audio_aug_max_speech_snr_db 30 \
-             --audio_aug_limit_audio_peak_dbfs 3.0 \
-             --audio_aug_limit_noise_peak_dbfs 1.0 \
-             --audio_aug_limit_speech_peak_dbfs 1.0 \
-             --audio_aug_min_n_noises 0 \
-             --audio_aug_max_n_noises 2 \
-             --audio_aug_min_n_speakers 0 \
-             --audio_aug_max_n_speakers 2"
   AUG_FREQ_TIME="--augmentation_freq_and_time_masking True"
 
   #  Easy disabling of single flags only
   #  AUG_ADD_DROP=""
-  #  AUG_NOISE=""
   #  AUG_FREQ_TIME=""
   #  AUG_PITCH_TEMPO=""
 else
   AUG_PITCH_TEMPO=""
   AUG_ADD_DROP=""
-  AUG_NOISE=""
   AUG_FREQ_TIME=""
 fi
 
@@ -83,11 +62,9 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --checkpoint_dir ${CHECKPOINT_DIR} \
         --summary_dir ${CHECKPOINT_DIR} \
         --max_to_keep 3 \
-        --review_audio_steps 7 \
         ${AUG_FREQ_TIME} \
         ${AUG_PITCH_TEMPO} \
-        ${AUG_ADD_DROP} \
-        ${AUG_NOISE}"
+        ${AUG_ADD_DROP}"
 
 echo ""
 echo ""

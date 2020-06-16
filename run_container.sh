@@ -1,14 +1,13 @@
 #! /bin/bash
 
-# Add "--gpus all" to use with docker + gpu (its not working with podman)
-
-podman run \
-  --network host \
+docker run \
+  --network host --rm -it \
   --name dsg_container \
-  --rm \
-  --mount type=bind,src="$(pwd)"/deepspeech-german/,dst=/DeepSpeech/deepspeech-german/ \
-  --mount type=bind,src="$(pwd)"/checkpoints/,dst=/DeepSpeech/checkpoints/ \
-  --mount type=bind,src="$(pwd)"/data_original/,dst=/DeepSpeech/data_original/ \
-  --mount type=bind,src="$(pwd)"/data_prepared/,dst=/DeepSpeech/data_prepared/ \
-  -it deep_speech_german_slurm \
+  --gpus all --privileged --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 \
+  --volume `pwd`/DeepSpeech/training/:/DeepSpeech/training/ \
+  --volume `pwd`/deepspeech-german/:/DeepSpeech/deepspeech-german/ \
+  --volume `pwd`/checkpoints/:/DeepSpeech/checkpoints/ \
+  --volume `pwd`/data_original/:/DeepSpeech/data_original/ \
+  --volume `pwd`/data_prepared/:/DeepSpeech/data_prepared/ \
+  deep_speech_german \
   bash
