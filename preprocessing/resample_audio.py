@@ -7,7 +7,8 @@ import tqdm
 import soundfile as sf
 
 
-# ======================================================================================================================
+# ==================================================================================================
+
 
 def input_to_output_path(input_path, output_audio_path):
     output_path = os.path.basename(input_path)
@@ -15,7 +16,8 @@ def input_to_output_path(input_path, output_audio_path):
     return output_path
 
 
-# ======================================================================================================================
+# ==================================================================================================
+
 
 def resample_file(input_path, output_audio_path, output_rate):
     output_path = input_to_output_path(input_path, output_audio_path)
@@ -28,13 +30,14 @@ def resample_file(input_path, output_audio_path, output_rate):
     return file_size
 
 
-# ======================================================================================================================
+# ==================================================================================================
+
 
 def main():
-    parser = argparse.ArgumentParser(description='Resample audiofiles')
-    parser.add_argument('--input_csv_path', type=str)
-    parser.add_argument('--output_dir_path', type=str)
-    parser.add_argument('--output_rate', type=int, default=16000)
+    parser = argparse.ArgumentParser(description="Resample audiofiles")
+    parser.add_argument("--input_csv_path", type=str)
+    parser.add_argument("--output_dir_path", type=str)
+    parser.add_argument("--output_rate", type=int, default=16000)
     args = parser.parse_args()
 
     # Keep the german 0 as "null" string
@@ -45,15 +48,19 @@ def main():
 
     tqdm.tqdm.pandas()
 
-    data["wav_filesize"] = data["wav_filename"].progress_apply(lambda x: resample_file(x, audio_dir, args.output_rate))
-    data["wav_filename"] = data["wav_filename"].apply(lambda x: input_to_output_path(x, audio_dir))
+    data["wav_filesize"] = data["wav_filename"].progress_apply(
+        lambda x: resample_file(x, audio_dir, args.output_rate)
+    )
+    data["wav_filename"] = data["wav_filename"].apply(
+        lambda x: input_to_output_path(x, audio_dir)
+    )
 
     output_path = os.path.basename(args.input_csv_path)
     output_path = os.path.join(args.output_dir_path, output_path)
-    data.to_csv(output_path, index=False, encoding='utf-8')
+    data.to_csv(output_path, index=False, encoding="utf-8")
 
 
-# ======================================================================================================================
+# ==================================================================================================
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

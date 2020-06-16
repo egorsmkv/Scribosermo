@@ -15,7 +15,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 
 File structure will look as follows:
 
-```
+```text
 my_deepspeech_folder
     checkpoints
     data_original
@@ -26,7 +26,7 @@ my_deepspeech_folder
 
 Clone DeepSpeech and build docker container:
 
-```
+```bash
 git clone https://github.com/mozilla/DeepSpeech.git
 # or
 git clone https://github.com/DanBmh/DeepSpeech.git
@@ -35,7 +35,7 @@ docker build -t mozilla_deep_speech DeepSpeech/
 ```
 
 Build and run our docker container:
-```
+```bash
 docker build -t deep_speech_german deepspeech-german/
 
 ./deepspeech-german/run_container.sh
@@ -60,12 +60,12 @@ docker build -t deep_speech_german deepspeech-german/
 <br/>
 
 Download datasets (Run in docker container):
-```
-python3 deepspeech-german/data/download_data.py --tuda data_original/
-python3 deepspeech-german/data/download_data.py --voxforge data_original/
-python3 deepspeech-german/data/download_data.py --mailabs data_original/
-python3 deepspeech-german/data/download_data.py --swc data_original/
-python3 deepspeech-german/data/download_data.py --tatoeba data_original/
+```bash
+python3 deepspeech-german/preprocessing/download_data.py --tuda data_original/
+python3 deepspeech-german/preprocessing/download_data.py --voxforge data_original/
+python3 deepspeech-german/preprocessing/download_data.py --mailabs data_original/
+python3 deepspeech-german/preprocessing/download_data.py --swc data_original/
+python3 deepspeech-german/preprocessing/download_data.py --tatoeba data_original/
 ```
 
 Download common voice dataset: https://voice.mozilla.org/en/datasets \
@@ -74,7 +74,7 @@ Extract and move it to datasets directory (data_original/common_voice/)
 <br/>
 
 Prepare datasets, this may take some time (Run in docker container):
-```
+```bash
 # Prepare the datasets one by one first to ensure everything is working:
 
 ./deepspeech-german/pre-processing/run_to_utf_8.sh "/DeepSpeech/data_original/voxforge/*/etc/prompts-original"
@@ -91,19 +91,19 @@ python3 deepspeech-german/pre-processing/prepare_data.py --tatoeba data_original
 python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tuda/ --voxforge data_original/voxforge/  data_prepared/tuda_voxforge/
 
 # Or, which is much faster, but only combining train, dev, test and all csv files, run:
-python3 deepspeech-german/data/combine_datasets.py data_prepared/ --tuda --voxforge
+python3 deepspeech-german/preprocessing/combine_datasets.py data_prepared/ --tuda --voxforge
 
 # Or to combine specific csv files:
-python3 deepspeech-german/data/combine_datasets.py "" --files_output data_prepared/tuda-voxforge-swc-mailabs-common_voice/train_mix.csv --files "data_prepared/tuda/train.csv data_prepared/voxforge/all.csv data_prepared/swc/all.csv data_prepared/mailabs/all.csv data_prepared/common_voice/train.csv"
+python3 deepspeech-german/preprocessing/combine_datasets.py "" --files_output data_prepared/tuda-voxforge-swc-mailabs-common_voice/train_mix.csv --files "data_prepared/tuda/train.csv data_prepared/voxforge/all.csv data_prepared/swc/all.csv data_prepared/mailabs/all.csv data_prepared/common_voice/train.csv"
 
 
 # To shuffle and replace "äöü" characters and clean the files run (for all 3 csv files):
-python3 /DeepSpeech/deepspeech-german/data/dataset_operations.py /DeepSpeech/data_prepared/tuda-voxforge/train.csv /DeepSpeech/data_prepared/tuda-voxforge/train_azce.csv --replace --shuffle --clean --exclude
+python3 /DeepSpeech/deepspeech-german/preprocessing/dataset_operations.py /DeepSpeech/data_prepared/tuda-voxforge/train.csv /DeepSpeech/data_prepared/tuda-voxforge/train_azce.csv --replace --shuffle --clean --exclude
 
 
 # To split tuda into the correct train, dev and test splits run: 
 # (you will have to rename the [train/dev/test]_s.csv files before combining them with other datasets)
-python3 deepspeech-german/data/split_dataset.py data_prepared/tuda/ --tuda --file_appendix _s
+python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/tuda/ --tuda --file_appendix _s
 ```
 
 Preparation times using Intel i7-8700K:
@@ -117,7 +117,7 @@ Preparation times using Intel i7-8700K:
 
 Download and extract noise data (You have to merge https://github.com/mozilla/DeepSpeech/pull/2622 for that, run in container):
 
-```
+```bash
 cd data_original/noise/
 
 # Download freesound data:
@@ -148,13 +148,13 @@ rm rnnoise_contributions.tar.gz
 
 # Normalize all the audio files:
 cd /DeepSpeech/
-python deepspeech-german/data/normalize_noise_audio.py --from_dir data_original/noise/ --to_dir data_prepared/noise/ --max_sec 45
+python deepspeech-german/preprocessing/normalize_noise_audio.py --from_dir data_original/noise/ --to_dir data_prepared/noise/ --max_sec 45
 ```
 
 #### Create the language model
 
 Download and prepare the open-source [German Speech Corpus](http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz):
-```
+```bash
 wget http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz -O data_original/sentences.txt.gz
 gzip -d data_original/sentences.txt.gz
 
@@ -176,7 +176,7 @@ For me only training with voxforge worked at first. With tuda dataset I got an e
 "Invalid argument: Not enough time for target transition sequence"
 
 To fix it you have to follow this [solution](https://github.com/mozilla/DeepSpeech/issues/1629#issuecomment-427423707):
-```
+```text
 # Add the parameter "ignore_longer_outputs_than_inputs=True" in DeepSpeech.py (~ line 231)
 
 # Compute the CTC loss using TensorFlow's `ctc_loss`
@@ -189,7 +189,7 @@ This will result in another error after some training steps: \
 "Invalid argument: WAV data chunk '[Some strange symbol here]"
 
 Just ignore this in the train steps:
-```
+```text
 # Add another exception (tf.errors.InvalidArgumentError) in the training loop in DeepSpeech.py (~ line 602):
 
 try:
@@ -210,7 +210,7 @@ Add the parameter and the ignored exception in evaluate.py file too (~ lines 73 
 
 To filter the files causing infinite loss:
 
-```
+```text
 # Below this lines (DeepSpeech.py ~ line 620):
 
 problem_files = [f.decode('utf8') for f in problem_files[..., 0]]
@@ -230,7 +230,7 @@ sys.exit(1)
 
 Download pretrained deepspeech checkpoints.
 
-```
+```bash
 wget https://github.com/mozilla/DeepSpeech/releases/download/v0.6.0/deepspeech-0.6.0-checkpoint.tar.gz -P checkpoints/
 tar xvfz checkpoints/deepspeech-0.6.0-checkpoint.tar.gz -C checkpoints/
 rm checkpoints/deepspeech-0.6.0-checkpoint.tar.gz
@@ -238,7 +238,7 @@ rm checkpoints/deepspeech-0.6.0-checkpoint.tar.gz
 
 Adjust the parameters to your needs (Run in docker container):
 
-```
+```bash
 # Delete old model files:
 rm -rf /root/.local/share/deepspeech/summaries && rm -rf /root/.local/share/deepspeech/checkpoints
 
