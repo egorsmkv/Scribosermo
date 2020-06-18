@@ -9,7 +9,7 @@ DELETE_OLD_CHECKPOINTS=${5:-0}
 START_FROM_CHECKPOINT=${6:-"/DeepSpeech/checkpoints/deepspeech-0.7.3-checkpoint/"}
 
 BATCH_SIZE=36
-USE_AUGMENTATION=0
+USE_AUGMENTATION=1
 
 if [[ "${DELETE_OLD_CHECKPOINTS}" == "1" ]] || [[ "${START_FROM_CHECKPOINT}" != "--" ]]; then
   rm -rf ${CHECKPOINT_DIR}
@@ -28,15 +28,25 @@ if [[ "${USE_AUGMENTATION}" == "1" ]]; then
   AUG_ADD_DROP="--data_aug_features_additive 0.2 \
                 --augmentation_spec_dropout_keeprate 0.95"
   AUG_FREQ_TIME="--augmentation_freq_and_time_masking True"
+  AUG_AUDIO="--augment reverb[p=0.1,delay=50.0~30.0,decay=10.0:2.0~1.0] \
+      --augment gaps[p=0.05,n=1:3~2,size=10:100] \
+      --augment resample[p=0.1,rate=12000:8000~4000] \
+      --augment codec[p=0.1,bitrate=48000:16000] \
+      --augment volume[p=0.1,dbfs=-10:-40]"
+  AUG_SPEECH="augment overlay[p=0.2,source=$TRAIN_FILE,layers=10:6,snr=50:20~10]"
 
   #  Easy disabling of single flags only
   #  AUG_ADD_DROP=""
   #  AUG_FREQ_TIME=""
   #  AUG_PITCH_TEMPO=""
+  #  AUG_AUDIO=""
+  #  AUG_SPEECH=""
 else
   AUG_PITCH_TEMPO=""
   AUG_ADD_DROP=""
   AUG_FREQ_TIME=""
+  AUG_AUDIO=""
+  AUG_SPEECH=""
 fi
 
 DSARGS="--train_files ${TRAIN_FILE} \
@@ -64,7 +74,9 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --max_to_keep 3 \
         ${AUG_FREQ_TIME} \
         ${AUG_PITCH_TEMPO} \
-        ${AUG_ADD_DROP}"
+        ${AUG_ADD_DROP} \
+        ${AUG_AUDIO} \
+        ${AUG_SPEECH}"
 
 echo ""
 echo ""

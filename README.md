@@ -378,6 +378,18 @@ Some results with the current code version: \
 | CommonVoice + GoogleWavenet | added all of GoogleWavenet to train data, dev/test from CommonVoice | Test: 25.029057,  Validation: 17.511973 | 35 | WER: 0.214689, CER: 0.084206 |
 | CommonVoice + GoogleWavenet | above tested with reduced testset | Test: 34.191067 | | WER: 0.213164, CER: 0.079121 |
 
+<br/>
+
+Updated to DeepSpeech v0.7.3 and new english checkpoint:
+
+| Dataset | Additional Infos | Losses | Training epochs of best model | Result |
+|---------|------------------|--------|-------------------------------|--------|
+| Voxforge | | Test: 32.844025, Validation: 36.912005 | 14 | WER: 0.240091, CER: 0.087971 |
+| Voxforge | without _freq_and_time_masking_ augmentation | Test: 33.698494, Validation: 38.071722 | 10 | WER: 0.244600, CER: 0.094577 |
+| Voxforge | using new audio augmentation options | Test: 29.280865, Validation: 33.294815 | 21 | WER: 0.220538, CER: 0.079463 |
+| Voxforge | add cocktail party augmentation | Test: 29.231031, Validation: 33.375155 | 24 | WER: 0.221675, CER: 0.081430 |
+
+
 #### Language Model and Checkpoints
 
 Scorer with training transcriptions: [Link](https://drive.google.com/open?id=1r-0Xu7MD_1KECFbBnB05iCRiMYEbZgXN) \
