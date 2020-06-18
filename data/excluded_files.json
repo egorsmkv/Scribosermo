@@ -671,5 +671,6 @@
   "/DeepSpeech/data_prepared/swc/audio/00000022_0000000506_1363860_1365480.wav",
   "/DeepSpeech/data_prepared/common_voice/audio/common_voice_de_20064527.wav",
   "/DeepSpeech/data_prepared/swc/audio/00000100_0000000677_1396420_1398270.wav",
-  "/DeepSpeech/data_original/tuda/train/2014-03-17-13-07-00_Realtek.wav"
+  "/DeepSpeech/data_original/tuda/train/2014-03-17-13-07-00_Realtek.wav",
+  "/DeepSpeech/data_original/voxforge/robin-20070821_de1/wav/de1-34.wav"
 ]

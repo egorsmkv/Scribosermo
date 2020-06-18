@@ -99,7 +99,7 @@ python3 deepspeech-german/preprocessing/combine_datasets.py "" --files_output da
 
 
 # To shuffle and replace "äöü" characters and clean the files run (repeat for all 3 csv files):
-python3 /DeepSpeech/deepspeech-german/preprocessing/dataset_operations.py /DeepSpeech/data_prepared/tuda-voxforge/train.csv /DeepSpeech/data_prepared/tuda-voxforge/train_azce.csv --replace --shuffle --clean --exclude
+python3 /DeepSpeech/deepspeech-german/preprocessing/dataset_operations.py /DeepSpeech/data_prepared/voxforge/train.csv /DeepSpeech/data_prepared/voxforge/train_azce.csv --replace --shuffle --clean --exclude
 
 
 # To split tuda into the correct train, dev and test splits run: 

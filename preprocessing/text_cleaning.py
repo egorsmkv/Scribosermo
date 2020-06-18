@@ -7,9 +7,10 @@ import num2words
 
 # ==================================================================================================
 
-# Number patterns
+# Regex patterns
 int_pattern = re.compile(r"[0-9]+")
 float_pattern = re.compile(r"[0-9]+[,\.][0-9]+")
+multi_space_pattern = re.compile(r"\s+")
 
 # Allowed characters a-zA-Z 'äöüß
 allowed = list(string.ascii_lowercase)
@@ -185,9 +186,10 @@ def clean_sentence(sentence):
     4. join with spaces
     """
 
-    words = sentence.strip().split(" ")
-    cleaned_words = []
+    sentence = re.sub(multi_space_pattern, " ", sentence)
+    words = sentence.strip().split()
 
+    cleaned_words = []
     for word in words:
         cleaned_word = clean_word(word)
         cleaned_words.append(cleaned_word)
