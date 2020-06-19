@@ -104,7 +104,7 @@ python3 /DeepSpeech/deepspeech-german/preprocessing/dataset_operations.py /DeepS
 
 # To split tuda into the correct train, dev and test splits run: 
 # (you will have to rename the [train/dev/test]_s.csv files before combining them with other datasets)
-python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/tuda/ --tuda --file_appendix _s
+python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/tuda/all.csv --tuda --file_appendix _s
 ```
 
 Preparation times using Intel i7-8700K:
@@ -143,13 +143,17 @@ rm *.zip
 rm *.z0*
 
 # Download rnnoise data:
-wget https://people.xiph.org/~jm/demo/rnnoise/rnnoise_contributions.tar.gz
+wget https://media.xiph.org/rnnoise/rnnoise_contributions.tar.gz
 tar -xvzf rnnoise_contributions.tar.gz
 rm rnnoise_contributions.tar.gz
 
-# Normalize all the audio files:
+# Normalize all the audio files (run with python2):
 cd /DeepSpeech/
 python deepspeech-german/preprocessing/normalize_noise_audio.py --from_dir data_original/noise/ --to_dir data_prepared/noise/ --max_sec 45
+
+# Create csv files:
+python3 deepspeech-german/preprocessing/noise_to_csv.py
+python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/noise/all.csv  --split "70|15|15"
 ```
 
 #### Create the language model
