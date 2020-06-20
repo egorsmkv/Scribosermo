@@ -52,11 +52,14 @@ docker build -t deep_speech_german deepspeech-german/
 * GoogleWavenet ~165h, artificial training data generated with the google text to speech service
 * [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
 
-* Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipeline existing
-* Not used: [Zamia](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~18h
-* Not used: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~?h
 * Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
 * Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
+* Noise data: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
+
+* Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipeline existing
+* Not used: [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~18h
+* Not used: [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~17h
+* Not used: [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html) ~?
 
 <br/>
 
@@ -147,6 +150,11 @@ wget https://media.xiph.org/rnnoise/rnnoise_contributions.tar.gz
 tar -xvzf rnnoise_contributions.tar.gz
 rm rnnoise_contributions.tar.gz
 
+# Download zamia noise
+wget http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz
+tar -xvf noise.tar.xz
+rm noise.tar.xz
+
 # Normalize all the audio files (run with python2):
 cd /DeepSpeech/
 python deepspeech-german/preprocessing/normalize_noise_audio.py --from_dir data_original/noise/ --to_dir data_prepared/noise/ --max_sec 45
@@ -158,9 +166,9 @@ python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/noise/all
 
 #### Create the language model
 
-Download and prepare the open-source [German Speech Corpus](http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz):
+Download and prepare the open-source [German Speech Corpus](http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/):
 ```bash
-wget http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz -O data_original/sentences.txt.gz
+wget "http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz" -O data_original/sentences.txt.gz
 gzip -d data_original/sentences.txt.gz
 
 python3 deepspeech-german/pre-processing/prepare_vocab.py data_original/sentences.txt data_prepared/clean_vocab_az.txt --replace_umlauts
@@ -391,7 +399,9 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint:
 | Voxforge | | Test: 32.844025, Validation: 36.912005 | 14 | WER: 0.240091, CER: 0.087971 |
 | Voxforge | without _freq_and_time_masking_ augmentation | Test: 33.698494, Validation: 38.071722 | 10 | WER: 0.244600, CER: 0.094577 |
 | Voxforge | using new audio augmentation options | Test: 29.280865, Validation: 33.294815 | 21 | WER: 0.220538, CER: 0.079463 |
-| Voxforge | add cocktail party augmentation | Test: 29.231031, Validation: 33.375155 | 24 | WER: 0.221675, CER: 0.081430 |
+||
+| Voxforge | updated augmentations | Test: 28.846869, Validation: 32.680268 | 16 | WER: 0.225360, CER: 0.083504 |
+| Voxforge | add speech overlay augmentation | Test: 28.843914, Validation: 32.341234 | 37 | WER: 0.222024, CER: 0.083036 |
 
 
 #### Language Model and Checkpoints
