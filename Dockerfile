@@ -3,8 +3,7 @@ FROM mozilla_deep_speech:latest
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get update && apt-get install -y --no-install-recommends file
-RUN apt-get update && apt-get install -y --no-install-recommends zip
+RUN apt-get update && apt-get install -y --no-install-recommends nano file zip
 RUN apt-get update && apt-get install -y --no-install-recommends sox libsox-dev
 
 # Dependencies for noise normalization
@@ -39,8 +38,8 @@ RUN pip3 install --upgrade --no-cache-dir setuptools
 RUN pip3 install --upgrade --no-cache-dir pandas
 
 # Install audiomate
-#RUN pip3 install git+https://github.com/danbmh/audiomate.git@show_progress_and_changed_label
-RUN pip3 install --no-cache-dir audiomate
+RUN pip3 install git+https://github.com/danbmh/audiomate.git@new_features
+#RUN pip3 install --no-cache-dir audiomate
 
 COPY . /DeepSpeech/deepspeech-german/
 

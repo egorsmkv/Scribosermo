@@ -39,6 +39,8 @@ def main():
     parser.add_argument("--mailabs", type=str)
     parser.add_argument("--common_voice", type=str)
     parser.add_argument("--tatoeba", type=str)
+    parser.add_argument("--css_german", type=str)
+    parser.add_argument("--zamia_speech", type=str)
 
     args = parser.parse_args()
 
@@ -48,6 +50,8 @@ def main():
     mailabs_path = args.mailabs
     cv_path = args.common_voice
     tatoeba_path = args.tatoeba
+    css_path = args.css_german
+    zs_path = args.zamia_speech
 
     corpora = []
 
@@ -81,6 +85,16 @@ def main():
         corpus = audiomate.Corpus.load(tatoeba_path, reader="tatoeba")
         corpora.append(corpus)
 
+    if css_path is not None:
+        print("Loading css-german ...")
+        corpus = audiomate.Corpus.load(css_path, reader="css10")
+        corpora.append(corpus)
+
+    if zs_path is not None:
+        print("Loading zamia-speech ...")
+        corpus = audiomate.Corpus.load(zs_path, reader="zamia-speech")
+        corpora.append(corpus)
+
     if len(corpora) <= 0:
         raise ValueError("No Corpus given!")
 
@@ -89,9 +103,11 @@ def main():
 
     print("Splitting corpus ...")
     splitter = subset.Splitter(merged_corpus, random_seed=38)
-    splits = splitter.split(
-        {"train": 0.7, "dev": 0.15, "test": 0.15}, separate_issuers=True
-    )
+    split_sizes = {"train": 0.7, "dev": 0.15, "test": 0.15}
+    if css_path is not None and len(corpora) == 1:
+        splits = splitter.split(split_sizes, separate_issuers=False)
+    else:
+        splits = splitter.split(split_sizes, separate_issuers=True)
 
     merged_corpus.import_subview("train", splits["train"])
     merged_corpus.import_subview("dev", splits["dev"])

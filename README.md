@@ -21,7 +21,7 @@ my_deepspeech_folder
     data_original
     data_prepared
     DeepSpeech
-    deepspeech-german    <- This repositiory
+    deepspeech-german    <- This repository
 ```
 
 Clone DeepSpeech and build container:
@@ -51,14 +51,15 @@ docker build -t deep_speech_german deepspeech-german/
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
 * GoogleWavenet ~165h, artificial training data generated with the google text to speech service
 * [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
+* [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
+* [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
+
 
 * Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
 * Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
 * Noise data: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
 
 * Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipeline existing
-* Not used: [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~18h
-* Not used: [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~17h
 * Not used: [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html) ~?
 
 <br/>
@@ -70,10 +71,13 @@ python3 deepspeech-german/preprocessing/download_data.py --voxforge data_origina
 python3 deepspeech-german/preprocessing/download_data.py --mailabs data_original/
 python3 deepspeech-german/preprocessing/download_data.py --swc data_original/
 python3 deepspeech-german/preprocessing/download_data.py --tatoeba data_original/
+python3 deepspeech-german/preprocessing/download_data.py --common_voice data_original/
+python3 deepspeech-german/preprocessing/download_data.py --zamia_speech data_original/
 ```
 
-Download common voice dataset: https://voice.mozilla.org/en/datasets \
-Extract and move it to datasets directory (data_original/common_voice/)
+Download css10 german dataset (Requires kaggle account): [LINK](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) \
+Extract and move it to datasets directory (data_original/css_german/) \
+It seems the files are saved all twice, so remove the duplicate folders
 
 <br/>
 
@@ -82,17 +86,19 @@ Prepare datasets, this may take some time (Run in docker container):
 # Prepare the datasets one by one first to ensure everything is working:
 
 ./deepspeech-german/pre-processing/run_to_utf_8.sh "/DeepSpeech/data_original/voxforge/*/etc/prompts-original"
-python3 deepspeech-german/pre-processing/prepare_data.py --voxforge data_original/voxforge/  data_prepared/voxforge/
+python3 deepspeech-german/pre-processing/prepare_data.py --voxforge data_original/voxforge/ data_prepared/voxforge/
 
-python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tuda/  data_prepared/tuda/
-python3 deepspeech-german/pre-processing/prepare_data.py --common_voice data_original/common_voice/  data_prepared/common_voice/
-python3 deepspeech-german/pre-processing/prepare_data.py --mailabs data_original/mailabs/  data_prepared/mailabs/
-python3 deepspeech-german/pre-processing/prepare_data.py --swc data_original/swc/  data_prepared/swc/
-python3 deepspeech-german/pre-processing/prepare_data.py --tatoeba data_original/tatoeba/  data_prepared/tatoeba/
+python3 deepspeech-german/preprocessing/prepare_data.py --tuda data_original/tuda/ data_prepared/tuda/
+python3 deepspeech-german/preprocessing/prepare_data.py --common_voice data_original/common_voice/ data_prepared/common_voice/
+python3 deepspeech-german/preprocessing/prepare_data.py --mailabs data_original/mailabs/ data_prepared/mailabs/
+python3 deepspeech-german/preprocessing/prepare_data.py --swc data_original/swc/ data_prepared/swc/
+python3 deepspeech-german/preprocessing/prepare_data.py --tatoeba data_original/tatoeba/ data_prepared/tatoeba/
+python3 deepspeech-german/preprocessing/prepare_data.py --css_german data_original/css_german/ data_prepared/css_german/
+python3 deepspeech-german/preprocessing/prepare_data.py --zamia_speech data_original/zamia_speech/ data_prepared/zamia_speech/
 
 
 # To combine multiple datasets run the command as follows:
-python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tuda/ --voxforge data_original/voxforge/  data_prepared/tuda_voxforge/
+python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tuda/ --voxforge data_original/voxforge/ data_prepared/tuda_voxforge/
 
 # Or, which is much faster, but only combining train, dev, test and all csv files, run:
 python3 deepspeech-german/preprocessing/combine_datasets.py data_prepared/ --tuda --voxforge
@@ -153,6 +159,7 @@ rm rnnoise_contributions.tar.gz
 # Download zamia noise
 wget http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz
 tar -xvf noise.tar.xz
+mv noise/ zamia/
 rm noise.tar.xz
 
 # Normalize all the audio files (run with python2):
@@ -401,7 +408,8 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint:
 | Voxforge | using new audio augmentation options | Test: 29.280865, Validation: 33.294815 | 21 | WER: 0.220538, CER: 0.079463 |
 ||
 | Voxforge | updated augmentations | Test: 28.846869, Validation: 32.680268 | 16 | WER: 0.225360, CER: 0.083504 |
-| Voxforge | add speech overlay augmentation | Test: 28.843914, Validation: 32.341234 | 37 | WER: 0.222024, CER: 0.083036 |
+| Voxforge | add speech overlay augmentation | Test: 28.843914, Validation: 32.341234 | 27 | WER: 0.222024, CER: 0.083036 |
+| Voxforge | add noise overlay augmentation | Test: 27.940659, Validation: 31.988175 | 28 | WER: 0.219143, CER: 0.076050 |
 
 
 #### Language Model and Checkpoints

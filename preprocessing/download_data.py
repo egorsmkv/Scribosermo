@@ -15,6 +15,7 @@ def main():
     parser.add_argument("--mailabs", action="store_true")
     parser.add_argument("--common_voice", action="store_true")
     parser.add_argument("--tatoeba", action="store_true")
+    parser.add_argument("--zamia_speech", action="store_true")
     args = parser.parse_args()
 
     if args.tuda:
@@ -38,12 +39,19 @@ def main():
         dl.download(os.path.join(args.target_path, "mailabs"))
 
     if args.common_voice:
-        print("No downloader for common voice -> Download manually")
+        print("Downloading common-voice ...")
+        dl = io.CommonVoiceDownloader(lang="de")
+        dl.download(os.path.join(args.target_path, "common_voice"))
 
     if args.tatoeba:
         print("Downloading tatoeba ...")
-        dl = io.TatoebaDownloader(include_languages="deu")
+        dl = io.TatoebaDownloader(include_languages=["deu"])
         dl.download(os.path.join(args.target_path, "tatoeba"))
+
+    if args.zamia_speech:
+        print("Downloading zamia-speech ...")
+        dl = io.ZamiaSpeechDownloader(lang="de")
+        dl.download(os.path.join(args.target_path, "zamia_speech"))
 
 
 # ==================================================================================================
