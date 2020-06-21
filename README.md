@@ -42,7 +42,7 @@ docker build -t deep_speech_german deepspeech-german/
 ./deepspeech-german/run_container.sh
 ```
 
-#### Download and prepare voice data
+#### Datasets
 
 * [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
 * [Mozilla Common Voice](https://voice.mozilla.org/) ~506h
@@ -54,15 +54,19 @@ docker build -t deep_speech_german deepspeech-german/
 * [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
 * [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
 
-
 * Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
 * Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
 * Noise data: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
 
-* Not used: [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no data pipeline existing
-* Not used: [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html) ~?
+<br>
 
-<br/>
+Links:
+* [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no aligned transcriptions
+* [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html), seems to be paid only
+* [Many differnt languages](https://www.clarin.eu/resource-families/spoken-corpora), most with login or non commercial
+
+
+#### Download and prepare voice data
 
 Download datasets (Run in docker container):
 ```bash
@@ -353,10 +357,6 @@ Some results with some older code version: \
 
 | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
 |---------|------------------|--------|-------------------------------|--------|
-| Voxforge | batch size 36 | Test: 46.309738, Validation: 50.323496 | 12 | WER: 0.343841, CER: 0.134452 |
-| Voxforge | above checkpoint tested with cocktail party augmentation | Test: 118.516922 | | WER: 0.689503, CER: 0.359209 |
-| Voxforge | like above, cocktail party augmentation with same dataset | Test: 53.604279, Validation: 55.484096 | 22 | WER: 0.426425, CER: 0.212265 |
-| Voxforge | above checkpoint tested without cocktail party augmentation | Test: 63.336746 | | WER: 0.431053, CER: 0.249465 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice  | test only with Tuda + CommonVoice others completely for training, language model with training transcriptions, with augmentation | Test: 29.363405, Validation: 23.509546 | 55 | WER: 0.190189, CER: 0.091737 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested with 3-gram language model | Test: 29.363405 | | WER: 0.199709, CER: 0.095318 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested on Tuda only | Test: 87.074394 | | WER: 0.378379, CER: 0.167380 |
@@ -399,7 +399,8 @@ Some results with the current code version: \
 
 <br/>
 
-Updated to DeepSpeech v0.7.3 and new english checkpoint:
+Updated to DeepSpeech v0.7.3 and new english checkpoint: \
+(Testing with noise and speech overlay is done with older _noiseaugmaster_ branch, which implemented this functionality)
 
 | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
 |---------|------------------|--------|-------------------------------|--------|
@@ -407,9 +408,31 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint:
 | Voxforge | without _freq_and_time_masking_ augmentation | Test: 33.698494, Validation: 38.071722 | 10 | WER: 0.244600, CER: 0.094577 |
 | Voxforge | using new audio augmentation options | Test: 29.280865, Validation: 33.294815 | 21 | WER: 0.220538, CER: 0.079463 |
 ||
-| Voxforge | updated augmentations | Test: 28.846869, Validation: 32.680268 | 16 | WER: 0.225360, CER: 0.083504 |
+| Voxforge | updated augmentations again | Test: 28.846869, Validation: 32.680268 | 16 | WER: 0.225360, CER: 0.083504 |
+| Voxforge | test above with older _noiseaugmaster_ branch | Test: 28.831675 | | WER: 0.238961, CER: 0.081555 |
+| Voxforge | test with speech overlay | Test: 89.661995 | | WER: 0.570903, CER: 0.301745 |
+| Voxforge | test with noise overlay | Test: 40.471050 | | WER: 0.336495, CER: 0.142741 |
+| Voxforge | test with speech and noise overlay | Test: 84.258522 | | WER: 0.563202, CER: 0.296978 |
+| Voxforge | second test with speech and noise to check random influence | Test: 83.914047 | | WER: 0.560698, CER: 0.296569 |
+||
 | Voxforge | add speech overlay augmentation | Test: 28.843914, Validation: 32.341234 | 27 | WER: 0.222024, CER: 0.083036 |
+| Voxforge | test above with older _noiseaugmaster_ branch | Test: 28.827101 | | WER: 0.240592, CER: 0.081938 |
+| Voxforge | test with speech overlay | Test: 54.188499 | | WER: 0.415137, CER: 0.194616 |
+| Voxforge | test with noise overlay | Test: 39.604137 | | WER: 0.329780, CER: 0.135477 |
+| Voxforge | test with speech and noise overlay | Test: 58.281570 | | WER: 0.448938, CER: 0.222420 |
+||
 | Voxforge | add noise overlay augmentation | Test: 27.940659, Validation: 31.988175 | 28 | WER: 0.219143, CER: 0.076050 |
+| Voxforge | test above with older _noiseaugmaster_ branch | Test: 27.920797 | | WER: 0.234977, CER: 0.075931 |
+| Voxforge | test with speech overlay | Test: 85.620941 | | WER: 0.534977, CER: 0.270445 |
+| Voxforge | test with noise overlay | Test: 38.851250 | | WER: 0.323672, CER: 0.127608 |
+| Voxforge | test with speech and noise overlay | Test: 82.439636 | | WER: 0.544575, CER: 0.273623 |
+||
+| Voxforge | speech and noise overlay | Test: 28.391241, Validation: 32.197396 | 25 | WER: 0.222972, CER: 0.081806 |
+| Voxforge | test above with older _noiseaugmaster_ branch | Test: 28.375004 | | WER: 0.237557, CER: 0.080253 |
+| Voxforge | test with speech overlay | Test: 55.377308 | | WER: 0.420106, CER: 0.193839 |
+| Voxforge | test with noise overlay | Test: 38.534264 | | WER: 0.326214, CER: 0.131013 |
+| Voxforge | test with speech and noise overlay | Test: 55.959534 | | WER: 0.431753, CER: 0.205108 |
+||
 
 
 #### Language Model and Checkpoints

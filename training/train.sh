@@ -58,7 +58,7 @@ if [[ "${USE_AUGMENTATION}" == "1" ]]; then
   #  AUG_FREQ_TIME=""
   #  AUG_EXTRA=""
   #  AUG_SPEECH=""
-    AUG_NOISE=""
+  #  AUG_NOISE=""
 else
   AUG_AUDIO=""
   AUG_ADD_DROP=""
