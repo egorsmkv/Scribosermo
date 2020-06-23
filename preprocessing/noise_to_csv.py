@@ -14,7 +14,9 @@ def collect_file_texts(noise_dir):
     for dirpath, _, filenames in os.walk(noise_dir):
         for f in filenames:
             if f.endswith(".wav"):
-                text = os.path.join(dirpath, f) + ",123,some noise"
+                sound_path = os.path.join(dirpath, f)
+                file_size = os.path.getsize(sound_path)
+                text = "{},{},some noise".format(sound_path, file_size)
                 texts.append(text)
     return texts
 

@@ -9,6 +9,36 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
     <img src="media/deep_speech_architecture.png" align="center" title="DeepSpeech Graph" />
 </p>
 
+<br/>
+
+
+## Datasets
+
+* [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~506h
+* [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
+* [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
+* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
+* GoogleWavenet ~165h, artificial training data generated with the google text to speech service
+* [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
+* [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
+* [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
+
+* Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
+* Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
+* Noise data: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
+
+<br>
+
+Links:
+* [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no aligned transcriptions
+* [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html), seems to be paid only
+* [Many different languages](https://www.clarin.eu/resource-families/spoken-corpora), most with login or non commercial
+* GerTV1000h German Broadcast corpus and Difficult Speech Corpus (DiSCo), no links found
+
+<br/>
+
+
 ## Usage
 
 #### General infos
@@ -42,28 +72,7 @@ docker build -t deep_speech_german deepspeech-german/
 ./deepspeech-german/run_container.sh
 ```
 
-#### Datasets
-
-* [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~506h
-* [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
-* [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
-* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
-* GoogleWavenet ~165h, artificial training data generated with the google text to speech service
-* [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
-* [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
-* [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
-
-* Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
-* Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
-* Noise data: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
-
-<br>
-
-Links:
-* [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no aligned transcriptions
-* [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html), seems to be paid only
-* [Many differnt languages](https://www.clarin.eu/resource-families/spoken-corpora), most with login or non commercial
+<br/>
 
 
 #### Download and prepare voice data
@@ -129,7 +138,11 @@ Preparation times using Intel i7-8700K:
 
 <br/>
 
-Download and extract noise data (You have to merge https://github.com/mozilla/DeepSpeech/pull/2622 for that, run in container):
+
+#### Download and prepare noise data
+
+You have to merge https://github.com/mozilla/DeepSpeech/pull/2622 for testing with noise, or use my noiseaugmaster branch. \
+Run in container:
 
 ```bash
 cd data_original/noise/
@@ -175,6 +188,9 @@ python3 deepspeech-german/preprocessing/noise_to_csv.py
 python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/noise/all.csv  --split "70|15|15"
 ```
 
+<br/>
+
+
 #### Create the language model
 
 Download and prepare the open-source [German Speech Corpus](http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/):
@@ -193,6 +209,9 @@ python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared
 
 python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-german/data/alphabet_az.txt --lm /DeepSpeech/data_prepared/lm/lm.binary --vocab /DeepSpeech/data_prepared/lm/vocab-500000.txt --package /DeepSpeech/data_prepared/lm/kenlm_az.scorer --default_alpha 0.75 --default_beta 1.85
 ```
+
+<br/>
+
 
 #### Fix some issues
 
@@ -250,6 +269,9 @@ add_files_to_excluded(problem_files)
 sys.exit(1)
 ```
 
+<br/>
+
+
 #### Training
 
 Download pretrained deepspeech checkpoints.
@@ -296,6 +318,9 @@ One epoch with all datasets and batch size of 12 needs about 2:50h, testing abou
 
 One epoch with all datasets and only Tuda + CommonVoice as testset needs about 3:30h. Training for 55 epochs took 8d 6h, testing about 1h.
 
+<br/>
+
+
 ## Results
 
 #### Paper
@@ -329,6 +354,7 @@ python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/voxforg
 | Tuda | correct tuda test split, there may be overlaps between test and training data because of random splitting | Test: 402.696991 | WER: 0.785655, CER: 0.428786 |
 
 <br/>
+
 
 #### This repo
 
@@ -436,6 +462,8 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 | Voxforge | test with noise overlay | Test: 44.035809 | | WER: 0.377276, CER: 0.171528 |
 | Voxforge | test with speech and noise overlay | Test: 53.832214 | | WER: 0.441768, CER: 0.218798 |
 ||
+
+<br/>
 
 
 #### Language Model and Checkpoints

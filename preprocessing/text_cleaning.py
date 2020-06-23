@@ -194,4 +194,7 @@ def clean_sentence(sentence):
         cleaned_word = clean_word(word)
         cleaned_words.append(cleaned_word)
 
-    return " ".join(cleaned_words)
+    sentence = " ".join(cleaned_words)
+    # Remove duplicate whitespaces again, we may have added some with the above steps
+    sentence = re.sub(multi_space_pattern, " ", sentence)
+    return sentence
