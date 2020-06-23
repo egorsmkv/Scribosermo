@@ -411,27 +411,30 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 | Voxforge | updated augmentations again | Test: 28.846869, Validation: 32.680268 | 16 | WER: 0.225360, CER: 0.083504 |
 | Voxforge | test above with older _noiseaugmaster_ branch | Test: 28.831675 | | WER: 0.238961, CER: 0.081555 |
 | Voxforge | test with speech overlay | Test: 89.661995 | | WER: 0.570903, CER: 0.301745 |
-| Voxforge | test with noise overlay | Test: 40.471050 | | WER: 0.336495, CER: 0.142741 |
-| Voxforge | test with speech and noise overlay | Test: 84.258522 | | WER: 0.563202, CER: 0.296978 |
-| Voxforge | second test with speech and noise to check random influence | Test: 83.914047 | | WER: 0.560698, CER: 0.296569 |
+| Voxforge | test with noise overlay | Test: 53.461609 | | WER: 0.438126, CER: 0.213890 |
+| Voxforge | test with speech and noise overlay | Test: 79.736122 | | WER: 0.581259, CER: 0.310365 |
+| Voxforge | second test with speech and noise to check random influence | Test: 81.241333 | | WER: 0.595410, CER: 0.319077 |
 ||
 | Voxforge | add speech overlay augmentation | Test: 28.843914, Validation: 32.341234 | 27 | WER: 0.222024, CER: 0.083036 |
-| Voxforge | test above with older _noiseaugmaster_ branch | Test: 28.827101 | | WER: 0.240592, CER: 0.081938 |
-| Voxforge | test with speech overlay | Test: 54.188499 | | WER: 0.415137, CER: 0.194616 |
-| Voxforge | test with noise overlay | Test: 39.604137 | | WER: 0.329780, CER: 0.135477 |
-| Voxforge | test with speech and noise overlay | Test: 58.281570 | | WER: 0.448938, CER: 0.222420 |
+| Voxforge | change snr=50:20~9m to snr=30:15~9 | Test: 28.502413, Validation: 32.236247 | 28 |WER: 0.226005, CER: 0.085475 |
+| Voxforge | test above with older _noiseaugmaster_ branch | Test: 28.488537 | | WER: 0.239530, CER: 0.083855 |
+| Voxforge | test with speech overlay | Test: 47.783081 | | WER: 0.383612, CER: 0.175735 |
+| Voxforge | test with noise overlay | Test: 51.682060 | | WER: 0.428566, CER: 0.209789 |
+| Voxforge | test with speech and noise overlay | Test: 60.275940 | | WER: 0.487709, CER: 0.255167 |
 ||
 | Voxforge | add noise overlay augmentation | Test: 27.940659, Validation: 31.988175 | 28 | WER: 0.219143, CER: 0.076050 |
-| Voxforge | test above with older _noiseaugmaster_ branch | Test: 27.920797 | | WER: 0.234977, CER: 0.075931 |
-| Voxforge | test with speech overlay | Test: 85.620941 | | WER: 0.534977, CER: 0.270445 |
-| Voxforge | test with noise overlay | Test: 38.851250 | | WER: 0.323672, CER: 0.127608 |
-| Voxforge | test with speech and noise overlay | Test: 82.439636 | | WER: 0.544575, CER: 0.273623 |
+| Voxforge | change snr=50:20~6 to snr=24:12~6 | Test: 26.588453, Validation: 31.151855 | 34 | WER: 0.206141, CER: 0.072018 |
+| Voxforge | change to snr=18:9~6 | Test: 26.311581, Validation: 30.531299 | 30 | WER: 0.211865, CER: 0.074281 |
+| Voxforge | test above with older _noiseaugmaster_ branch | Test: 26.300938 | | WER: 0.227466, CER: 0.073827 |
+| Voxforge | test with speech overlay | Test: 76.401451 | | WER: 0.499962, CER: 0.254203 |
+| Voxforge | test with noise overlay | Test: 44.011471 | | WER: 0.376783, CER: 0.165329 |
+| Voxforge | test with speech and noise overlay | Test: 65.408264 | | WER: 0.496168, CER: 0.246516 |
 ||
-| Voxforge | speech and noise overlay | Test: 28.391241, Validation: 32.197396 | 25 | WER: 0.222972, CER: 0.081806 |
-| Voxforge | test above with older _noiseaugmaster_ branch | Test: 28.375004 | | WER: 0.237557, CER: 0.080253 |
-| Voxforge | test with speech overlay | Test: 55.377308 | | WER: 0.420106, CER: 0.193839 |
-| Voxforge | test with noise overlay | Test: 38.534264 | | WER: 0.326214, CER: 0.131013 |
-| Voxforge | test with speech and noise overlay | Test: 55.959534 | | WER: 0.431753, CER: 0.205108 |
+| Voxforge | speech and noise overlay | Test: 27.101889, Validation: 31.407527 | 44 | WER: 0.220243, CER: 0.082179 |
+| Voxforge | test above with older _noiseaugmaster_ branch | Test: 27.087360 | | WER: 0.232094, CER: 0.080319 |
+| Voxforge | test with speech overlay | Test: 46.012951 | | WER: 0.362291, CER: 0.164134 |
+| Voxforge | test with noise overlay | Test: 44.035809 | | WER: 0.377276, CER: 0.171528 |
+| Voxforge | test with speech and noise overlay | Test: 53.832214 | | WER: 0.441768, CER: 0.218798 |
 ||
 
 

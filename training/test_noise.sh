@@ -15,9 +15,9 @@ AUG_SPEECH="--test_augmentation_speech_files ${TEST_FILE} \
             --audio_aug_max_n_speakers 3"
 AUG_NOISE="--test_augmentation_noise_files ${NOISE_FILE} \
            --audio_aug_min_noise_snr_db 6 \
-           --audio_aug_max_noise_snr_db 30 \
+           --audio_aug_max_noise_snr_db 20 \
            --audio_aug_limit_noise_peak_dbfs 1.0 \
-           --audio_aug_min_n_noises 0 \
+           --audio_aug_min_n_noises 1 \
            --audio_aug_max_n_noises 2"
 #AUG_SPEECH=""
 #AUG_NOISE=""
