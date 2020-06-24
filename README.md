@@ -96,11 +96,8 @@ It seems the files are saved all twice, so remove the duplicate folders
 
 Prepare datasets, this may take some time (Run in docker container):
 ```bash
-# Prepare the datasets one by one first to ensure everything is working:
-
-./deepspeech-german/pre-processing/run_to_utf_8.sh "/DeepSpeech/data_original/voxforge/*/etc/prompts-original"
-python3 deepspeech-german/pre-processing/prepare_data.py --voxforge data_original/voxforge/ data_prepared/voxforge/
-
+# Prepare the datasets one by one to ensure everything is working:
+python3 deepspeech-german/preprocessing/prepare_data.py --voxforge data_original/voxforge/ data_prepared/voxforge/
 python3 deepspeech-german/preprocessing/prepare_data.py --tuda data_original/tuda/ data_prepared/tuda/
 python3 deepspeech-german/preprocessing/prepare_data.py --common_voice data_original/common_voice/ data_prepared/common_voice/
 python3 deepspeech-german/preprocessing/prepare_data.py --mailabs data_original/mailabs/ data_prepared/mailabs/
@@ -110,7 +107,7 @@ python3 deepspeech-german/preprocessing/prepare_data.py --css_german data_origin
 python3 deepspeech-german/preprocessing/prepare_data.py --zamia_speech data_original/zamia_speech/ data_prepared/zamia_speech/
 
 
-# To combine multiple datasets run the command as follows:
+# To combine multiple datasets run the command as follows (not recommended):
 python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tuda/ --voxforge data_original/voxforge/ data_prepared/tuda_voxforge/
 
 # Or, which is much faster, but only combining train, dev, test and all csv files, run:
