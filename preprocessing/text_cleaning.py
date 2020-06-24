@@ -8,13 +8,13 @@ import num2words
 # ==================================================================================================
 
 # Regex patterns
-int_pattern = re.compile(r"[0-9]+")
-float_pattern = re.compile(r"[0-9]+[,\.][0-9]+")
+int_pattern = re.compile(r"[+-]?[0-9]+")
+ordinal_pattern = re.compile(r"([0-9]+[.])(?![.0-9])")
+float_pattern = re.compile(r"(?<![.0-9])([+-]?[0-9]+[,.][0-9]+)(?![.0-9])")
 multi_space_pattern = re.compile(r"\s+")
 
-# Allowed characters a-zA-Z 'äöüß
+# Allowed characters a-zA-Z äöüß
 allowed = list(string.ascii_lowercase)
-allowed.append("'")
 allowed.append(" ")
 allowed.append("ä")
 allowed.append("ö")
@@ -45,42 +45,85 @@ replacer = {
     "ŵ": "w",
     "ýÿŷ": "y",
     "źżžȥ": "z",
-    "-­": " ",
+    "-­/:": " ",
 }
+
+# Switch keys and value
+replacements = {}
+for all, replacement in replacer.items():
+    for to_replace in all:
+        replacements[to_replace] = replacement
 
 # Various replacement rules
 special_replacers = {
+    " m / s ": "meter pro sekunde",
+    "m/s ": "meter pro sekunde",
     "€": "euro",
     "$": "dollar",
     "£": "pfund",
     "%": "prozent",
+    "‰": "promille",
     "&": "und",
+    "§": "paragraph",
     "m³": "kubikmeter",
     "km²": "quadratkilometer",
     "m²": "quadratmeter",
     "co2": "c o zwei",
+    "‰": "promille",
+    "±": "plus minus",
+    "°c": "grad celsius",
+    "°": "grad",
+    "kg": "kilogramm",
+    "α": "alpha",
+    "β": "beta",
+    "γ": "gamma",
+    "1910er": "neunzehnhundertzehner",
+    "1920er": "neunzehnhundertzwanziger",
+    "1930er": "neunzehnhundertdreißiger",
+    "1940er": "neunzehnhundertvierziger",
+    "1950er": "neunzehnhundertfünfziger",
+    "1960er": "neunzehnhundertsechziger",
+    "1970er": "neunzehnhundertsiebziger",
+    "1980er": "neunzehnhundertachtziger",
+    "1990er": "neunzehnhundertneunziger",
+    "10er": "zehner",
+    "20er": "zwanziger",
+    "30er": "dreißiger",
+    "40er": "vierziger",
+    "50er": "fünfziger",
+    "60er": "sechziger",
+    "70er": "siebziger",
+    "80er": "achtziger",
+    "90er": "neunziger",
+    "eins punkt null null null punkt null null null punkt null null null": "eine milliarde",
+    "punkt null null null punkt null null null punkt null null null": "milliarden",
+    "eins punkt null null null punkt null null null": "eine million",
+    "punkt null null null punkt null null null": "millionen",
 }
 
-replacements = {}
-replacements.update(special_replacers)
 
-for all, replacement in replacer.items():
-    for to_replace in all:
-        replacements[to_replace] = replacement
+# ==================================================================================================
+
+
+def replace_specials(word):
+    """ Apply special replacement rules to the given word. """
+
+    for to_replace, replacement in special_replacers.items():
+        word = word.replace(to_replace, " {} ".format(replacement))
+
+    return word
 
 
 # ==================================================================================================
 
 
 def replace_symbols(word):
-    """ Apply all replacement characters/rules to the given word. """
-
-    result = word
+    """ Apply all replacement character rules to the given word. """
 
     for to_replace, replacement in replacements.items():
-        result = result.replace(to_replace, replacement)
+        word = word.replace(to_replace, replacement)
 
-    return result
+    return word
 
 
 # ==================================================================================================
@@ -108,27 +151,27 @@ def remove_symbols(word):
 def word_to_num(word):
     """ Replace numbers with their written representation. """
 
-    result = word
-    match = float_pattern.search(result)
+    matches = float_pattern.findall(word)
+    if len(matches) == 1:
+        num = matches[0].replace(",", ".")
+        num_word = num2words.num2words(float(num), lang="de")
+        word = word.replace(matches[0], " {} ".format(num_word))
 
-    while match is not None:
-        word = match.group().replace(",", ".")
-        num_word = num2words.num2words(float(word), lang="de")
-        before = result[: match.start()]
-        after = result[match.end() :]
-        result = " ".join([before, num_word.lower(), after])
-        match = float_pattern.search(result)
+    matches = ordinal_pattern.findall(word)
+    if len(matches) == 1:
+        num_word = num2words.num2words(int(matches[0][:-1]), lang="de", to="ordinal")
+        word = word.replace(matches[0], " {} ".format(num_word))
+        print(word, num_word)
 
-    match = int_pattern.search(result)
+    matches = int_pattern.findall(word)
+    for match in matches:
+        num_word = num2words.num2words(int(match), lang="de")
+        word = word.replace(match, " {} ".format(num_word))
 
-    while match is not None:
-        num_word = num2words.num2words(int(match.group()), lang="de")
-        before = result[: match.start()]
-        after = result[match.end() :]
-        result = " ".join([before, num_word, after])
-        match = int_pattern.search(result)
-
-    return result
+    # Replace dots like in 168.192.0.1 and make word lowercase again
+    word = word.replace(".", " punkt ")
+    word = word.lower()
+    return word
 
 
 # ==================================================================================================
@@ -187,6 +230,8 @@ def clean_sentence(sentence):
     """
 
     sentence = re.sub(multi_space_pattern, " ", sentence)
+    sentence = sentence.lower()
+    sentence = replace_specials(sentence)
     words = sentence.strip().split()
 
     cleaned_words = []

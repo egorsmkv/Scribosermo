@@ -13,20 +13,6 @@ from pandarallel import pandarallel
 
 umlaut_replacers = {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}
 
-replacer = {
-    "eins punkt null null null punkt null null null punkt null null null": "eine milliarde",
-    "punkt null null null punkt null null null punkt null null null": "milliarden",
-    "eins punkt null null null punkt null null null": "eine million",
-    "punkt null null null punkt null null null": "millionen",
-    "eins punkt null null null": "ein tausend",
-    "punkt null null null": "tausend",
-    "punkt null": "",
-}
-
-# Combine replacers
-replacer.update(umlaut_replacers)
-
-
 # ==================================================================================================
 
 
@@ -179,7 +165,7 @@ def main():
         data["transcript"] = data["transcript"].parallel_apply(
             lambda x: text_cleaning.clean_sentence(x)
         )
-        data["transcript"] = data["transcript"].replace(replacer, regex=True)
+        data["transcript"] = data["transcript"].replace(umlaut_replacers, regex=True)
 
     if args.clean and not args.nostats:
         data = clean(data)
