@@ -190,12 +190,25 @@ python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/noise/all
 
 #### Create the language model
 
-Download and prepare the open-source [German Speech Corpus](http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/):
+Download and prepare the text corpora [tuda](http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/), [europarl+news](https://www.statmt.org/wmt13/translation-task.html):
 ```bash
-wget "http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz" -O data_original/sentences.txt.gz
-gzip -d data_original/sentences.txt.gz
+cd data_original/texts/
 
-python3 deepspeech-german/pre-processing/prepare_vocab.py data_original/sentences.txt data_prepared/clean_vocab_az.txt --replace_umlauts
+wget "http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz" -O tuda_sentences.txt.gz
+gzip -d tuda_sentences.txt.gz
+
+wget "https://www.statmt.org/wmt13/training-monolingual-nc-v8.tgz" -O news-commentary.tgz
+tar zxvf news-commentary.tgz && mv training/news-commentary-v8.de news-commentary-v8.de && rm news-commentary.tgz && rm -r training/
+
+# If you have enough space you can also download the other years
+wget "https://www.statmt.org/wmt13/training-monolingual-news-2012.tgz" -O news-2012.tgz
+tar zxvf news-2012.tgz && mv training-monolingual/news.2012.de.shuffled news.2012.de && rm news-2012.tgz && rm -r training-monolingual/
+
+wget "https://www.statmt.org/wmt13/training-monolingual-europarl-v7.tgz" -O europarl.tgz
+tar zxvf europarl.tgz && mv training/europarl-v7.de europarl-v7.de && rm europarl.tgz && rm -r training/
+
+# THis needs a lot of memory for processing (~30gb, you can also skip some of the files)
+python3 deepspeech-german/preprocessing/prepare_vocab.py data_original/texts/ data_prepared/clean_vocab_az.txt --replace_umlauts
 ```
 
 Generate scorer (Run in docker container):

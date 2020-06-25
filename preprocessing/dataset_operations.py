@@ -9,9 +9,6 @@ import pandas as pd
 import text_cleaning
 from pandarallel import pandarallel
 
-# ==================================================================================================
-
-umlaut_replacers = {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}
 
 # ==================================================================================================
 
@@ -163,9 +160,8 @@ def main():
     if args.replace:
         data["transcript"] = data["transcript"].str.lower()
         data["transcript"] = data["transcript"].parallel_apply(
-            lambda x: text_cleaning.clean_sentence(x)
+            lambda x: text_cleaning.clean_sentence(x, replace_umlauts=True)
         )
-        data["transcript"] = data["transcript"].replace(umlaut_replacers, regex=True)
 
     if args.clean and not args.nostats:
         data = clean(data)

@@ -1,16 +1,19 @@
-# -*- coding: utf-8 -*-
-
+import collections
 import re
 import string
+from functools import partial
+from multiprocessing import Pool
 
 import num2words
+import tqdm
 
 # ==================================================================================================
 
-# Regex patterns
-int_pattern = re.compile(r"[+-]?[0-9]+")
-ordinal_pattern = re.compile(r"([0-9]+[.])(?![.0-9])")
-float_pattern = re.compile(r"(?<![.0-9])([+-]?[0-9]+[,.][0-9]+)(?![.0-9])")
+# Regex patterns, see www.regexr.com for good explanation
+dp = r"(?:[\s][+-])?[0-9]+(?:(?:[.][0-9]{3}(?:(?=[^0-9])))+)?(?:[,][0-9]+)?"
+decimal_pattern = re.compile(dp)
+ordinal_pattern = re.compile(r"[0-9]+[.] ")
+special_pattern = re.compile(r"&#[0-9]+;")
 multi_space_pattern = re.compile(r"\s+")
 
 # Allowed characters a-zA-Z äöüß
@@ -20,6 +23,10 @@ allowed.append("ä")
 allowed.append("ö")
 allowed.append("ü")
 allowed.append("ß")
+all_bad_characters = set()
+
+umlaut_replacers = {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss"}
+umlaut_pattern = re.compile("|".join(umlaut_replacers.keys()))
 
 # Replacement characters
 replacer = {
@@ -45,7 +52,7 @@ replacer = {
     "ŵ": "w",
     "ýÿŷ": "y",
     "źżžȥ": "z",
-    "-­/:": " ",
+    '–-­/:(),.!?"[]': " ",
 }
 
 # Switch keys and value
@@ -57,7 +64,7 @@ for all, replacement in replacer.items():
 # Various replacement rules
 special_replacers = {
     " m / s ": "meter pro sekunde",
-    "m/s ": "meter pro sekunde",
+    " m/s ": "meter pro sekunde",
     "€": "euro",
     "$": "dollar",
     "£": "pfund",
@@ -69,14 +76,19 @@ special_replacers = {
     "km²": "quadratkilometer",
     "m²": "quadratmeter",
     "co2": "c o zwei",
-    "‰": "promille",
+    " ft ": "fuss",
     "±": "plus minus",
     "°c": "grad celsius",
     "°": "grad",
-    "kg": "kilogramm",
+    " kg ": "kilogramm",
     "α": "alpha",
     "β": "beta",
     "γ": "gamma",
+    "δ": "delta",
+    "@": "at",
+    "½": "einhalb",
+    "⅓": "ein drittel",
+    "¼": "ein viertel",
     "1910er": "neunzehnhundertzehner",
     "1920er": "neunzehnhundertzwanziger",
     "1930er": "neunzehnhundertdreißiger",
@@ -129,20 +141,13 @@ def replace_symbols(word):
 # ==================================================================================================
 
 
-def remove_symbols(word):
+def remove_symbols(word, bad_characters):
     """ Remove all symbols that are not allowed. """
 
-    result = word
-    bad_characters = []
+    for c in set(bad_characters):
+        word = word.replace(c, "")
 
-    for c in result:
-        if c not in allowed:
-            bad_characters.append(c)
-
-    for c in bad_characters:
-        result = result.replace(c, "")
-
-    return result
+    return word
 
 
 # ==================================================================================================
@@ -151,25 +156,23 @@ def remove_symbols(word):
 def word_to_num(word):
     """ Replace numbers with their written representation. """
 
-    matches = float_pattern.findall(word)
-    if len(matches) == 1:
-        num = matches[0].replace(",", ".")
-        num_word = num2words.num2words(float(num), lang="de")
-        word = word.replace(matches[0], " {} ".format(num_word))
+    matches = special_pattern.findall(word)
+    for match in matches:
+        word = word.replace(match, " ")
 
     matches = ordinal_pattern.findall(word)
     if len(matches) == 1:
         num_word = num2words.num2words(int(matches[0][:-1]), lang="de", to="ordinal")
         word = word.replace(matches[0], " {} ".format(num_word))
-        print(word, num_word)
 
-    matches = int_pattern.findall(word)
+    matches = decimal_pattern.findall(word)
     for match in matches:
-        num_word = num2words.num2words(int(match), lang="de")
+        num = match.replace(".", "")
+        num = num.replace(",", ".")
+        num_word = num2words.num2words(float(num), lang="de")
         word = word.replace(match, " {} ".format(num_word))
 
-    # Replace dots like in 168.192.0.1 and make word lowercase again
-    word = word.replace(".", " punkt ")
+    # Make word lowercase again
     word = word.lower()
     return word
 
@@ -177,14 +180,14 @@ def word_to_num(word):
 # ==================================================================================================
 
 
-def get_bad_character(text):
+def get_bad_characters(text):
     """ Return all characters in the text that are not allowed. """
 
-    bad_characters = set()
+    bad_characters = []
 
     for c in text:
         if c not in allowed:
-            bad_characters.add(c)
+            bad_characters.append(c)
 
     return bad_characters
 
@@ -197,37 +200,27 @@ def clean_word(word):
     Clean the given word.
 
     1. numbers to words
-    2. character/rule replacements
+    2. character replacements
     3. delete disallowed symbols
     """
 
     word = word.lower()
     word = word_to_num(word)
+    # Replace special characters again, sometimes they are behind a number like 12kg
+    word = replace_specials(word)
     word = replace_symbols(word)
-    word = remove_symbols(word)
 
-    bad_chars = get_bad_character(word)
+    bad_chars = get_bad_characters(word)
+    # word = remove_symbols(word, bad_chars)
 
-    if len(bad_chars) > 0:
-        print('Bad characters in "{}"'.format(word))
-        print("--> {}".format(", ".join(bad_chars)))
-
-    return word
+    return word, bad_chars
 
 
 # ==================================================================================================
 
 
-def clean_sentence(sentence):
-    """
-    Clean the given sentence.
-
-    1. split into words by spaces
-    2. numbers to words
-    3. character/rule replacements
-    4. delete disallowed symbols
-    4. join with spaces
-    """
+def clean_sentence(sentence, replace_umlauts=False):
+    """ Clean the given sentence """
 
     sentence = re.sub(multi_space_pattern, " ", sentence)
     sentence = sentence.lower()
@@ -235,11 +228,39 @@ def clean_sentence(sentence):
     words = sentence.strip().split()
 
     cleaned_words = []
+    bad_chars_sen = []
     for word in words:
-        cleaned_word = clean_word(word)
+        cleaned_word, bad_chars = clean_word(word)
         cleaned_words.append(cleaned_word)
+        bad_chars_sen.extend(bad_chars)
 
     sentence = " ".join(cleaned_words)
+    if replace_umlauts:
+        sentence = umlaut_pattern.sub(lambda x: umlaut_replacers[x.group()], sentence)
     # Remove duplicate whitespaces again, we may have added some with the above steps
     sentence = re.sub(multi_space_pattern, " ", sentence)
-    return sentence
+
+    return sentence, bad_chars_sen
+
+
+# ==================================================================================================
+
+
+def clean_sentence_list(sentences, replace_umlauts):
+    cl_func = partial(clean_sentence, replace_umlauts=replace_umlauts)
+
+    with Pool() as p:
+        processed_sentences = list(
+            tqdm.tqdm(p.imap(cl_func, sentences), total=len(sentences))
+        )
+
+    cleaned_sentences, bad_characters = zip(*processed_sentences)
+    all_bad_characters = []
+
+    for bc in bad_characters:
+        all_bad_characters.extend(bc)
+
+    msg = "\nCharacters which were deleted without replacement: {}"
+    print(msg.format(collections.Counter(all_bad_characters)))
+
+    return cleaned_sentences
