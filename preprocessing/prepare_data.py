@@ -24,7 +24,7 @@ def clean_transcriptions(corpus):
         ll = utterance.label_lists[audiomate.corpus.LL_WORD_TRANSCRIPT]
 
         for label in ll:
-            label.value = text_cleaning.clean_sentence(label.value)
+            label.value = text_cleaning.clean_sentence(label.value)[0]
 
 
 # ==================================================================================================
