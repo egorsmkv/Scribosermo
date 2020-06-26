@@ -1,13 +1,13 @@
-#! /usr/bin/env python
-
 import argparse
 import os
 
 import pandas as pd
 
+
 # ==================================================================================================
 
-if __name__ == "__main__":
+
+def main():
     parser = argparse.ArgumentParser(description="Split dataset into parts")
     parser.add_argument("csv_to_split_path", type=str)
     parser.add_argument("--file_appendix", type=str, default="")
@@ -88,3 +88,10 @@ if __name__ == "__main__":
         index=False,
         encoding="utf-8",
     )
+
+
+# ==================================================================================================
+
+if __name__ == "__main__":
+    main()
+    print("FINISHED")

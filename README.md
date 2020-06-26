@@ -177,12 +177,11 @@ mv noise/ zamia/
 rm noise.tar.xz
 
 # Normalize all the audio files (run with python2):
-cd /DeepSpeech/
-python deepspeech-german/preprocessing/normalize_noise_audio.py --from_dir data_original/noise/ --to_dir data_prepared/noise/ --max_sec 45
+python /DeepSpeech/deepspeech-german/preprocessing/normalize_noise_audio.py --from_dir /DeepSpeech/data_original/noise/ --to_dir /DeepSpeech/data_prepared/noise/ --max_sec 45
 
 # Create csv files:
-python3 deepspeech-german/preprocessing/noise_to_csv.py
-python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/noise/all.csv  --split "70|15|15"
+python3 /DeepSpeech/deepspeech-german/preprocessing/noise_to_csv.py
+python3 /DeepSpeech/deepspeech-german/preprocessing/split_dataset.py /DeepSpeech/data_prepared/noise/all.csv  --split "70|15|15"
 ```
 
 <br/>
@@ -207,8 +206,8 @@ tar zxvf news-2012.tgz && mv training-monolingual/news.2012.de.shuffled news.201
 wget "https://www.statmt.org/wmt13/training-monolingual-europarl-v7.tgz" -O europarl.tgz
 tar zxvf europarl.tgz && mv training/europarl-v7.de europarl-v7.de && rm europarl.tgz && rm -r training/
 
-# THis needs a lot of memory for processing (~30gb, you can also skip some of the files)
-python3 deepspeech-german/preprocessing/prepare_vocab.py data_original/texts/ data_prepared/clean_vocab_az.txt --replace_umlauts
+# This needs a lot of memory for processing (~30gb, but you can also skip some of the files)
+python3 /DeepSpeech/deepspeech-german/preprocessing/prepare_vocab.py /DeepSpeech/data_original/texts/ /DeepSpeech/data_prepared/clean_vocab_az.txt --replace_umlauts
 ```
 
 Generate scorer (Run in docker container):
@@ -287,9 +286,9 @@ sys.exit(1)
 Download pretrained deepspeech checkpoints.
 
 ```bash
-wget https://github.com/mozilla/DeepSpeech/releases/download/v0.6.0/deepspeech-0.6.0-checkpoint.tar.gz -P checkpoints/
-tar xvfz checkpoints/deepspeech-0.6.0-checkpoint.tar.gz -C checkpoints/
-rm checkpoints/deepspeech-0.6.0-checkpoint.tar.gz
+wget https://github.com/mozilla/DeepSpeech/releases/download/v0.7.3/deepspeech-0.7.3-checkpoint.tar.gz -P checkpoints/
+tar xvfz checkpoints/deepspeech-0.7.3-checkpoint.tar.gz -C checkpoints/
+rm checkpoints/deepspeech-0.7.3-checkpoint.tar.gz
 ```
 
 Adjust the parameters to your needs (Run in docker container):

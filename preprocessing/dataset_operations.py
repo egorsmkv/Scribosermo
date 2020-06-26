@@ -160,7 +160,7 @@ def main():
     if args.replace:
         data["transcript"] = data["transcript"].str.lower()
         data["transcript"] = data["transcript"].parallel_apply(
-            lambda x: text_cleaning.clean_sentence(x, replace_umlauts=True)
+            lambda x: text_cleaning.clean_sentence(x, replace_umlauts=True)[0]
         )
 
     if args.clean and not args.nostats:
@@ -200,3 +200,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    print("FINISHED")

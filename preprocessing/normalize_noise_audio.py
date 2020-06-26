@@ -219,3 +219,4 @@ if __name__ == "__main__":
     duration, file_num = get_noise_duration(PARAMS.to_dir)
     msg = "Your noise dataset has {} files and a duration of {} hours\n"
     print(msg.format(file_num, seconds_to_hours(duration)))
+    print("FINISHED")

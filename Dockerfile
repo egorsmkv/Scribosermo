@@ -18,7 +18,7 @@ RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
 # Update pip
-RUN pip3 install --upgrade --no-cache-dir pip
+RUN python3 -m pip install --upgrade pip
 
 # Install python packages
 RUN pip3 install --no-cache-dir --upgrade \
@@ -36,6 +36,17 @@ RUN pip3 install --upgrade --no-cache-dir setuptools
 
 # Update pandas version to fix an error
 RUN pip3 install --upgrade --no-cache-dir pandas
+
+# Build kenlm
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential cmake libboost-all-dev
+RUN cd /DeepSpeech/native_client/ && rm -r kenlm/ \
+    && git clone --depth 1 https://github.com/kpu/kenlm \
+    && cd kenlm \
+    && mkdir -p build \
+    && cd build \
+    && cmake .. \
+    && make -j 4
 
 # Install audiomate
 RUN pip3 install git+https://github.com/danbmh/audiomate.git@new_features

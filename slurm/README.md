@@ -30,30 +30,36 @@ Convert image.sif to sandbox folder (if local /tmp directory is to small). In co
 singularity build --sandbox dsgs_sandbox/ deep_speech_german_slurm.sif
 ```
 
-
 <br/>
+
 
 #### Use docker/podman images:
 
 * Install singularity on your local pc: [Instructions](https://sylabs.io/guides/3.5/user-guide/quick_start.html#quick-installation-steps)
 
 * Build images:
-
-    ```bash
-    podman build -f DeepSpeech/Dockerfile_slurm -t mds_slurm DeepSpeech/
-    podman build -t deep_speech_german_slurm deepspeech-german/
-    ```
+    - In DeepSpeech's Dockerfile.train switch `FROM tensorflow/tensorflow:1.15.2-gpu-py3` to `FROM nvcr.io/nvidia/tensorflow:20.03-tf1-py3` 
+        (This is required because cudnn doesn't work in slurm with the other base image)
+    - Build `mozilla_deep_speech` and `deep_speech_german`
 
 * Convert your images to compressed singularity images:
 
     ```bash
     # docker
-    ./deepspeech-german/slurm/convert_to_sifgz.sh d deep_speech_german_slurm    
+    ./deepspeech-german/slurm/convert_to_sifgz.sh d deep_speech_german
     # podman
-    ./deepspeech-german/slurm/convert_to_sifgz.sh p deep_speech_german_slurm
+    ./deepspeech-german/slurm/convert_to_sifgz.sh p deep_speech_german
     ```
   
 * Upload and decompress the singularity image
+
+    ```bash
+    scp deep_speech_german_slurm.sif.gz user@ip:/cfs/share/cache/db_xds/images/
+    gunzip deep_speech_german_slurm.sif.gz
+    ```
+
+<br/>
+
 
 ## Installation of dependencies
 Installation of singularity and needed dependencies without using root privileges. \
@@ -116,9 +122,21 @@ export PATH=$PATH:/cfs/share/cache/db_xds/programs/singularity/builddir
 echo "export PATH=$PATH:/cfs/share/cache/db_xds/programs/singularity/builddir" >> ~/.bashrc
 
 # Install spython for dockerfile conversion 
-# (but building does not work without root priviledges)
+# (but building does not work without root privileges)
 pip3 install spython
 # Close and reopen shell
+```
+
+Test singularity:
+```bash
+singularity exec \
+  --nv \
+  --bind checkpoints/:/DeepSpeech/checkpoints/ \
+  --bind data_original/:/DeepSpeech/data_original/ \
+  --bind data_prepared/:/DeepSpeech/data_prepared/ \
+  --bind deepspeech-german/:/DeepSpeech/deepspeech-german/ \
+  deep_speech_german.sif \
+  /bin/bash /DeepSpeech/deepspeech-german/training/train.sh 
 ```
 
 <br/>

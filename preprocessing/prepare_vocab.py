@@ -37,8 +37,7 @@ def main():
 
     # Load text corpora
     for file in os.listdir(args.source_path):
-        # if file.endswith(".txt") or file.endswith(".de"):
-        if file.endswith("v7.de"):
+        if file.endswith(".txt") or file.endswith(".de"):
             path = os.path.join(args.source_path, file)
             with open(path, "r", encoding="utf-8") as source_file:
                 content = source_file.readlines()
@@ -66,3 +65,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    print("FINISHED")

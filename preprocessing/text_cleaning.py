@@ -211,7 +211,7 @@ def clean_word(word):
     word = replace_symbols(word)
 
     bad_chars = get_bad_characters(word)
-    # word = remove_symbols(word, bad_chars)
+    word = remove_symbols(word, bad_chars)
 
     return word, bad_chars
 

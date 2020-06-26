@@ -2,7 +2,6 @@
 
 docker run \
   --network host --rm -it \
-  --name dsg_container \
   --gpus all --privileged --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 \
   --volume `pwd`/deepspeech-german/:/DeepSpeech/deepspeech-german/ \
   --volume `pwd`/checkpoints/:/DeepSpeech/checkpoints/ \
