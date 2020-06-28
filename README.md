@@ -5,34 +5,45 @@ _Original paper code can be found [here](https://github.com/AASHISHAG/deepspeech
 
 This project aims to develop a working Speech to Text module using [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech), which can be used for any Audio processing pipeline. [Mozillla DeepSpeech](https://github.com/mozilla/DeepSpeech) is a state-of-the-art open-source automatic speech recognition (ASR) toolkit. DeepSpeech is using a model trained by machine learning techniques based on [Baidu's Deep Speech](https://gigaom2.files.wordpress.com/2014/12/deep_speech3_12_17.pdf) research paper. Project DeepSpeech uses Google's TensorFlow to make the implementation easier.
 
-<p align="center">
-    <img src="media/deep_speech_architecture.png" align="center" title="DeepSpeech Graph" />
-</p>
+<div align="center">
+    <img src="media/deep_speech_architecture.png" alt="deepspeech graph" width="85%"/>
+</div>
+
 
 <br/>
 
 
 ## Datasets
 
-* [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
+#### German
 * [Mozilla Common Voice](https://voice.mozilla.org/) ~506h
-* [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
-* [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
-* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
-* GoogleWavenet ~165h, artificial training data generated with the google text to speech service
-* [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
 * [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
+* GoogleWavenet ~165h, artificial training data generated with the google text to speech service
+* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
+* [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
+* [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
+* [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
+* [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
 * [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
 
+#### French
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~?h
+* [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) ~?h
+* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~?h
+* [Tatoeba](https://tatoeba.org/fra/sentences/search?query=&from=fra&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~2h
+* [Voxforge](http://www.voxforge.org/home/) ~37h
+
+#### Noise
 * Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
 * Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
 * Noise data: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
 
 <br>
 
-Links:
+#### Links
 * [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no aligned transcriptions
 * [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html), seems to be paid only
+* [Many different languages](https://github.com/JRMeyer/open-speech-corpora)
 * [Many different languages](https://www.clarin.eu/resource-families/spoken-corpora), most with login or non commercial
 * GerTV1000h German Broadcast corpus and Difficult Speech Corpus (DiSCo), no links found
 
@@ -72,58 +83,68 @@ docker build -t deep_speech_german deepspeech-german/
 ./deepspeech-german/run_container.sh
 ```
 
+Set your language in `data/config/global_config.json.default` and save as `global_config.json`.
+
 <br/>
 
 
 #### Download and prepare voice data
 
-Download datasets (Run in docker container):
+Download datasets (Run in container):
 ```bash
-python3 deepspeech-german/preprocessing/download_data.py --tuda data_original/
-python3 deepspeech-german/preprocessing/download_data.py --voxforge data_original/
-python3 deepspeech-german/preprocessing/download_data.py --mailabs data_original/
-python3 deepspeech-german/preprocessing/download_data.py --swc data_original/
-python3 deepspeech-german/preprocessing/download_data.py --tatoeba data_original/
-python3 deepspeech-german/preprocessing/download_data.py --common_voice data_original/
-python3 deepspeech-german/preprocessing/download_data.py --zamia_speech data_original/
+export LANGUAGE="de"
+
+# German
+python3 deepspeech-german/preprocessing/download_data.py --swc_${LANGUAGE} data_original/${LANGUAGE}/
+python3 deepspeech-german/preprocessing/download_data.py --tuda_${LANGUAGE} data_original/${LANGUAGE}/
+python3 deepspeech-german/preprocessing/download_data.py --zamia_speech_${LANGUAGE} data_original/${LANGUAGE}/
+
+# German or French
+python3 deepspeech-german/preprocessing/download_data.py --common_voice_${LANGUAGE} data_original/${LANGUAGE}/
+python3 deepspeech-german/preprocessing/download_data.py --mailabs_${LANGUAGE} data_original/${LANGUAGE}/
+python3 deepspeech-german/preprocessing/download_data.py --tatoeba_${LANGUAGE} data_original/${LANGUAGE}/
+python3 deepspeech-german/preprocessing/download_data.py --voxforge_${LANGUAGE} data_original/${LANGUAGE}/
 ```
 
-Download css10 german dataset (Requires kaggle account): [LINK](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) \
-Extract and move it to datasets directory (data_original/css_german/) \
+Download css10 german/french dataset (Requires kaggle account, see links above) \
+Extract and move it to datasets directory (data_original/${LANGUAGE}/css_ten/) \
 It seems the files are saved all twice, so remove the duplicate folders
 
 <br/>
 
-Prepare datasets, this may take some time (Run in docker container):
+Prepare datasets, this may take some time (Run in container):
 ```bash
-# Prepare the datasets one by one to ensure everything is working:
-python3 deepspeech-german/preprocessing/prepare_data.py --voxforge data_original/voxforge/ data_prepared/voxforge/
-python3 deepspeech-german/preprocessing/prepare_data.py --tuda data_original/tuda/ data_prepared/tuda/
-python3 deepspeech-german/preprocessing/prepare_data.py --common_voice data_original/common_voice/ data_prepared/common_voice/
-python3 deepspeech-german/preprocessing/prepare_data.py --mailabs data_original/mailabs/ data_prepared/mailabs/
-python3 deepspeech-german/preprocessing/prepare_data.py --swc data_original/swc/ data_prepared/swc/
-python3 deepspeech-german/preprocessing/prepare_data.py --tatoeba data_original/tatoeba/ data_prepared/tatoeba/
-python3 deepspeech-german/preprocessing/prepare_data.py --css_german data_original/css_german/ data_prepared/css_german/
-python3 deepspeech-german/preprocessing/prepare_data.py --zamia_speech data_original/zamia_speech/ data_prepared/zamia_speech/
+export LANGUAGE="de"
 
+# German
+python3 deepspeech-german/preprocessing/prepare_data.py --swc data_original/${LANGUAGE}/swc/ data_prepared/${LANGUAGE}/swc/
+python3 deepspeech-german/preprocessing/prepare_data.py --tuda data_original/${LANGUAGE}/tuda/ data_prepared/${LANGUAGE}/tuda/
+python3 deepspeech-german/preprocessing/prepare_data.py --zamia_speech data_original/${LANGUAGE}/zamia_speech/ data_prepared/${LANGUAGE}/zamia_speech/
+
+# German or French
+python3 deepspeech-german/preprocessing/prepare_data.py --common_voice data_original/${LANGUAGE}/common_voice/ data_prepared/${LANGUAGE}/common_voice/
+python3 deepspeech-german/preprocessing/prepare_data.py --css_ten data_original/${LANGUAGE}/css_ten/ data_prepared/${LANGUAGE}/css_ten/
+python3 deepspeech-german/preprocessing/prepare_data.py --mailabs data_original/${LANGUAGE}/mailabs/ data_prepared/${LANGUAGE}/mailabs/
+python3 deepspeech-german/preprocessing/prepare_data.py --tatoeba data_original/${LANGUAGE}/tatoeba/ data_prepared/${LANGUAGE}/tatoeba/
+python3 deepspeech-german/preprocessing/prepare_data.py --voxforge data_original/${LANGUAGE}/voxforge/ data_prepared/${LANGUAGE}/voxforge/
 
 # To combine multiple datasets run the command as follows (not recommended):
-python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tuda/ --voxforge data_original/voxforge/ data_prepared/tuda_voxforge/
+python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/de/tuda/ --voxforge data_original/de/voxforge/ data_prepared/de/tuda_voxforge/
 
 # Or, which is much faster, but only combining train, dev, test and all csv files, run:
-python3 deepspeech-german/preprocessing/combine_datasets.py data_prepared/ --tuda --voxforge
+python3 deepspeech-german/preprocessing/combine_datasets.py data_prepared/de/ --tuda --voxforge
 
 # Or to combine specific csv files:
-python3 /DeepSpeech/deepspeech-german/preprocessing/combine_datasets.py "" --files_output /DeepSpeech/data_prepared/tvsmc/train_mix.csv --files "/DeepSpeech/data_prepared/tuda/train.csv /DeepSpeech/data_prepared/voxforge/train.csv /DeepSpeech/data_prepared/swc/all.csv /DeepSpeech/data_prepared/mailabs/all.csv /DeepSpeech/data_prepared/common_voice/train.csv"
+python3 /DeepSpeech/deepspeech-german/preprocessing/combine_datasets.py "" --files_output /DeepSpeech/data_prepared/de/tvsmc/train_mix.csv --files "/DeepSpeech/data_prepared/de/common_voice/train.csv /DeepSpeech/data_prepared/de/mailabs/all.csv /DeepSpeech/data_prepared/de/swc/all.csv /DeepSpeech/data_prepared/de/tuda/train.csv /DeepSpeech/data_prepared/de/voxforge/train.csv"
 
 
 # To shuffle and replace "äöü" characters and clean the files run (repeat for all 3 csv files):
-python3 /DeepSpeech/deepspeech-german/preprocessing/dataset_operations.py /DeepSpeech/data_prepared/voxforge/train.csv /DeepSpeech/data_prepared/voxforge/train_azce.csv --replace --shuffle --clean --exclude
+python3 /DeepSpeech/deepspeech-german/preprocessing/dataset_operations.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv --replace --shuffle --clean --exclude
 
 
 # To split tuda into the correct train, dev and test splits run: 
 # (you will have to rename the [train/dev/test]_s.csv files before combining them with other datasets)
-python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/tuda/all.csv --tuda --file_appendix _s
+python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/de/tuda/all.csv --tuda --file_appendix _s
 ```
 
 Preparation times using Intel i7-8700K:
@@ -191,38 +212,46 @@ python3 /DeepSpeech/deepspeech-german/preprocessing/split_dataset.py /DeepSpeech
 
 Download and prepare the text corpora [tuda](http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/), [europarl+news](https://www.statmt.org/wmt13/translation-task.html):
 ```bash
-cd data_original/texts/
+export LANGUAGE="de"
+mkdir data_original/texts/ && mkdir data_original/texts/${LANGUAGE}/
+mkdir data_prepared/texts/ && mkdir data_prepared/texts/${LANGUAGE}/
+cd data_original/texts/${LANGUAGE}/
 
+# German
 wget "http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz" -O tuda_sentences.txt.gz
 gzip -d tuda_sentences.txt.gz
 
+# German or French
 wget "https://www.statmt.org/wmt13/training-monolingual-nc-v8.tgz" -O news-commentary.tgz
-tar zxvf news-commentary.tgz && mv training/news-commentary-v8.de news-commentary-v8.de && rm news-commentary.tgz && rm -r training/
-
+tar zxvf news-commentary.tgz && mv training/news-commentary-v8.${LANGUAGE} news-commentary-v8.${LANGUAGE}
+rm news-commentary.tgz && rm -r training/
+wget "https://www.statmt.org/wmt13/training-monolingual-europarl-v7.tgz" -O europarl.tgz
+tar zxvf europarl.tgz && mv training/europarl-v7.${LANGUAGE} europarl-v7.${LANGUAGE}
+rm europarl.tgz && rm -r training/
 # If you have enough space you can also download the other years
 wget "https://www.statmt.org/wmt13/training-monolingual-news-2012.tgz" -O news-2012.tgz
-tar zxvf news-2012.tgz && mv training-monolingual/news.2012.de.shuffled news.2012.de && rm news-2012.tgz && rm -r training-monolingual/
-
-wget "https://www.statmt.org/wmt13/training-monolingual-europarl-v7.tgz" -O europarl.tgz
-tar zxvf europarl.tgz && mv training/europarl-v7.de europarl-v7.de && rm europarl.tgz && rm -r training/
+tar zxvf news-2012.tgz && mv training-monolingual/news.2012.${LANGUAGE}.shuffled news.2012.${LANGUAGE}
+rm news-2012.tgz && rm -r training-monolingual/
 
 # This needs a lot of memory for processing (~30gb, but you can also skip some of the files)
-python3 /DeepSpeech/deepspeech-german/preprocessing/prepare_vocab.py /DeepSpeech/data_original/texts/ /DeepSpeech/data_prepared/clean_vocab_az.txt --replace_umlauts
+python3 /DeepSpeech/deepspeech-german/preprocessing/prepare_vocab.py /DeepSpeech/data_original/texts/${LANGUAGE}/ /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab_az.txt
 ```
 
-Generate scorer (Run in docker container):
+Generate scorer (Run in container):
 ```bash
-mkdir data_prepared/lm/
-
-python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/clean_vocab_az.txt --output_dir /DeepSpeech/data_prepared/lm/ --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie
-
-python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-german/data/alphabet_az.txt --lm /DeepSpeech/data_prepared/lm/lm.binary --vocab /DeepSpeech/data_prepared/lm/vocab-500000.txt --package /DeepSpeech/data_prepared/lm/kenlm_az.scorer --default_alpha 0.75 --default_beta 1.85
+export LANGUAGE="de"
+python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab_az.txt --output_dir /DeepSpeech/data_prepared/texts/${LANGUAGE}/ --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie
+python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-german/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary --vocab /DeepSpeech/data_prepared/texts/${LANGUAGE}/vocab-500000.txt --package /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_az.scorer --default_alpha 0.75 --default_beta 1.85
 ```
 
 <br/>
 
 
 #### Fix some issues
+
+Following issues may or may not occur in your trainings, so better try it first without changing the scripts.
+
+<br/>
 
 For me only training with voxforge worked at first. With tuda dataset I got an error: \
 "Invalid argument: Not enough time for target transition sequence"
@@ -291,28 +320,35 @@ tar xvfz checkpoints/deepspeech-0.7.3-checkpoint.tar.gz -C checkpoints/
 rm checkpoints/deepspeech-0.7.3-checkpoint.tar.gz
 ```
 
-Adjust the parameters to your needs (Run in docker container):
+Adjust the parameters/scripts to your needs (Run in container):
+```bash
+# Run a training using the english checkpoint:
+/bin/bash /DeepSpeech/deepspeech-german/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/train_azce.csv /DeepSpeech/data_prepared/voxforge/dev_azce.csv /DeepSpeech/data_prepared/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.7.3-checkpoint/
 
+# Run test only
+# Don't forget to use the noiseaugmaster image if testing with noise
+/bin/bash /DeepSpeech/deepspeech-german/training/test_noise.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/test_azce.csv 
+```
+
+<br/>
+
+Other things you can do:
 ```bash
 # Delete old model files:
 rm -rf /root/.local/share/deepspeech/summaries && rm -rf /root/.local/share/deepspeech/checkpoints
 
-
-# Run training:
-python3 DeepSpeech.py --train_files data_prepared/voxforge/train.csv --dev_files data_prepared/voxforge/dev.csv --test_files data_prepared/voxforge/test.csv \
---alphabet_config_path deepspeech-german/data/alphabet.txt --lm_trie_path data_prepared/trie --lm_binary_path data_prepared/lm.binary --test_batch_size 48 --train_batch_size 48 --dev_batch_size 48 \
---epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --export_dir deepspeech-german/models --use_allow_growth --use_cudnn_rnn 
-
-# Or adjust the train.sh file and run a training using the english checkpoint:
-/bin/bash /DeepSpeech/deepspeech-german/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/train_azce.csv /DeepSpeech/data_prepared/voxforge/dev_azce.csv /DeepSpeech/data_prepared/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.6.0-checkpoint/
-
-# Or to run a cycled training as described in the paper, run:
-python3 /DeepSpeech/deepspeech-german/training/cycled_training.py /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/ _azce --voxforge
-
+# Run training without the helpful script:
+python3 DeepSpeech.py --train_files data_prepared/de/voxforge/train.csv --dev_files data_prepared/de/voxforge/dev.csv --test_files data_prepared/de/voxforge/test.csv \
+--scorer data_prepared/texts/de/kenlm_az.scorer --alphabet_config_path deepspeech-german/data/alphabet_de.txt --test_batch_size 48 --train_batch_size 48 --dev_batch_size 48 \
+--epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --use_allow_growth --use_cudnn_rnn \
+--export_dir checkpoints/de/voxforge/ --checkpoint_dir /checkpoints/de/voxforge/ --summary_dir /checkpoints/de/voxforge/
 
 # Run test only (The use_allow_growth flag fixes "cuDNN failed to initialize" error):
-# Don't forget to add the noise augmentation flags if testing with noise
-python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/voxforge/test_azce.csv --checkpoint_dir /DeepSpeech/checkpoints/voxforge/ --scorer_path /DeepSpeech/data_prepared/lm/kenlm_az.scorer --alphabet_config_path /DeepSpeech/deepspeech-german/data/alphabet_az.txt --test_batch_size 36 --use_allow_growth
+python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/de/voxforge/test_azce.csv --checkpoint_dir /DeepSpeech/checkpoints/de/voxforge/ \
+--scorer data_prepared/texts/de/kenlm_az.scorer --alphabet_config_path /DeepSpeech/deepspeech-german/data/alphabet_de.txt --test_batch_size 36 --use_allow_growth
+
+# Or to run a cycled training as described in the paper, run:
+python3 /DeepSpeech/deepspeech-german/training/cycled_training.py /DeepSpeech/checkpoints/de/voxforge/ /DeepSpeech/data_prepared/de/ _azce --voxforge
 ```
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. Training until early stop took 22min for 10 epochs. 
@@ -472,6 +508,8 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 | Voxforge | test with speech and noise overlay | Test: 53.832214 | | WER: 0.441768, CER: 0.218798 |
 ||
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | test with Voxforge + Tuda + CommonVoice others completely for training, with noise and speech overlay | Test: 22.055849, Validation: 17.613633 | 46 | WER: 0.208809, CER: 0.087215 |
+||
+| Voxforge FR | speech and noise overlay | Test: 5.341695, Validation: 12.736551 | 49 | WER: 0.175954, CER: 0.045416 |
 ||
 
 <br/>

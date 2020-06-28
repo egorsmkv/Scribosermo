@@ -1,9 +1,11 @@
 #! /bin/bash
 
-CHECKPOINT_DIR=${1:-"/DeepSpeech/checkpoints/voxforge/"}
-TRAIN_FILE=${2:-"/DeepSpeech/data_prepared/voxforge/train_azce.csv"}
-DEV_FILE=${3:-"/DeepSpeech/data_prepared/voxforge/dev_azce.csv"}
-TEST_FILE=${4:-"/DeepSpeech/data_prepared/voxforge/test_azce.csv"}
+LANGUAGE="de"
+
+CHECKPOINT_DIR=${1:-"/DeepSpeech/checkpoints/${LANGUAGE}/voxforge/"}
+TRAIN_FILE=${2:-"/DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv"}
+DEV_FILE=${3:-"/DeepSpeech/data_prepared/${LANGUAGE}/voxforge/dev_azce.csv"}
+TEST_FILE=${4:-"/DeepSpeech/data_prepared/${LANGUAGE}/voxforge/test_azce.csv"}
 
 DELETE_OLD_CHECKPOINTS=${5:-0}
 START_FROM_CHECKPOINT=${6:-"/DeepSpeech/checkpoints/deepspeech-0.7.3-checkpoint/"}
@@ -19,6 +21,12 @@ fi
 
 if [[ "${START_FROM_CHECKPOINT}" != "--" ]]; then
   cp -a ${START_FROM_CHECKPOINT}"." ${CHECKPOINT_DIR}
+fi
+
+if [[ "${LANGUAGE}" == "de" ]]; then
+  DROP_SOURCE_LAYERS=0
+else
+  DROP_SOURCE_LAYERS=1
 fi
 
 #if [[ "${USE_AUGMENTATION}" == "1" ]]; then
@@ -71,8 +79,8 @@ fi
 DSARGS="--train_files ${TRAIN_FILE} \
         --dev_files ${DEV_FILE} \
         --test_files ${TEST_FILE} \
-        --scorer /DeepSpeech/data_prepared/lm/kenlm_az.scorer \
-        --alphabet_config_path /DeepSpeech/deepspeech-german/data/alphabet_az.txt \
+        --scorer /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_az.scorer \
+        --alphabet_config_path /DeepSpeech/deepspeech-german/data/alphabet_${LANGUAGE}.txt \
         --test_batch_size ${BATCH_SIZE} \
         --train_batch_size ${BATCH_SIZE} \
         --dev_batch_size ${BATCH_SIZE} \
@@ -85,7 +93,7 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --learning_rate 0.0001 \
         --dropout_rate 0.25 \
         --use_allow_growth  \
-        --drop_source_layers 0 \
+        --drop_source_layers ${DROP_SOURCE_LAYERS} \
         --train_cudnn \
         --export_dir ${CHECKPOINT_DIR} \
         --checkpoint_dir ${CHECKPOINT_DIR} \

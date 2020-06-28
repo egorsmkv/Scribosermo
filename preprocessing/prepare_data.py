@@ -33,66 +33,56 @@ def clean_transcriptions(corpus):
 def main():
     parser = argparse.ArgumentParser(description="Prepare data for training.")
     parser.add_argument("target_path", type=str)
+    parser.add_argument("--common_voice", type=str)
+    parser.add_argument("--css_ten", type=str)
+    parser.add_argument("--mailabs", type=str)
+    parser.add_argument("--swc", type=str)
+    parser.add_argument("--tatoeba", type=str)
     parser.add_argument("--tuda", type=str)
     parser.add_argument("--voxforge", type=str)
-    parser.add_argument("--swc", type=str)
-    parser.add_argument("--mailabs", type=str)
-    parser.add_argument("--common_voice", type=str)
-    parser.add_argument("--tatoeba", type=str)
-    parser.add_argument("--css_german", type=str)
     parser.add_argument("--zamia_speech", type=str)
-
     args = parser.parse_args()
-
-    tuda_path = args.tuda
-    voxforge_path = args.voxforge
-    swc_path = args.swc
-    mailabs_path = args.mailabs
-    cv_path = args.common_voice
-    tatoeba_path = args.tatoeba
-    css_path = args.css_german
-    zs_path = args.zamia_speech
 
     corpora = []
 
-    if tuda_path is not None:
-        print("Loading tuda ...")
-        corpus = audiomate.Corpus.load(tuda_path, reader="tuda")
-        corpora.append(corpus)
-
-    if voxforge_path is not None:
-        print("Loading voxforge ...")
-        corpus = audiomate.Corpus.load(voxforge_path, reader="voxforge")
-        corpora.append(corpus)
-
-    if swc_path is not None:
-        print("Loading swc ...")
-        corpus = audiomate.Corpus.load(swc_path, reader="swc")
-        corpora.append(corpus)
-
-    if mailabs_path is not None:
-        print("Loading mailabs ...")
-        corpus = audiomate.Corpus.load(mailabs_path, reader="mailabs")
-        corpora.append(corpus)
-
-    if cv_path is not None:
+    if args.common_voice is not None:
         print("Loading common-voice ...")
-        corpus = audiomate.Corpus.load(cv_path, reader="common-voice")
+        corpus = audiomate.Corpus.load(args.common_voice, reader="common-voice")
         corpora.append(corpus)
 
-    if tatoeba_path is not None:
+    if args.css_ten is not None:
+        print("Loading css ...")
+        corpus = audiomate.Corpus.load(args.css_ten, reader="css10")
+        corpora.append(corpus)
+
+    if args.mailabs is not None:
+        print("Loading mailabs ...")
+        corpus = audiomate.Corpus.load(args.mailabs, reader="mailabs")
+        corpora.append(corpus)
+
+    if args.tatoeba is not None:
         print("Loading tatoeba ...")
-        corpus = audiomate.Corpus.load(tatoeba_path, reader="tatoeba")
+        corpus = audiomate.Corpus.load(args.tatoeba, reader="tatoeba")
         corpora.append(corpus)
 
-    if css_path is not None:
-        print("Loading css-german ...")
-        corpus = audiomate.Corpus.load(css_path, reader="css10")
+    if args.swc is not None:
+        print("Loading swc ...")
+        corpus = audiomate.Corpus.load(args.swc, reader="swc")
         corpora.append(corpus)
 
-    if zs_path is not None:
+    if args.tuda is not None:
+        print("Loading tuda ...")
+        corpus = audiomate.Corpus.load(args.tuda, reader="tuda")
+        corpora.append(corpus)
+
+    if args.voxforge is not None:
+        print("Loading voxforge ...")
+        corpus = audiomate.Corpus.load(args.voxforge, reader="voxforge")
+        corpora.append(corpus)
+
+    if args.zamia_speech is not None:
         print("Loading zamia-speech ...")
-        corpus = audiomate.Corpus.load(zs_path, reader="zamia-speech")
+        corpus = audiomate.Corpus.load(args.zamia_speech, reader="zamia-speech")
         corpora.append(corpus)
 
     if len(corpora) <= 0:
@@ -104,7 +94,7 @@ def main():
     print("Splitting corpus ...")
     splitter = subset.Splitter(merged_corpus, random_seed=38)
     split_sizes = {"train": 0.7, "dev": 0.15, "test": 0.15}
-    if css_path is not None and len(corpora) == 1:
+    if (args.css_ten is not None or args.tatoeba is not None) and len(corpora) == 1:
         splits = splitter.split(split_sizes, separate_issuers=False)
     else:
         splits = splitter.split(split_sizes, separate_issuers=True)

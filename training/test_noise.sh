@@ -1,7 +1,9 @@
 #! /bin/bash
 
-CHECKPOINT_DIR=${1:-"/DeepSpeech/checkpoints/voxforge/"}
-TEST_FILE=${2:-"/DeepSpeech/data_prepared/voxforge/test_azce.csv"}
+LANGUAGE="de"
+
+CHECKPOINT_DIR=${1:-"/DeepSpeech/checkpoints/${LANGUAGE}/voxforge/"}
+TEST_FILE=${2:-"/DeepSpeech/data_prepared/${LANGUAGE}/voxforge/test_azce.csv"}
 
 BATCH_SIZE=24
 NOISE_FILE="/DeepSpeech/data_prepared/noise/test.csv"
@@ -19,13 +21,13 @@ AUG_NOISE="--test_augmentation_noise_files ${NOISE_FILE} \
            --audio_aug_limit_noise_peak_dbfs 1.0 \
            --audio_aug_min_n_noises 1 \
            --audio_aug_max_n_noises 2"
-#AUG_SPEECH=""
-#AUG_NOISE=""
+AUG_SPEECH=""
+AUG_NOISE=""
 
 DSARGS="--test_files ${TEST_FILE} \
         --checkpoint_dir ${CHECKPOINT_DIR} \
-        --scorer /DeepSpeech/data_prepared/lm/kenlm_az.scorer \
-        --alphabet_config_path /DeepSpeech/deepspeech-german/data/alphabet_az.txt \
+        --scorer /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_az.scorer \
+        --alphabet_config_path /DeepSpeech/deepspeech-german/data/alphabet_${LANGUAGE}.txt \
         --test_batch_size ${BATCH_SIZE} \
         --use_allow_growth  \
         ${AUG_SPEECH} \
