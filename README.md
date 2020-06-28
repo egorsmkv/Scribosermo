@@ -114,7 +114,7 @@ python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/tu
 python3 deepspeech-german/preprocessing/combine_datasets.py data_prepared/ --tuda --voxforge
 
 # Or to combine specific csv files:
-python3 deepspeech-german/preprocessing/combine_datasets.py "" --files_output data_prepared/tuda-voxforge-swc-mailabs-common_voice/train_mix.csv --files "data_prepared/tuda/train.csv data_prepared/voxforge/all.csv data_prepared/swc/all.csv data_prepared/mailabs/all.csv data_prepared/common_voice/train.csv"
+python3 /DeepSpeech/deepspeech-german/preprocessing/combine_datasets.py "" --files_output /DeepSpeech/data_prepared/tvsmc/train_mix.csv --files "/DeepSpeech/data_prepared/tuda/train.csv /DeepSpeech/data_prepared/voxforge/train.csv /DeepSpeech/data_prepared/swc/all.csv /DeepSpeech/data_prepared/mailabs/all.csv /DeepSpeech/data_prepared/common_voice/train.csv"
 
 
 # To shuffle and replace "äöü" characters and clean the files run (repeat for all 3 csv files):
@@ -392,9 +392,9 @@ Some results with some older code version: \
 
 | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
 |---------|------------------|--------|-------------------------------|--------|
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | test only with Tuda + CommonVoice others completely for training, language model with training transcriptions, with augmentation | Test: 29.363405, Validation: 23.509546 | 55 | WER: 0.190189, CER: 0.091737 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested with 3-gram language model | Test: 29.363405 | | WER: 0.199709, CER: 0.095318 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice  | above checkpoint tested on Tuda only | Test: 87.074394 | | WER: 0.378379, CER: 0.167380 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | test only with Tuda + CommonVoice others completely for training, language model with training transcriptions, with augmentation | Test: 29.363405, Validation: 23.509546 | 55 | WER: 0.190189, CER: 0.091737 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above checkpoint tested with 3-gram language model | Test: 29.363405 | | WER: 0.199709, CER: 0.095318 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above checkpoint tested on Tuda only | Test: 87.074394 | | WER: 0.378379, CER: 0.167380 |
 
 <br/>
 
@@ -470,6 +470,8 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 | Voxforge | test with speech overlay | Test: 46.012951 | | WER: 0.362291, CER: 0.164134 |
 | Voxforge | test with noise overlay | Test: 44.035809 | | WER: 0.377276, CER: 0.171528 |
 | Voxforge | test with speech and noise overlay | Test: 53.832214 | | WER: 0.441768, CER: 0.218798 |
+||
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | test with Voxforge + Tuda + CommonVoice others completely for training, with noise and speech overlay | Test: 22.055849, Validation: 17.613633 | 46 | WER: 0.208809, CER: 0.087215 |
 ||
 
 <br/>
