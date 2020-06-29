@@ -13,25 +13,46 @@ lang = utils.load_global_config()["language"]
 langdicts = utils.get_langdicts()
 
 # Regex patterns, see www.regexr.com for good explanation
-decimal_pattern = re.compile(langdicts["number_pattern"][lang]["decimal"])
-ordinal_pattern = re.compile(langdicts["number_pattern"][lang]["ordinal"])
+decimal_pattern = None
+ordinal_pattern = None
 special_pattern = re.compile(r"&#[0-9]+;|&nbsp;")
 multi_space_pattern = re.compile(r"\s+")
 
 # Allowed characters
-allowed_chars = langdicts["allowed_chars"][lang]
+allowed_chars = None
 all_bad_characters = set()
 
 # Special replacements
-umlaut_replacers = langdicts["umlaut_replacers"][lang]
-special_replacers = langdicts["special_replacers"][lang]
+umlaut_replacers = None
+special_replacers = None
+char_replacers = None
 
-replacer = langdicts["char_replacers"][lang]
-char_replacers = {}
-for all, replacement in replacer.items():
-    # Switch keys and value
-    for to_replace in all:
-        char_replacers[to_replace] = replacement
+
+# ==================================================================================================
+
+
+def load_replacers(lang):
+    global decimal_pattern, ordinal_pattern, allowed_chars, umlaut_replacers, special_replacers, char_replacers
+
+    decimal_pattern = re.compile(langdicts["number_pattern"][lang]["decimal"])
+    ordinal_pattern = re.compile(langdicts["number_pattern"][lang]["ordinal"])
+
+    allowed_chars = langdicts["allowed_chars"][lang]
+    umlaut_replacers = langdicts["umlaut_replacers"][lang]
+    special_replacers = langdicts["special_replacers"][lang]
+
+    replacer = langdicts["char_replacers"][lang]
+    char_replacers = {}
+    for all, replacement in replacer.items():
+        # Switch keys and value
+        for to_replace in all:
+            char_replacers[to_replace] = replacement
+
+
+# ==================================================================================================
+
+# Load replacers in extra function that language is exchangeable for testing
+load_replacers(lang)
 
 
 # ==================================================================================================
@@ -129,8 +150,9 @@ def clean_word(word):
 
     word = word.lower()
     word = word_to_num(word)
-    # Replace special characters again, sometimes they are behind a number like 12kg
-    word = replace_specials(word)
+    # Replace special words again, sometimes they are behind a number like '12kg' -> 'twelve kg'
+    # Adding a space because replacer only looks for ' kg ' so that 'kg' is not replaced in words
+    word = replace_specials(" {} ".format(word))
     word = replace_symbols(word)
 
     bad_chars = get_bad_characters(word)
@@ -185,4 +207,4 @@ def clean_sentence_list(sentences):
     msg = "\nCharacters which were deleted without replacement: {}"
     print(msg.format(collections.Counter(all_bad_characters)))
 
-    return cleaned_sentences
+    return list(cleaned_sentences)
