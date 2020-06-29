@@ -134,6 +134,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /De
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
 
 # German or French or Spanish
+# The french mailabs and common_voice datasets have a different directory structure compared to the german datasets, you have to fix this first, see https://github.com/DanBmh/audiomate/issues/4
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/common_voice/ /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --css_ten /DeepSpeech/data_original/${LANGUAGE}/css_ten/ /DeepSpeech/data_prepared/${LANGUAGE}/css_ten/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --mailabs /DeepSpeech/data_original/${LANGUAGE}/mailabs/ /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/
@@ -159,7 +160,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/dataset_operations.py /Dee
 python3 deepspeech-polyglot/preprocessing/split_dataset.py data_prepared/de/tuda/all.csv --tuda --file_appendix _s
 ```
 
-Preparation times using Intel i7-8700K:
+Preparation times for german datasets using Intel i7-8700K:
 * voxforge: some seconds
 * tuda: some minutes
 * mailabs: ~20min
@@ -541,7 +542,7 @@ Graph model for above checkpoint: [Link](https://drive.google.com/open?id=14VBl8
 You can contribute to this project in multiple ways:
 
 * Add a new language:
-    - Extend `data/langdicts.json`
+    - Extend `data/langdicts.json` and `tests/test_text_cleaning.py`
     - Add speech datasets 
     - Find text corpora for the language model
 * Help to solve the open issues

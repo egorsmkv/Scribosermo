@@ -4,6 +4,6 @@
 .~lock*
 **.log
 **.tmp
-.coverage
+.coverage*
 models/*
 data/google_application_credentials.json

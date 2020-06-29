@@ -48,6 +48,8 @@ RUN cd /DeepSpeech/native_client/ && rm -r kenlm/ \
     && cmake .. \
     && make -j 4
 
+RUN pip3 install --upgrade --no-cache-dir pytest pytest-cov
+
 # Install audiomate
 RUN pip3 install git+https://github.com/danbmh/audiomate.git@new_features
 #RUN pip3 install --no-cache-dir audiomate

@@ -36,11 +36,15 @@ def test_clean_sentence_list_de():
         "Hi, wie geht's dir?",
         "Möchtest du 3kg Vanilleeis?",
         "Ich habe leider nur 2€",
+        "Der Preiß mag dafür 12.300,50€",
+        "Für Vanilleeis? Da kauf ich lieber 1,5m² Grundstück in München"
     ]
     correct_sentences = [
         "hi wie gehts dir",
         "moechtest du drei kilogramm vanilleeis",
         "ich habe leider nur zwei euro",
+        "der preiss mag dafuer zwoelftausenddreihundert komma fuenf euro",
+        "fuer vanilleeis da kauf ich lieber eins komma fuenf quadratmeter grundstueck in muenchen"
     ]
     cleaned_sentences = text_cleaning.clean_sentence_list(sentences)
 
