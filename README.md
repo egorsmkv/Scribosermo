@@ -6,9 +6,14 @@ _Original paper code can be found [here](https://github.com/AASHISHAG/deepspeech
 This project aims to develop a working Speech to Text module using [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech), which can be used for any Audio processing pipeline. [Mozillla DeepSpeech](https://github.com/mozilla/DeepSpeech) is a state-of-the-art open-source automatic speech recognition (ASR) toolkit. DeepSpeech is using a model trained by machine learning techniques based on [Baidu's Deep Speech](https://gigaom2.files.wordpress.com/2014/12/deep_speech3_12_17.pdf) research paper. Project DeepSpeech uses Google's TensorFlow to make the implementation easier.
 
 <div align="center">
-    <img src="media/deep_speech_architecture.png" alt="deepspeech graph" width="75%"/>
+    <img src="media/deep_speech_architecture.png" alt="deepspeech graph" width="45%"/>
 </div>
 
+<br/>
+
+[![pipeline status](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/badges/master/pipeline.svg)](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/-/commits/master)
+[![coverage report](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/badges/master/coverage.svg)](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/-/commits/master)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 <br/>
 
