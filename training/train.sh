@@ -80,7 +80,7 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --dev_files ${DEV_FILE} \
         --test_files ${TEST_FILE} \
         --scorer /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_az.scorer \
-        --alphabet_config_path /DeepSpeech/deepspeech-german/data/alphabet_${LANGUAGE}.txt \
+        --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt \
         --test_batch_size ${BATCH_SIZE} \
         --train_batch_size ${BATCH_SIZE} \
         --dev_batch_size ${BATCH_SIZE} \

@@ -27,7 +27,7 @@ python3 -c "import tensorflow as tf; sess = tf.Session(config=tf.ConfigProto(log
 
 Convert image.sif to sandbox folder (if local /tmp directory is to small). In commands simply exchange image.sif with sandbox directory:
 ```bash
-singularity build --sandbox dsgs_sandbox/ deep_speech_german_slurm.sif
+singularity build --sandbox dsgs_sandbox/ deepspeech_polyglot.sif
 ```
 
 <br/>
@@ -40,22 +40,22 @@ singularity build --sandbox dsgs_sandbox/ deep_speech_german_slurm.sif
 * Build images:
     - In DeepSpeech's Dockerfile.train switch `FROM tensorflow/tensorflow:1.15.2-gpu-py3` to `FROM nvcr.io/nvidia/tensorflow:20.03-tf1-py3` 
         (This is required because cudnn doesn't work in slurm with the other base image)
-    - Build `mozilla_deep_speech` and `deep_speech_german`
+    - Build `mozilla_deepspeech` and `deepspeech_polyglot`
 
 * Convert your images to compressed singularity images:
 
     ```bash
     # docker
-    ./deepspeech-german/slurm/convert_to_sifgz.sh d deep_speech_german
+    ./deepspeech-polyglot/slurm/convert_to_sifgz.sh d deepspeech_polyglot
     # podman
-    ./deepspeech-german/slurm/convert_to_sifgz.sh p deep_speech_german
+    ./deepspeech-polyglot/slurm/convert_to_sifgz.sh p deepspeech_polyglot
     ```
   
 * Upload and decompress the singularity image
 
     ```bash
-    scp deep_speech_german_slurm.sif.gz user@ip:/cfs/share/cache/db_xds/images/
-    gunzip deep_speech_german_slurm.sif.gz
+    scp deepspeech_polyglot.sif.gz user@ip:/cfs/share/cache/db_xds/images/
+    gzip -d deepspeech_polyglot.sif.gz
     ```
 
 <br/>
@@ -70,7 +70,7 @@ my_deepspeech_folder (named db_xds here)
     data_original
     data_prepared
     DeepSpeech
-    deepspeech-german    <- This repositiory
+    deepspeech-polyglot    <- This repositiory
 
     programs <- New folder for dependencies installations
 ```
@@ -134,9 +134,9 @@ singularity exec \
   --bind checkpoints/:/DeepSpeech/checkpoints/ \
   --bind data_original/:/DeepSpeech/data_original/ \
   --bind data_prepared/:/DeepSpeech/data_prepared/ \
-  --bind deepspeech-german/:/DeepSpeech/deepspeech-german/ \
-  deep_speech_german.sif \
-  /bin/bash /DeepSpeech/deepspeech-german/training/train.sh 
+  --bind deepspeech-polyglot/:/DeepSpeech/deepspeech-polyglot/ \
+  deepspeech_polyglot.sif \
+  /bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh 
 ```
 
 <br/>

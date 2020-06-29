@@ -1,4 +1,4 @@
-# DeepSpeech German
+# DeepSpeech Polyglot
 
 _This project is build upon the paper [German End-to-end Speech Recognition based on DeepSpeech](https://www.researchgate.net/publication/336532830_German_End-to-end_Speech_Recognition_based_on_DeepSpeech)._
 _Original paper code can be found [here](https://github.com/AASHISHAG/deepspeech-german)._
@@ -62,7 +62,7 @@ my_deepspeech_folder
     data_original
     data_prepared
     DeepSpeech
-    deepspeech-german    <- This repository
+    deepspeech-polyglot    <- This repository
 ```
 
 Clone DeepSpeech and build container:
@@ -73,14 +73,14 @@ git clone https://github.com/mozilla/DeepSpeech.git
 git clone https://github.com/DanBmh/DeepSpeech.git
 
 cd DeepSpeech && make Dockerfile.train && cd ..
-docker build -f DeepSpeech/Dockerfile.train -t mozilla_deep_speech DeepSpeech/
+docker build -f DeepSpeech/Dockerfile.train -t mozilla_deepspeech DeepSpeech/
 ```
 
 Build and run our docker container:
 ```bash
-docker build -t deep_speech_german deepspeech-german/
+docker build -t deepspeech_polyglot deepspeech-polyglot/
 
-./deepspeech-german/run_container.sh
+./deepspeech-polyglot/run_container.sh
 ```
 
 Set your language in `data/config/global_config.json.default` and save as `global_config.json`.
@@ -95,15 +95,15 @@ Download datasets (Run in container):
 export LANGUAGE="de"
 
 # German
-python3 deepspeech-german/preprocessing/download_data.py --swc_${LANGUAGE} data_original/${LANGUAGE}/
-python3 deepspeech-german/preprocessing/download_data.py --tuda_${LANGUAGE} data_original/${LANGUAGE}/
-python3 deepspeech-german/preprocessing/download_data.py --zamia_speech_${LANGUAGE} data_original/${LANGUAGE}/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --swc_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --tuda_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --zamia_speech_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 
 # German or French
-python3 deepspeech-german/preprocessing/download_data.py --common_voice_${LANGUAGE} data_original/${LANGUAGE}/
-python3 deepspeech-german/preprocessing/download_data.py --mailabs_${LANGUAGE} data_original/${LANGUAGE}/
-python3 deepspeech-german/preprocessing/download_data.py --tatoeba_${LANGUAGE} data_original/${LANGUAGE}/
-python3 deepspeech-german/preprocessing/download_data.py --voxforge_${LANGUAGE} data_original/${LANGUAGE}/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --common_voice_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --mailabs_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --tatoeba_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --voxforge_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 ```
 
 Download css10 german/french dataset (Requires kaggle account, see links above) \
@@ -117,34 +117,34 @@ Prepare datasets, this may take some time (Run in container):
 export LANGUAGE="de"
 
 # German
-python3 deepspeech-german/preprocessing/prepare_data.py --swc data_original/${LANGUAGE}/swc/ data_prepared/${LANGUAGE}/swc/
-python3 deepspeech-german/preprocessing/prepare_data.py --tuda data_original/${LANGUAGE}/tuda/ data_prepared/${LANGUAGE}/tuda/
-python3 deepspeech-german/preprocessing/prepare_data.py --zamia_speech data_original/${LANGUAGE}/zamia_speech/ data_prepared/${LANGUAGE}/zamia_speech/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --swc /DeepSpeech/data_original/${LANGUAGE}/swc/ /DeepSpeech/data_prepared/${LANGUAGE}/swc/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /DeepSpeech/data_original/${LANGUAGE}/tuda/ /DeepSpeech/data_prepared/${LANGUAGE}/tuda/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
 
 # German or French
-python3 deepspeech-german/preprocessing/prepare_data.py --common_voice data_original/${LANGUAGE}/common_voice/ data_prepared/${LANGUAGE}/common_voice/
-python3 deepspeech-german/preprocessing/prepare_data.py --css_ten data_original/${LANGUAGE}/css_ten/ data_prepared/${LANGUAGE}/css_ten/
-python3 deepspeech-german/preprocessing/prepare_data.py --mailabs data_original/${LANGUAGE}/mailabs/ data_prepared/${LANGUAGE}/mailabs/
-python3 deepspeech-german/preprocessing/prepare_data.py --tatoeba data_original/${LANGUAGE}/tatoeba/ data_prepared/${LANGUAGE}/tatoeba/
-python3 deepspeech-german/preprocessing/prepare_data.py --voxforge data_original/${LANGUAGE}/voxforge/ data_prepared/${LANGUAGE}/voxforge/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/common_voice/ /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --css_ten /DeepSpeech/data_original/${LANGUAGE}/css_ten/ /DeepSpeech/data_prepared/${LANGUAGE}/css_ten/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --mailabs /DeepSpeech/data_original/${LANGUAGE}/mailabs/ /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tatoeba /DeepSpeech/data_original/${LANGUAGE}/tatoeba/ /DeepSpeech/data_prepared/${LANGUAGE}/tatoeba/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --voxforge /DeepSpeech/data_original/${LANGUAGE}/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/
 
-# To combine multiple datasets run the command as follows (not recommended):
-python3 deepspeech-german/pre-processing/prepare_data.py --tuda data_original/de/tuda/ --voxforge data_original/de/voxforge/ data_prepared/de/tuda_voxforge/
+# To combine multiple datasets run: 
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py /DeepSpeech/data_prepared/de/ --tuda --voxforge
 
-# Or, which is much faster, but only combining train, dev, test and all csv files, run:
-python3 deepspeech-german/preprocessing/combine_datasets.py data_prepared/de/ --tuda --voxforge
+# To combine not only train, dev, test and all csv files run (not recommended because it's very slow):
+python3 deepspeech-polyglot/pre-processing/prepare_data.py --tuda data_original/de/tuda/ --voxforge data_original/de/voxforge/ data_prepared/de/tuda_voxforge/
 
 # Or to combine specific csv files:
-python3 /DeepSpeech/deepspeech-german/preprocessing/combine_datasets.py "" --files_output /DeepSpeech/data_prepared/de/tvsmc/train_mix.csv --files "/DeepSpeech/data_prepared/de/common_voice/train.csv /DeepSpeech/data_prepared/de/mailabs/all.csv /DeepSpeech/data_prepared/de/swc/all.csv /DeepSpeech/data_prepared/de/tuda/train.csv /DeepSpeech/data_prepared/de/voxforge/train.csv"
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py "" --files_output /DeepSpeech/data_prepared/de/tvsmc/train_mix.csv --files "/DeepSpeech/data_prepared/de/common_voice/train.csv /DeepSpeech/data_prepared/de/mailabs/all.csv /DeepSpeech/data_prepared/de/swc/all.csv /DeepSpeech/data_prepared/de/tuda/train.csv /DeepSpeech/data_prepared/de/voxforge/train.csv"
 
 
 # To shuffle and replace "äöü" characters and clean the files run (repeat for all 3 csv files):
-python3 /DeepSpeech/deepspeech-german/preprocessing/dataset_operations.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv --replace --shuffle --clean --exclude
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/dataset_operations.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv --replace --shuffle --clean --exclude
 
 
 # To split tuda into the correct train, dev and test splits run: 
 # (you will have to rename the [train/dev/test]_s.csv files before combining them with other datasets)
-python3 deepspeech-german/preprocessing/split_dataset.py data_prepared/de/tuda/all.csv --tuda --file_appendix _s
+python3 deepspeech-polyglot/preprocessing/split_dataset.py data_prepared/de/tuda/all.csv --tuda --file_appendix _s
 ```
 
 Preparation times using Intel i7-8700K:
@@ -198,11 +198,11 @@ mv noise/ zamia/
 rm noise.tar.xz
 
 # Normalize all the audio files (run with python2):
-python /DeepSpeech/deepspeech-german/preprocessing/normalize_noise_audio.py --from_dir /DeepSpeech/data_original/noise/ --to_dir /DeepSpeech/data_prepared/noise/ --max_sec 45
+python /DeepSpeech/deepspeech-polyglot/preprocessing/normalize_noise_audio.py --from_dir /DeepSpeech/data_original/noise/ --to_dir /DeepSpeech/data_prepared/noise/ --max_sec 45
 
 # Create csv files:
-python3 /DeepSpeech/deepspeech-german/preprocessing/noise_to_csv.py
-python3 /DeepSpeech/deepspeech-german/preprocessing/split_dataset.py /DeepSpeech/data_prepared/noise/all.csv  --split "70|15|15"
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/noise_to_csv.py
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/split_dataset.py /DeepSpeech/data_prepared/noise/all.csv  --split "70|15|15"
 ```
 
 <br/>
@@ -234,14 +234,14 @@ tar zxvf news-2012.tgz && mv training-monolingual/news.2012.${LANGUAGE}.shuffled
 rm news-2012.tgz && rm -r training-monolingual/
 
 # This needs a lot of memory for processing (~30gb, but you can also skip some of the files)
-python3 /DeepSpeech/deepspeech-german/preprocessing/prepare_vocab.py /DeepSpeech/data_original/texts/${LANGUAGE}/ /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab_az.txt
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_vocab.py /DeepSpeech/data_original/texts/${LANGUAGE}/ /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab_az.txt
 ```
 
 Generate scorer (Run in container):
 ```bash
 export LANGUAGE="de"
 python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab_az.txt --output_dir /DeepSpeech/data_prepared/texts/${LANGUAGE}/ --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie
-python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-german/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary --vocab /DeepSpeech/data_prepared/texts/${LANGUAGE}/vocab-500000.txt --package /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_az.scorer --default_alpha 0.75 --default_beta 1.85
+python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary --vocab /DeepSpeech/data_prepared/texts/${LANGUAGE}/vocab-500000.txt --package /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_az.scorer --default_alpha 0.75 --default_beta 1.85
 ```
 
 <br/>
@@ -301,7 +301,7 @@ log_error('The following files caused an infinite (or NaN) '
 
 # Add the following to save the files to excluded_files.json and stop training
 
-sys.path.append("/DeepSpeech/deepspeech-german/training/")
+sys.path.append("/DeepSpeech/deepspeech-polyglot/training/")
 from filter_invalid_files import add_files_to_excluded
 add_files_to_excluded(problem_files)
 sys.exit(1)
@@ -323,11 +323,11 @@ rm checkpoints/deepspeech-0.7.3-checkpoint.tar.gz
 Adjust the parameters/scripts to your needs (Run in container):
 ```bash
 # Run a training using the english checkpoint:
-/bin/bash /DeepSpeech/deepspeech-german/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/train_azce.csv /DeepSpeech/data_prepared/voxforge/dev_azce.csv /DeepSpeech/data_prepared/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.7.3-checkpoint/
+/bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/train_azce.csv /DeepSpeech/data_prepared/voxforge/dev_azce.csv /DeepSpeech/data_prepared/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.7.3-checkpoint/
 
 # Run test only
 # Don't forget to use the noiseaugmaster image if testing with noise
-/bin/bash /DeepSpeech/deepspeech-german/training/test_noise.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/test_azce.csv 
+/bin/bash /DeepSpeech/deepspeech-polyglot/training/test_noise.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/test_azce.csv 
 ```
 
 <br/>
@@ -339,16 +339,16 @@ rm -rf /root/.local/share/deepspeech/summaries && rm -rf /root/.local/share/deep
 
 # Run training without the helpful script:
 python3 DeepSpeech.py --train_files data_prepared/de/voxforge/train.csv --dev_files data_prepared/de/voxforge/dev.csv --test_files data_prepared/de/voxforge/test.csv \
---scorer data_prepared/texts/de/kenlm_az.scorer --alphabet_config_path deepspeech-german/data/alphabet_de.txt --test_batch_size 48 --train_batch_size 48 --dev_batch_size 48 \
+--scorer data_prepared/texts/de/kenlm_az.scorer --alphabet_config_path deepspeech-polyglot/data/alphabet_de.txt --test_batch_size 48 --train_batch_size 48 --dev_batch_size 48 \
 --epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --use_allow_growth --use_cudnn_rnn \
 --export_dir checkpoints/de/voxforge/ --checkpoint_dir /checkpoints/de/voxforge/ --summary_dir /checkpoints/de/voxforge/
 
 # Run test only (The use_allow_growth flag fixes "cuDNN failed to initialize" error):
 python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/de/voxforge/test_azce.csv --checkpoint_dir /DeepSpeech/checkpoints/de/voxforge/ \
---scorer data_prepared/texts/de/kenlm_az.scorer --alphabet_config_path /DeepSpeech/deepspeech-german/data/alphabet_de.txt --test_batch_size 36 --use_allow_growth
+--scorer data_prepared/texts/de/kenlm_az.scorer --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_de.txt --test_batch_size 36 --use_allow_growth
 
 # Or to run a cycled training as described in the paper, run:
-python3 /DeepSpeech/deepspeech-german/training/cycled_training.py /DeepSpeech/checkpoints/de/voxforge/ /DeepSpeech/data_prepared/de/ _azce --voxforge
+python3 /DeepSpeech/deepspeech-polyglot/training/cycled_training.py /DeepSpeech/checkpoints/de/voxforge/ /DeepSpeech/data_prepared/de/ _azce --voxforge
 ```
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. Training until early stop took 22min for 10 epochs. 

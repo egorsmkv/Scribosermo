@@ -27,7 +27,7 @@ AUG_NOISE=""
 DSARGS="--test_files ${TEST_FILE} \
         --checkpoint_dir ${CHECKPOINT_DIR} \
         --scorer /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_az.scorer \
-        --alphabet_config_path /DeepSpeech/deepspeech-german/data/alphabet_${LANGUAGE}.txt \
+        --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt \
         --test_batch_size ${BATCH_SIZE} \
         --use_allow_growth  \
         ${AUG_SPEECH} \

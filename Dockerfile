@@ -1,4 +1,4 @@
-FROM mozilla_deep_speech:latest
+FROM mozilla_deepspeech:latest
 #FROM mds_slurm:latest
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -52,6 +52,6 @@ RUN cd /DeepSpeech/native_client/ && rm -r kenlm/ \
 RUN pip3 install git+https://github.com/danbmh/audiomate.git@new_features
 #RUN pip3 install --no-cache-dir audiomate
 
-COPY . /DeepSpeech/deepspeech-german/
+COPY . /DeepSpeech/deepspeech-polyglot/
 
 CMD ["/bin/bash"]

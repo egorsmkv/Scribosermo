@@ -32,7 +32,7 @@ def add_files_to_excluded(problem_files):
 def main():
     while True:
         # Exclude files
-        cmd = "python3 /DeepSpeech/deepspeech-german/data/dataset_operations.py {} {}"
+        cmd = "python3 /DeepSpeech/deepspeech-polyglot/data/dataset_operations.py {} {}"
         cmd += " --shuffle --exclude --nostats"
         cmd = cmd.format(data_train_path, data_train_path)
         sp = subprocess.Popen(["/bin/bash", "-c", cmd])
@@ -40,9 +40,7 @@ def main():
 
         # Run training
         check_path = checkpoint_path + str(int(time.time())) + "/"
-        cmd = (
-            "/bin/bash /DeepSpeech/deepspeech-german/training/train.sh {} {} {} {} 0 {}"
-        )
+        cmd = "/bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh {} {} {} {} 0 {}"
         cmd = cmd.format(
             check_path,
             data_train_path,

@@ -112,7 +112,7 @@ def main():
             data_train_all = data_train_all.reset_index(drop=True)
             data_train_all.to_csv(data_train_path_cycled, index=False, encoding="utf-8")
 
-            cmd = "/bin/bash /DeepSpeech/deepspeech-german/training/train.sh {} {} {} {} 0 {}"
+            cmd = "/bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh {} {} {} {} 0 {}"
             cmd = cmd.format(
                 args.checkpoint_path,
                 data_train_path_cycled,
