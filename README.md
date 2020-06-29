@@ -555,3 +555,17 @@ You can contribute to this project in multiple ways:
     And if your using this commercially, I suggest to think about some gpus instead;)
     
     [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HMN45MDHCNJNQ) (PayPal)
+
+<br/>
+
+
+## Testing
+Install requirements:
+```bash
+pip3 install pytest pytest-cov
+```
+
+Run test:
+```bash
+pytest --cov=preprocessing
+```
