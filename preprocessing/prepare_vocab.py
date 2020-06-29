@@ -35,6 +35,7 @@ def main():
     text_data = []
 
     # Load text corpora
+    print("Loading files")
     for file in os.listdir(args.source_path):
         if not (file.endswith(".gz") or file.endswith(".tgz")):
             path = os.path.join(args.source_path, file)
@@ -43,7 +44,7 @@ def main():
                 content = [x.strip() for x in content]
                 text_data.extend(content)
 
-    print("Adding sentences from source file")
+    print("Adding sentences from source files")
     print(len(text_data))
     csl = text_cleaning.clean_sentence_list(text_data)
     all_cleaned_sentences.extend(csl)

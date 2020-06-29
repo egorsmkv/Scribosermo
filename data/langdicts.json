@@ -1,10 +1,15 @@
 {
   "allowed_chars": {
     "de": "abcdefghijklmnopqrstuvwxyz ",
+    "es": "abcdefghijklmnopqrstuvwxyz áéíóúýñü",
     "fr": "abcdefghijklmnopqrstuvwxyz' àâæçèéêëîïôœùûüÿ"
   },
   "number_pattern": {
     "de": {
+      "decimal": "(?:[\\s][+-])?[0-9]+(?:(?:[.][0-9]{3}(?:(?=[^0-9])))+)?(?:[,][0-9]+)?",
+      "ordinal": "[0-9]+[.] "
+    },
+    "es": {
       "decimal": "(?:[\\s][+-])?[0-9]+(?:(?:[.][0-9]{3}(?:(?=[^0-9])))+)?(?:[,][0-9]+)?",
       "ordinal": "[0-9]+[.] "
     },
@@ -20,6 +25,7 @@
       "ü": "ue",
       "ß": "ss"
     },
+    "es": {},
     "fr": {}
   },
   "char_replacers": {
@@ -45,6 +51,31 @@
       "ùúûũūŭůűųȕȗ": "u",
       "ŵ": "w",
       "ýÿŷ": "y",
+      "źżžȥ": "z",
+      "–-­/:(),.!?\"[]": " "
+    },
+    "es": {
+      "àâãåāăąǟǡǻȁȃȧ": "a",
+      "æǣǽä": "ae",
+      "çćĉċč": "c",
+      "ďđ": "d",
+      "èêëēĕėęěȅȇȩε": "e",
+      "ĝğġģǥǧǵ": "g",
+      "ĥħȟ": "h",
+      "ìîïĩīĭįıȉȋ": "i",
+      "ĵǰ": "j",
+      "ķĸǩǩκ": "k",
+      "ĺļľŀł": "l",
+      "м": "m",
+      "ńņňŉŋǹ": "n",
+      "òôõøōŏőǫǭǿȍȏðο": "o",
+      "œö": "oe",
+      "ŕŗřȑȓ": "r",
+      "śŝşšș": "s",
+      "ţťŧț": "t",
+      "ùûũūŭůűųȕȗ": "u",
+      "ŵ": "w",
+      "ÿŷ": "y",
       "źżžȥ": "z",
       "–-­/:(),.!?\"[]": " "
     },
@@ -125,6 +156,39 @@
       "punkt null null null punkt null null null punkt null null null": "milliarden",
       "eins punkt null null null punkt null null null": "eine million",
       "punkt null null null punkt null null null": "millionen"
+    },
+    "es": {
+      " m/s ": "metros por segundo",
+      " m / s ": "metros por segundo",
+      "€": "euro",
+      "$": "dólar",
+      "£": "libra",
+      "%": "por ciento",
+      "‰": "promille",
+      "&": "y",
+      "§": "párrafo",
+      "m³": "metros cúbicos",
+      "km²": "millas cuadradas",
+      "m²": "metros cuadrados",
+      "co2": "c o dos",
+      " ft ": "pie",
+      "±": "más menos",
+      "°c": "grad celsius",
+      "°": "grad",
+      " kg ": "kilogramos",
+      "α": "alfa",
+      "β": "beta",
+      "γ": "gamma",
+      "δ": "delta",
+      "@": "at",
+      "½": "uno y medio",
+      "⅓": "un tercio",
+      "¼": "un cuarto",
+      "℆": "cada una",
+      "un punto cero cero cero cero cero cero cero cero cero": "un billón",
+      "punto cero cero cero cero punto cero cero cero punto cero cero": "billones",
+      "un punto cero cero cero cero punto cero cero cero": "un millón",
+      "punto cero cero cero cero punto cero cero cero": "millones"
     },
     "fr": {
       " m / s ": "mètres par seconde",

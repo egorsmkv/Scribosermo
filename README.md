@@ -15,7 +15,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 
 ## Datasets
 
-#### German
+#### German (de)
 * [Mozilla Common Voice](https://voice.mozilla.org/) ~506h
 * [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
 * GoogleWavenet ~165h, artificial training data generated with the google text to speech service
@@ -26,7 +26,14 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 * [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
 * [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
 
-#### French
+#### Spanish (es)
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~?h
+* [CSS10](https://www.kaggle.com/bryanpark/spanish-single-speaker-speech-dataset) ~?h
+* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~?h
+* [Tatoeba](https://tatoeba.org/spa/sentences/search?query=&from=spa&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~?h
+* [Voxforge](http://www.voxforge.org/home/) ~?h
+
+#### French (fr)
 * [Mozilla Common Voice](https://voice.mozilla.org/) ~?h
 * [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) ~?h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~?h
@@ -99,14 +106,14 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --swc_${L
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --tuda_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --zamia_speech_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 
-# German or French
+# German or French or Spanish
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --common_voice_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --mailabs_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --tatoeba_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --voxforge_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 ```
 
-Download css10 german/french dataset (Requires kaggle account, see links above) \
+Download css10 german/spanish/french dataset (Requires kaggle account, see links above) \
 Extract and move it to datasets directory (data_original/${LANGUAGE}/css_ten/) \
 It seems the files are saved all twice, so remove the duplicate folders
 
@@ -121,7 +128,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --swc /Dee
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /DeepSpeech/data_original/${LANGUAGE}/tuda/ /DeepSpeech/data_prepared/${LANGUAGE}/tuda/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
 
-# German or French
+# German or French or Spanish
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/common_voice/ /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --css_ten /DeepSpeech/data_original/${LANGUAGE}/css_ten/ /DeepSpeech/data_prepared/${LANGUAGE}/css_ten/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --mailabs /DeepSpeech/data_original/${LANGUAGE}/mailabs/ /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/
@@ -221,7 +228,7 @@ cd data_original/texts/${LANGUAGE}/
 wget "http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz" -O tuda_sentences.txt.gz
 gzip -d tuda_sentences.txt.gz
 
-# German or French
+# German or French or Spanish
 wget "https://www.statmt.org/wmt13/training-monolingual-nc-v8.tgz" -O news-commentary.tgz
 tar zxvf news-commentary.tgz && mv training/news-commentary-v8.${LANGUAGE} news-commentary-v8.${LANGUAGE}
 rm news-commentary.tgz && rm -r training/
@@ -434,7 +441,7 @@ Some results with some older code version: \
 
 <br/>
 
-Some results with the current code version: \
+Some results with some older code version: \
 (Default values: batch size 36, dropout 0.25, learning rate 0.0001, without "äöü", cleaned data , checkpoint from english deepspeech, early stopping, reduce learning rate on plateau, evaluation with scorer and top-500k words, data augmentation)
 
 | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
@@ -520,3 +527,31 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 Scorer with training transcriptions: [Link](https://drive.google.com/open?id=1r-0Xu7MD_1KECFbBnB05iCRiMYEbZgXN) \
 Checkpoints TVSMC training with 0.19 WER: [Link](https://drive.google.com/file/d/1ZzTeXD0HbwpbMdmEao_9qSq2H7zJzhH3) \
 Graph model for above checkpoint: [Link](https://drive.google.com/open?id=14VBl8p8W7Pa7-yht7vwVX3cdxDg6pOVc)
+
+<br/>
+
+
+## Contribution
+
+You can contribute to this project in multiple ways:
+
+* Add a new language:
+    - Extend `data/langdicts.json`
+    - Add speech datasets 
+    - Find text corpora for the language model
+* Help to solve the open issues
+
+* Train new models or improve the existing \
+    (Requires a gpu and a lot of time, or multiple gpus and some time)
+    
+* Experiment with the language models
+    
+* Last but not least, you can also donate for my electricity bill. \
+    And if your using this commercially, I suggest to think about some gpus instead;)
+    
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+        <input type="hidden" name="cmd" value="_s-xclick" />
+        <input type="hidden" name="hosted_button_id" value="HMN45MDHCNJNQ" />
+        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+        <img alt="" border="0" src="https://www.paypal.com/en_DE/i/scr/pixel.gif" width="1" height="1" />
+    </form> (PayPal)

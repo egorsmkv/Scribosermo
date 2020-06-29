@@ -3,6 +3,7 @@ import os
 
 from audiomate.corpus import io
 
+
 # ==================================================================================================
 
 
@@ -10,14 +11,18 @@ def main():
     parser = argparse.ArgumentParser(description="Prepare data for training.")
     parser.add_argument("target_path", type=str)
     parser.add_argument("--common_voice_de", action="store_true")
+    parser.add_argument("--common_voice_es", action="store_true")
     parser.add_argument("--common_voice_fr", action="store_true")
     parser.add_argument("--mailabs_de", action="store_true")
+    parser.add_argument("--mailabs_es", action="store_true")
     parser.add_argument("--mailabs_fr", action="store_true")
     parser.add_argument("--swc_de", action="store_true")
     parser.add_argument("--tatoeba_de", action="store_true")
+    parser.add_argument("--tatoeba_es", action="store_true")
     parser.add_argument("--tatoeba_fr", action="store_true")
     parser.add_argument("--tuda_de", action="store_true")
     parser.add_argument("--voxforge_de", action="store_true")
+    parser.add_argument("--voxforge_es", action="store_true")
     parser.add_argument("--voxforge_fr", action="store_true")
     parser.add_argument("--zamia_speech_de", action="store_true")
     args = parser.parse_args()
@@ -25,6 +30,11 @@ def main():
     if args.common_voice_de:
         print("Downloading common-voice-de ...")
         dl = io.CommonVoiceDownloader(lang="de")
+        dl.download(os.path.join(args.target_path, "common_voice"))
+
+    if args.common_voice_es:
+        print("Downloading common-voice-es ...")
+        dl = io.CommonVoiceDownloader(lang="es")
         dl.download(os.path.join(args.target_path, "common_voice"))
 
     if args.common_voice_fr:
@@ -35,6 +45,11 @@ def main():
     if args.mailabs_de:
         print("Downloading mailabs-de ...")
         dl = io.MailabsDownloader(tags=["de_DE"])
+        dl.download(os.path.join(args.target_path, "mailabs"))
+
+    if args.mailabs_es:
+        print("Downloading mailabs-es ...")
+        dl = io.MailabsDownloader(tags=["es_ES"])
         dl.download(os.path.join(args.target_path, "mailabs"))
 
     if args.mailabs_fr:
@@ -52,6 +67,11 @@ def main():
         dl = io.TatoebaDownloader(include_languages=["deu"])
         dl.download(os.path.join(args.target_path, "tatoeba"))
 
+    if args.tatoeba_es:
+        print("Downloading tatoeba-es ...")
+        dl = io.TatoebaDownloader(include_languages=["spa"])
+        dl.download(os.path.join(args.target_path, "tatoeba"))
+
     if args.tatoeba_fr:
         print("Downloading tatoeba-fr ...")
         dl = io.TatoebaDownloader(include_languages=["fra"])
@@ -65,6 +85,11 @@ def main():
     if args.voxforge_de:
         print("Downloading voxforge-de ...")
         dl = io.VoxforgeDownloader(lang="de")
+        dl.download(os.path.join(args.target_path, "voxforge"))
+
+    if args.voxforge_es:
+        print("Downloading voxforge-es ...")
+        dl = io.VoxforgeDownloader(lang="es")
         dl.download(os.path.join(args.target_path, "voxforge"))
 
     if args.voxforge_fr:
