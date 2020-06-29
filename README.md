@@ -6,7 +6,7 @@ _Original paper code can be found [here](https://github.com/AASHISHAG/deepspeech
 This project aims to develop a working Speech to Text module using [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech), which can be used for any Audio processing pipeline. [Mozillla DeepSpeech](https://github.com/mozilla/DeepSpeech) is a state-of-the-art open-source automatic speech recognition (ASR) toolkit. DeepSpeech is using a model trained by machine learning techniques based on [Baidu's Deep Speech](https://gigaom2.files.wordpress.com/2014/12/deep_speech3_12_17.pdf) research paper. Project DeepSpeech uses Google's TensorFlow to make the implementation easier.
 
 <div align="center">
-    <img src="media/deep_speech_architecture.png" alt="deepspeech graph" width="85%"/>
+    <img src="media/deep_speech_architecture.png" alt="deepspeech graph" width="75%"/>
 </div>
 
 
@@ -549,9 +549,4 @@ You can contribute to this project in multiple ways:
 * Last but not least, you can also donate for my electricity bill. \
     And if your using this commercially, I suggest to think about some gpus instead;)
     
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-        <input type="hidden" name="cmd" value="_s-xclick" />
-        <input type="hidden" name="hosted_button_id" value="HMN45MDHCNJNQ" />
-        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-        <img alt="" border="0" src="https://www.paypal.com/en_DE/i/scr/pixel.gif" width="1" height="1" />
-    </form> (PayPal)
+    [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HMN45MDHCNJNQ) (PayPal)
