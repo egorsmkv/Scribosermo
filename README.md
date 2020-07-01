@@ -247,14 +247,14 @@ tar zxvf news-2012.tgz && mv training-monolingual/news.2012.${LANGUAGE}.shuffled
 rm news-2012.tgz && rm -r training-monolingual/
 
 # This needs a lot of memory for processing (~30gb, but you can also skip some of the files)
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_vocab.py /DeepSpeech/data_original/texts/${LANGUAGE}/ /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab_az.txt
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_vocab.py /DeepSpeech/data_original/texts/${LANGUAGE}/ /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab.txt
 ```
 
 Generate scorer (Run in container):
 ```bash
 export LANGUAGE="de"
-python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab_az.txt --output_dir /DeepSpeech/data_prepared/texts/${LANGUAGE}/ --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie
-python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary --vocab /DeepSpeech/data_prepared/texts/${LANGUAGE}/vocab-500000.txt --package /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_az.scorer --default_alpha 0.75 --default_beta 1.85
+python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab.txt --output_dir /DeepSpeech/data_prepared/texts/${LANGUAGE}/ --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie
+python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary --vocab /DeepSpeech/data_prepared/texts/${LANGUAGE}/vocab-500000.txt --package /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer --default_alpha 0.75 --default_beta 1.85
 ```
 
 <br/>
@@ -352,13 +352,13 @@ rm -rf /root/.local/share/deepspeech/summaries && rm -rf /root/.local/share/deep
 
 # Run training without the helpful script:
 python3 DeepSpeech.py --train_files data_prepared/de/voxforge/train.csv --dev_files data_prepared/de/voxforge/dev.csv --test_files data_prepared/de/voxforge/test.csv \
---scorer data_prepared/texts/de/kenlm_az.scorer --alphabet_config_path deepspeech-polyglot/data/alphabet_de.txt --test_batch_size 48 --train_batch_size 48 --dev_batch_size 48 \
+--scorer data_prepared/texts/de/kenlm_de.scorer --alphabet_config_path deepspeech-polyglot/data/alphabet_de.txt --test_batch_size 48 --train_batch_size 48 --dev_batch_size 48 \
 --epochs 75 --learning_rate 0.0005 --dropout_rate 0.40 --use_allow_growth --use_cudnn_rnn \
 --export_dir checkpoints/de/voxforge/ --checkpoint_dir /checkpoints/de/voxforge/ --summary_dir /checkpoints/de/voxforge/
 
 # Run test only (The use_allow_growth flag fixes "cuDNN failed to initialize" error):
 python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/de/voxforge/test_azce.csv --checkpoint_dir /DeepSpeech/checkpoints/de/voxforge/ \
---scorer data_prepared/texts/de/kenlm_az.scorer --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_de.txt --test_batch_size 36 --use_allow_growth
+--scorer data_prepared/texts/de/kenlm_de.scorer --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_de.txt --test_batch_size 36 --use_allow_growth
 
 # Or to run a cycled training as described in the paper, run:
 python3 /DeepSpeech/deepspeech-polyglot/training/cycled_training.py /DeepSpeech/checkpoints/de/voxforge/ /DeepSpeech/data_prepared/de/ _azce --voxforge
@@ -523,16 +523,21 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | test with Voxforge + Tuda + CommonVoice others completely for training, with noise and speech overlay | Test: 22.055849, Validation: 17.613633 | 46 | WER: 0.208809, CER: 0.087215 |
 ||
 | Voxforge FR | speech and noise overlay | Test: 5.341695, Validation: 12.736551 | 49 | WER: 0.175954, CER: 0.045416 |
+| CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge ES | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay | Test: 14.521997, Validation: 22.408368 | 51 | WER: 0.154061, CER: 0.055357 |
 ||
 
 <br/>
 
 
-#### Language Model and Checkpoints
+#### Language Models and Checkpoints
 
-Scorer with training transcriptions: [Link](https://drive.google.com/open?id=1r-0Xu7MD_1KECFbBnB05iCRiMYEbZgXN) \
-Checkpoints TVSMC training with 0.19 WER: [Link](https://drive.google.com/file/d/1ZzTeXD0HbwpbMdmEao_9qSq2H7zJzhH3) \
-Graph model for above checkpoint: [Link](https://drive.google.com/open?id=14VBl8p8W7Pa7-yht7vwVX3cdxDg6pOVc)
+**German:** \
+(WER: 0.19, Train: ~1020h, Test: ~100h) \
+Checkpoints of TVSMC training, graph model and scorer with training transcriptions: [Link](https://drive.google.com/drive/folders/1oO-N-VH_0P89fcRKWEUlVDm-_z18Kbkb?usp=sharing)
+
+**Spanish:** \
+(WER: 0.15, Train: ~360h, Test: ~35h) \
+Checkpoints of CCMTV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1-3UgQBtzEf8QcH2qc8TJHkUqCBp5BBmO?usp=sharing)
 
 <br/>
 
@@ -553,7 +558,7 @@ You can contribute to this project in multiple ways:
 * Experiment with the language models
     
 * Last but not least, you can also donate for my electricity bill. \
-    And if your using this commercially, I suggest to think about some gpus instead;)
+    And if you are using this commercially, I suggest to think about some gpus instead;)
     
     [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HMN45MDHCNJNQ) (PayPal)
 
