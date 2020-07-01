@@ -80,6 +80,11 @@ def clean(data):
     data = data[data["duration"] < 45]
     print("Excluded", length_old - len(data), "files with too long duration")
 
+    # Drop sentences with empty transcription
+    length_old = len(data)
+    data = data[data["text_length"] > 0]
+    print("Excluded", length_old - len(data), "files with empty transcriptions")
+
     # Drop files spoken to fast
     length_old = len(data)
     avg_time = data["avg_time_per_char"].mean()

@@ -32,16 +32,16 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 * [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
 
 #### Spanish (es)
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~?h
-* [CSS10](https://www.kaggle.com/bryanpark/spanish-single-speaker-speech-dataset) ~?h
-* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~?h
-* [Tatoeba](https://tatoeba.org/spa/sentences/search?query=&from=spa&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~?h
-* [Voxforge](http://www.voxforge.org/home/) ~?h
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~187h
+* [CSS10](https://www.kaggle.com/bryanpark/spanish-single-speaker-speech-dataset) ~24h
+* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~108h
+* [Tatoeba](https://tatoeba.org/spa/sentences/search?query=&from=spa&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~59h
+* [Voxforge](http://www.voxforge.org/home/) ~52h
 
 #### French (fr)
 * [Mozilla Common Voice](https://voice.mozilla.org/) ~?h
-* [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) ~?h
-* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~?h
+* [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) ~19h
+* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~184h
 * [Tatoeba](https://tatoeba.org/fra/sentences/search?query=&from=fra&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~2h
 * [Voxforge](http://www.voxforge.org/home/) ~37h
 
@@ -134,7 +134,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /De
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
 
 # German or French or Spanish
-# The french mailabs and common_voice datasets have a different directory structure compared to the german datasets, you have to fix this first, see https://github.com/DanBmh/audiomate/issues/4
+# The spanish/french mailabs and common_voice datasets have a different directory structure compared to the german datasets, you have to fix this first, see https://github.com/DanBmh/audiomate/issues/4
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/common_voice/ /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --css_ten /DeepSpeech/data_original/${LANGUAGE}/css_ten/ /DeepSpeech/data_prepared/${LANGUAGE}/css_ten/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --mailabs /DeepSpeech/data_original/${LANGUAGE}/mailabs/ /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/
@@ -561,12 +561,8 @@ You can contribute to this project in multiple ways:
 
 
 ## Testing
-Install requirements:
-```bash
-pip3 install pytest pytest-cov
-```
 
-Run test:
+Run test (Run in container):
 ```bash
-pytest --cov=preprocessing
+cd /Deepspeech/deepspeech-polyglot/ && pytest --cov=preprocessing
 ```
