@@ -39,7 +39,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 * [Voxforge](http://www.voxforge.org/home/) ~52h
 
 #### French (fr)
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~?h
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~370h
 * [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) ~19h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~184h
 * [Tatoeba](https://tatoeba.org/fra/sentences/search?query=&from=fra&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~2h
@@ -523,6 +523,7 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | test with Voxforge + Tuda + CommonVoice others completely for training, with noise and speech overlay | Test: 22.055849, Validation: 17.613633 | 46 | WER: 0.208809, CER: 0.087215 |
 ||
 | Voxforge FR | speech and noise overlay | Test: 5.341695, Validation: 12.736551 | 49 | WER: 0.175954, CER: 0.045416 |
+| CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge FR | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay | Test: 20.404339, Validation: 21.920289 | 62 | WER: 0.302113, CER: 0.121300 |
 | CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge ES | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay | Test: 14.521997, Validation: 22.408368 | 51 | WER: 0.154061, CER: 0.055357 |
 ||
 
@@ -536,8 +537,12 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 Checkpoints of TVSMC training, graph model and scorer with training transcriptions: [Link](https://drive.google.com/drive/folders/1oO-N-VH_0P89fcRKWEUlVDm-_z18Kbkb?usp=sharing)
 
 **Spanish:** \
-(WER: 0.15, Train: ~360h, Test: ~35h) \
+(WER: 0.15, Train: ~357h, Test: ~35h) \
 Checkpoints of CCMTV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1-3UgQBtzEf8QcH2qc8TJHkUqCBp5BBmO?usp=sharing)
+
+**French:** \
+(WER: 0.30, Train: ~492h, Test: ~60h) \
+Checkpoints of CCMTV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1Nk_1uFVwM7lj2RQf4PaQOgdAdqhiKWyV?usp=sharing)
 
 <br/>
 
@@ -550,6 +555,7 @@ You can contribute to this project in multiple ways:
     - Extend `data/langdicts.json` and `tests/test_text_cleaning.py`
     - Add speech datasets 
     - Find text corpora for the language model
+    
 * Help to solve the open issues
 
 * Train new models or improve the existing \
