@@ -341,6 +341,10 @@ Adjust the parameters/scripts to your needs (Run in container):
 # Run test only
 # Don't forget to use the noiseaugmaster image if testing with noise
 /bin/bash /DeepSpeech/deepspeech-polyglot/training/test_noise.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/test_azce.csv 
+
+# Optimize scorer alpha and beta values
+# Requires a trained checkpoint and a scorer (used alpha and beta values are not important)
+/bin/bash /DeepSpeech/deepspeech-polyglot/training/optimize_scorer.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/dev_azce.csv 
 ```
 
 <br/>
