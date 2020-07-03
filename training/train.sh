@@ -33,7 +33,7 @@ fi
 #    AUG_AUDIO="--augment volume[p=0.1,dbfs=-10:-40] \
 #      --augment pitch[p=0.1,pitch=1.1~0.95] \
 #      --augment tempo[p=0.1,factor=1.25~0.75]"
-#    AUG_ADD_DROP="--augment dropout[p=0.1,rate=0.05] \
+#    AUG_ADD_DROP="--augment dropout[p=1,rate=0.05] \
 #      --augment add[p=0.1,domain=signal,stddev=0~0.5] \
 #      --augment multiply[p=0.1,domain=features,stddev=0~0.5]"
 #    AUG_FREQ_TIME="--augment frequency_mask[p=0.1,n=1:3,size=1:5] \
@@ -41,8 +41,8 @@ fi
 #    AUG_EXTRA="--augment reverb[p=0.1,delay=50.0~30.0,decay=10.0:2.0~1.0] \
 #      --augment resample[p=0.1,rate=12000:8000~4000] \
 #      --augment codec[p=0.1,bitrate=48000:16000]"
-#    AUG_SPEECH="--augment overlay[p=0.3,source=$TRAIN_FILE,layers=10:1,snr=50:20~9]"
-#    AUG_NOISE="--augment overlay[p=0.5,source=$NOISE_FILE,layers=2:1,snr=50:20~6]"
+#    AUG_SPEECH="--augment overlay[p=0.3,source=$TRAIN_FILE,layers=7:1,snr=30:15~9]"
+#    AUG_NOISE="--augment overlay[p=0.5,source=$NOISE_FILE,layers=2:1,snr=18:9~6]"
 
 if [[ "${USE_AUGMENTATION}" == "1" ]]; then
   AUG_AUDIO="--augmentation_pitch_and_tempo_scaling \
@@ -120,4 +120,12 @@ if [[ -f ${CHECKPOINT_DIR}"output_graph.pb" ]]; then
   echo ""
   /DeepSpeech/convert_graphdef_memmapped_format --in_graph=${CHECKPOINT_DIR}"output_graph.pb" \
     --out_graph=${CHECKPOINT_DIR}"output_graph_${LANGUAGE}.pbmm"
+
+  echo ""
+  python3 -u /DeepSpeech/DeepSpeech.py --checkpoint_dir ${CHECKPOINT_DIR} \
+    --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt \
+    --export_tflite --export_dir ${CHECKPOINT_DIR}
 fi
+
+echo ""
+echo "FINISHED TRAINING"
