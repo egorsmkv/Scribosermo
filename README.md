@@ -241,20 +241,29 @@ rm news-commentary.tgz && rm -r training/
 wget "https://www.statmt.org/wmt13/training-monolingual-europarl-v7.tgz" -O europarl.tgz
 tar zxvf europarl.tgz && mv training/europarl-v7.${LANGUAGE} europarl-v7.${LANGUAGE}
 rm europarl.tgz && rm -r training/
-# If you have enough space you can also download the other years
+# If you have enough space you can also download the other years (2007-2011)
 wget "https://www.statmt.org/wmt13/training-monolingual-news-2012.tgz" -O news-2012.tgz
 tar zxvf news-2012.tgz && mv training-monolingual/news.2012.${LANGUAGE}.shuffled news.2012.${LANGUAGE}
 rm news-2012.tgz && rm -r training-monolingual/
 
-# This needs a lot of memory for processing (~30gb, but you can also skip some of the files)
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_vocab.py /DeepSpeech/data_original/texts/${LANGUAGE}/ /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab.txt
+# Collect and normalize the sentences
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_vocab.py /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab.txt \
+    --source_dir /DeepSpeech/data_original/texts/${LANGUAGE}/ --training_csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train.csv
 ```
 
 Generate scorer (Run in container):
 ```bash
 export LANGUAGE="de"
-python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab.txt --output_dir /DeepSpeech/data_prepared/texts/${LANGUAGE}/ --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie
-python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary --vocab /DeepSpeech/data_prepared/texts/${LANGUAGE}/vocab-500000.txt --package /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer --default_alpha 0.75 --default_beta 1.85
+
+python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab.txt --output_dir /DeepSpeech/data_prepared/texts/${LANGUAGE}/ \
+    --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie --discount_fallback
+
+python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary \
+    --vocab /DeepSpeech/data_prepared/texts/${LANGUAGE}/vocab-500000.txt --package /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer --default_alpha 0.8223176270809696 --default_beta 0.25566134318440037
+
+# Optimized scorer alpha and beta values:
+# German: --default_alpha 0.8223176270809696 --default_beta 0.25566134318440037
+# English: --default_alpha 0.931289039105002 --default_beta 1.1834137581510284
 ```
 
 <br/>
@@ -488,6 +497,7 @@ Some results with some older code version: \
 <br/>
 
 Updated to DeepSpeech v0.7.3 and new english checkpoint: \
+(Default values: See flags.txt in releases, scorer with kaldi-tuda sentences only) 
 (Testing with noise and speech overlay is done with older _noiseaugmaster_ branch, which implemented this functionality)
 
 | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
@@ -525,6 +535,13 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 | Voxforge | test with speech and noise overlay | Test: 53.832214 | | WER: 0.441768, CER: 0.218798 |
 ||
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice | test with Voxforge + Tuda + CommonVoice others completely for training, with noise and speech overlay | Test: 22.055849, Validation: 17.613633 | 46 | WER: 0.208809, CER: 0.087215 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above tested on Voxforge devdata | Test: 16.395443 | | WER: 0.163827, CER: 0.056596 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | optimized scorer alpha and beta on Voxforge devdata | Test: 16.395443 | | WER: 0.162842 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | test with Voxforge + Tuda + CommonVoice, optimized scorer alpha and beta | Test: 22.055849 | | WER: 0.206960, CER: 0.086306 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | scorer (kaldi-tuda) with train transcriptions, optimized scorer alpha and beta | Test: 22.055849 | | WER: 0.134221, CER: 0.064267 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | scorer only out of train transcriptions, optimized scorer alpha and beta | Test: 22.055849 | | WER: 0.142880, CER: 0.064958 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | scorer (kaldi-tuda + europarl + news) with train transcriptions, optimized scorer alpha and beta | Test: 22.055849 | | WER: 0.135759, CER: 0.064773 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above scorer with 1m instead of 500k top words, optimized scorer alpha and beta | Test: 22.055849 | | WER: 0.136650, CER: 0.066470 |
 ||
 | Voxforge FR | speech and noise overlay | Test: 5.341695, Validation: 12.736551 | 49 | WER: 0.175954, CER: 0.045416 |
 | CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge FR | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay | Test: 20.404339, Validation: 21.920289 | 62 | WER: 0.302113, CER: 0.121300 |
@@ -537,7 +554,7 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 #### Language Models and Checkpoints
 
 **German:** \
-(WER: 0.19, Train: ~1020h, Test: ~100h) \
+(WER: 0.13, Train: ~1015h, Test: ~100h) \
 Checkpoints of TVSMC training, graph model and scorer with training transcriptions: [Link](https://drive.google.com/drive/folders/1oO-N-VH_0P89fcRKWEUlVDm-_z18Kbkb?usp=sharing)
 
 **Spanish:** \

@@ -2,6 +2,7 @@
 #SBATCH --partition=small-cpu # Name of cluster partition; default: big-cpu
 #SBATCH --job-name DSGS # Job Name
 #SBATCH --ntasks 1
+#SBATCH --mem 16000
 #SBATCH --time=1000:00:00 # Time after which the job will be aborted
 #
 #

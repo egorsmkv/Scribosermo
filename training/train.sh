@@ -124,7 +124,8 @@ if [[ -f ${CHECKPOINT_DIR}"output_graph.pb" ]]; then
   echo ""
   python3 -u /DeepSpeech/DeepSpeech.py --checkpoint_dir ${CHECKPOINT_DIR} \
     --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt \
-    --export_tflite --export_dir ${CHECKPOINT_DIR}
+    --export_tflite --export_dir ${CHECKPOINT_DIR} \
+    && mv ${CHECKPOINT_DIR}"output_graph.tflite" ${CHECKPOINT_DIR}"output_graph_${LANGUAGE}.tflite"
 fi
 
 echo ""
