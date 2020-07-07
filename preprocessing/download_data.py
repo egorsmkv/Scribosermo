@@ -19,6 +19,7 @@ def main():
     parser.add_argument("--swc_de", action="store_true")
     parser.add_argument("--tatoeba_de", action="store_true")
     parser.add_argument("--tatoeba_es", action="store_true")
+    parser.add_argument("--tatoeba_eo", action="store_true")
     parser.add_argument("--tatoeba_fr", action="store_true")
     parser.add_argument("--tuda_de", action="store_true")
     parser.add_argument("--voxforge_de", action="store_true")
@@ -70,6 +71,11 @@ def main():
     if args.tatoeba_es:
         print("Downloading tatoeba-es ...")
         dl = io.TatoebaDownloader(include_languages=["spa"])
+        dl.download(os.path.join(args.target_path, "tatoeba"))
+        
+    if args.tatoeba_eo:
+        print("Downloading tatoeba-eo ...")
+        dl = io.TatoebaDownloader(include_languages=["epo"])
         dl.download(os.path.join(args.target_path, "tatoeba"))
 
     if args.tatoeba_fr:
