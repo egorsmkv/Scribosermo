@@ -12,12 +12,25 @@ def main():
     parser.add_argument("csv_to_split_path", type=str)
     parser.add_argument("--file_appendix", type=str, default="")
     parser.add_argument(
-        "--tuda", action="store_true", help="Split into correct tuda parts"
+        "--tuda",
+        action="store_true",
+        help="Split into correct tuda parts. Use 'all.csv' path as first argument.",
     )
     parser.add_argument(
         "--common_voice",
         action="store_true",
-        help="Remove test samples where transcript also in trainset",
+        help="Split into correct common-voice parts. Use 'all.csv' path as first argument.",
+    )
+    parser.add_argument(
+        "--common_voice_org",
+        type=str,
+        default="",
+        help="Path to common-voice original data. Needed for '--common_voice' flag.",
+    )
+    parser.add_argument(
+        "--common_voice_test",
+        action="store_true",
+        help="Remove test samples where transcript is also in trainset. Use 'test.csv' path as first argument.",
     )
     parser.add_argument(
         "--split",
@@ -27,7 +40,7 @@ def main():
     )
     args = parser.parse_args()
 
-    if args.tuda or args.split != "":
+    if args.tuda or args.common_voice or args.split != "":
         # Keep the german 0 as "null" string
         data = pd.read_csv(args.csv_to_split_path, keep_default_na=False)
 
@@ -37,6 +50,32 @@ def main():
         data_test = data[data["wav_filename"].str.contains("/test/")]
 
     elif args.common_voice:
+        # Extract filename from path
+        data["filename"] = data.apply(
+            lambda x: os.path.splitext(os.path.basename(x.wav_filename))[0], axis=1
+        )
+
+        # Get filenames from test.tsv and filter all entries from all.csv with the same filename
+        test_org = os.path.join(args.common_voice_org, "test.tsv")
+        test_org = pd.read_csv(test_org, keep_default_na=False, sep="\t")
+        test_org = [os.path.splitext(f)[0] for f in test_org["path"]]
+        data_test = data[data["filename"].isin(test_org)]
+
+        # Get filenames from dev.tsv and filter all entries from all.csv with the same filename
+        dev_org = os.path.join(args.common_voice_org, "dev.tsv")
+        dev_org = pd.read_csv(dev_org, keep_default_na=False, sep="\t")
+        dev_org = [os.path.splitext(f)[0] for f in dev_org["path"]]
+        data_dev = data[data["filename"].isin(dev_org)]
+
+        # Use all entries not in dev or test for the trainset
+        data_dev_test = pd.concat([data_dev, data_test])["filename"]
+        data_train = data[~data["filename"].isin(data_dev_test)]
+
+        data_test.drop(columns=["filename"])
+        data_dev.drop(columns=["filename"])
+        data_train.drop(columns=["filename"])
+
+    elif args.common_voice_test:
         data_test = pd.read_csv(args.csv_to_split_path, keep_default_na=False)
         path = args.csv_to_split_path.replace("test", "dev")
         data_dev = pd.read_csv(path, keep_default_na=False)

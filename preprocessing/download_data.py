@@ -102,7 +102,7 @@ def main():
         print("Downloading tatoeba-es ...")
         dl = io.TatoebaDownloader(include_languages=["spa"])
         dl.download(os.path.join(args.target_path, "tatoeba"))
-        
+
     if args.tatoeba_eo:
         print("Downloading tatoeba-eo ...")
         dl = io.TatoebaDownloader(include_languages=["epo"])

@@ -165,6 +165,8 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/dataset_operations.py /Dee
 # To split tuda into the correct train, dev and test splits run: 
 # (you will have to rename the [train/dev/test]_s.csv files before combining them with other datasets)
 python3 deepspeech-polyglot/preprocessing/split_dataset.py data_prepared/de/tuda/all.csv --tuda --file_appendix _s
+# To split common-voice into the correct train, dev and test splits run: 
+python3 deepspeech-polyglot/preprocessing/split_dataset.py data_prepared/${LANGUAGE}/common_voice/all.csv --common_voice --common_voice_org /DeepSpeech/data_original/${LANGUAGE}/common_voice/${LANGUAGE}/ --file_appendix _s
 ```
 
 Preparation times for german datasets using Intel i7-8700K:
