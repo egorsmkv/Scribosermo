@@ -35,6 +35,7 @@ def main():
     parser.add_argument("target_path", type=str)
     parser.add_argument("--common_voice", type=str)
     parser.add_argument("--css_ten", type=str)
+    parser.add_argument("--lingualibre", type=str)
     parser.add_argument("--mailabs", type=str)
     parser.add_argument("--swc", type=str)
     parser.add_argument("--tatoeba", type=str)
@@ -51,8 +52,13 @@ def main():
         corpora.append(corpus)
 
     if args.css_ten is not None:
-        print("Loading css ...")
+        print("Loading css-ten ...")
         corpus = audiomate.Corpus.load(args.css_ten, reader="css10")
+        corpora.append(corpus)
+
+    if args.lingualibre is not None:
+        print("Loading lingualibre ...")
+        corpus = audiomate.Corpus.load(args.lingualibre, reader="lingualibre")
         corpora.append(corpus)
 
     if args.mailabs is not None:
@@ -94,10 +100,11 @@ def main():
     print("Splitting corpus ...")
     splitter = subset.Splitter(merged_corpus, random_seed=38)
     split_sizes = {"train": 0.7, "dev": 0.15, "test": 0.15}
-    if (args.css_ten is not None or args.tatoeba is not None) and len(corpora) == 1:
+
+    splits = splitter.split(split_sizes, separate_issuers=True)
+    if "test" not in splits or "dev" not in splits:
+        print("Very small dataset -> using random split instead of separated speakers")
         splits = splitter.split(split_sizes, separate_issuers=False)
-    else:
-        splits = splitter.split(split_sizes, separate_issuers=True)
 
     merged_corpus.import_subview("train", splits["train"])
     merged_corpus.import_subview("dev", splits["dev"])

@@ -24,6 +24,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 * [Mozilla Common Voice](https://voice.mozilla.org/) ~506h
 * [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
 * GoogleWavenet ~165h, artificial training data generated with the google text to speech service
+* [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~4h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
 * [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
 * [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
@@ -34,6 +35,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 #### Spanish (es)
 * [Mozilla Common Voice](https://voice.mozilla.org/) ~187h
 * [CSS10](https://www.kaggle.com/bryanpark/spanish-single-speaker-speech-dataset) ~24h
+* [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~1h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~108h
 * [Tatoeba](https://tatoeba.org/spa/sentences/search?query=&from=spa&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~59h
 * [Voxforge](http://www.voxforge.org/home/) ~52h
@@ -41,6 +43,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 #### French (fr)
 * [Mozilla Common Voice](https://voice.mozilla.org/) ~370h
 * [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) ~19h
+* [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~40h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~184h
 * [Tatoeba](https://tatoeba.org/fra/sentences/search?query=&from=fra&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~2h
 * [Voxforge](http://www.voxforge.org/home/) ~37h
@@ -115,6 +118,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --zamia_s
 
 # German or French or Spanish
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --common_voice_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --lingualibre_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --mailabs_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --tatoeba_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --voxforge_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
@@ -136,9 +140,10 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /De
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
 
 # German or French or Spanish
-# The spanish/french mailabs and common_voice datasets have a different directory structure compared to the german datasets, you have to fix this first, see https://github.com/DanBmh/audiomate/issues/4
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/common_voice/ /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/
+# The spanish/french mailabs datasets have a different directory structure compared to the german dataset, you have to fix this first, see https://github.com/DanBmh/audiomate/issues/4
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/common_voice/${LANGUAGE}/ /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --css_ten /DeepSpeech/data_original/${LANGUAGE}/css_ten/ /DeepSpeech/data_prepared/${LANGUAGE}/css_ten/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --lingualibre /DeepSpeech/data_original/${LANGUAGE}/lingualibre/ /DeepSpeech/data_prepared/${LANGUAGE}/lingualibre/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --mailabs /DeepSpeech/data_original/${LANGUAGE}/mailabs/ /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tatoeba /DeepSpeech/data_original/${LANGUAGE}/tatoeba/ /DeepSpeech/data_prepared/${LANGUAGE}/tatoeba/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --voxforge /DeepSpeech/data_original/${LANGUAGE}/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/

@@ -12,7 +12,12 @@ def main():
     parser.add_argument("target_path", type=str)
     parser.add_argument("--common_voice_de", action="store_true")
     parser.add_argument("--common_voice_es", action="store_true")
+    parser.add_argument("--common_voice_eo", action="store_true")
     parser.add_argument("--common_voice_fr", action="store_true")
+    parser.add_argument("--lingualibre_de", action="store_true")
+    parser.add_argument("--lingualibre_es", action="store_true")
+    parser.add_argument("--lingualibre_eo", action="store_true")
+    parser.add_argument("--lingualibre_fr", action="store_true")
     parser.add_argument("--mailabs_de", action="store_true")
     parser.add_argument("--mailabs_es", action="store_true")
     parser.add_argument("--mailabs_fr", action="store_true")
@@ -37,10 +42,35 @@ def main():
         dl = io.CommonVoiceDownloader(lang="es")
         dl.download(os.path.join(args.target_path, "common_voice"))
 
+    if args.common_voice_eo:
+        print("Downloading common-voice-eo ...")
+        dl = io.CommonVoiceDownloader(lang="eo")
+        dl.download(os.path.join(args.target_path, "common_voice"))
+
     if args.common_voice_fr:
         print("Downloading common-voice-fr ...")
         dl = io.CommonVoiceDownloader(lang="fr")
         dl.download(os.path.join(args.target_path, "common_voice"))
+
+    if args.lingualibre_de:
+        print("Downloading lingualibre-de ...")
+        dl = io.LinguaLibreDownloader(lang="deu")
+        dl.download(os.path.join(args.target_path, "lingualibre"))
+
+    if args.lingualibre_es:
+        print("Downloading lingualibre-es ...")
+        dl = io.LinguaLibreDownloader(lang="spa")
+        dl.download(os.path.join(args.target_path, "lingualibre"))
+
+    if args.lingualibre_eo:
+        print("Downloading lingualibre-eo ...")
+        dl = io.LinguaLibreDownloader(lang="epo")
+        dl.download(os.path.join(args.target_path, "lingualibre"))
+
+    if args.lingualibre_fr:
+        print("Downloading lingualibre-fr ...")
+        dl = io.LinguaLibreDownloader(lang="fra")
+        dl.download(os.path.join(args.target_path, "lingualibre"))
 
     if args.mailabs_de:
         print("Downloading mailabs-de ...")
