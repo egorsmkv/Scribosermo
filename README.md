@@ -81,10 +81,12 @@ Clone DeepSpeech and build container:
 
 ```bash
 git clone https://github.com/mozilla/DeepSpeech.git
-# or
+# or for noise augmentation testing
 git clone https://github.com/DanBmh/DeepSpeech.git
 
 cd DeepSpeech && make Dockerfile.train && cd ..
+# The currently used version's commit id is 188a6f2c1ee53dc79acf8abceaf729b5f9a05e7a, 
+# edit the dockerfile and set DEEPSPEECH_SHA accordingly
 docker build -f DeepSpeech/Dockerfile.train -t mozilla_deepspeech DeepSpeech/
 ```
 
