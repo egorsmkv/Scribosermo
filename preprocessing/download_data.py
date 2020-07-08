@@ -9,133 +9,94 @@ from audiomate.corpus import io
 
 def main():
     parser = argparse.ArgumentParser(description="Prepare data for training.")
-    parser.add_argument("target_path", type=str)
-    parser.add_argument("--common_voice_de", action="store_true")
-    parser.add_argument("--common_voice_es", action="store_true")
-    parser.add_argument("--common_voice_eo", action="store_true")
-    parser.add_argument("--common_voice_fr", action="store_true")
-    parser.add_argument("--lingualibre_de", action="store_true")
-    parser.add_argument("--lingualibre_es", action="store_true")
-    parser.add_argument("--lingualibre_eo", action="store_true")
-    parser.add_argument("--lingualibre_fr", action="store_true")
-    parser.add_argument("--mailabs_de", action="store_true")
-    parser.add_argument("--mailabs_es", action="store_true")
-    parser.add_argument("--mailabs_fr", action="store_true")
-    parser.add_argument("--swc_de", action="store_true")
-    parser.add_argument("--tatoeba_de", action="store_true")
-    parser.add_argument("--tatoeba_es", action="store_true")
-    parser.add_argument("--tatoeba_eo", action="store_true")
-    parser.add_argument("--tatoeba_fr", action="store_true")
-    parser.add_argument("--tuda_de", action="store_true")
-    parser.add_argument("--voxforge_de", action="store_true")
-    parser.add_argument("--voxforge_es", action="store_true")
-    parser.add_argument("--voxforge_fr", action="store_true")
-    parser.add_argument("--zamia_speech_de", action="store_true")
+    parser.add_argument("--target_path", type=str, required=True)
+    parser.add_argument("--language", type=str, required=True)
+    parser.add_argument("--common_voice", action="store_true")
+    parser.add_argument("--css_ten", action="store_true")
+    parser.add_argument("--lingualibre", action="store_true")
+    parser.add_argument("--mailabs", action="store_true")
+    parser.add_argument("--swc", action="store_true")
+    parser.add_argument("--tatoeba", action="store_true")
+    parser.add_argument("--tuda", action="store_true")
+    parser.add_argument("--voxforge", action="store_true")
+    parser.add_argument("--zamia_speech", action="store_true")
     args = parser.parse_args()
 
-    if args.common_voice_de:
-        print("Downloading common-voice-de ...")
-        dl = io.CommonVoiceDownloader(lang="de")
+    if args.common_voice:
+        dl = io.CommonVoiceDownloader(lang=args.language)
+        print("Downloading common-voice-{} ...".format(args.language))
         dl.download(os.path.join(args.target_path, "common_voice"))
 
-    if args.common_voice_es:
-        print("Downloading common-voice-es ...")
-        dl = io.CommonVoiceDownloader(lang="es")
-        dl.download(os.path.join(args.target_path, "common_voice"))
+    if args.lingualibre:
+        langs = {
+            "de": "deu",
+            "eo": "epo",
+            "es": "spa",
+            "fr": "fra",
+            "it": "ita",
+            "pl": "pol",
+        }
+        if args.language in langs:
+            print("Downloading lingualibre-{} ...".format(args.language))
+            dl = io.LinguaLibreDownloader(lang=langs[args.language])
+            dl.download(os.path.join(args.target_path, "lingualibre"))
+        else:
+            msg = "Language '{}' not supported for lingualibre"
+            raise ValueError(msg.format(args.language))
 
-    if args.common_voice_eo:
-        print("Downloading common-voice-eo ...")
-        dl = io.CommonVoiceDownloader(lang="eo")
-        dl.download(os.path.join(args.target_path, "common_voice"))
+    if args.mailabs:
+        langs = {
+            "de": "de_DE",
+            "es": "es_ES",
+            "fr": "fr_FR",
+            "it": "it_IT",
+            "pl": "pl_PL",
+            "ru": "ru_RU",
+            "uk": "uk_UK",
+        }
+        if args.language in langs:
+            print("Downloading mailabs-{} ...".format(args.language))
+            dl = io.MailabsDownloader(lang=langs[args.language])
+            dl.download(os.path.join(args.target_path, "mailabs"))
+        else:
+            msg = "Language '{}' not supported for mailabs"
+            raise ValueError(msg.format(args.language))
 
-    if args.common_voice_fr:
-        print("Downloading common-voice-fr ...")
-        dl = io.CommonVoiceDownloader(lang="fr")
-        dl.download(os.path.join(args.target_path, "common_voice"))
-
-    if args.lingualibre_de:
-        print("Downloading lingualibre-de ...")
-        dl = io.LinguaLibreDownloader(lang="deu")
-        dl.download(os.path.join(args.target_path, "lingualibre"))
-
-    if args.lingualibre_es:
-        print("Downloading lingualibre-es ...")
-        dl = io.LinguaLibreDownloader(lang="spa")
-        dl.download(os.path.join(args.target_path, "lingualibre"))
-
-    if args.lingualibre_eo:
-        print("Downloading lingualibre-eo ...")
-        dl = io.LinguaLibreDownloader(lang="epo")
-        dl.download(os.path.join(args.target_path, "lingualibre"))
-
-    if args.lingualibre_fr:
-        print("Downloading lingualibre-fr ...")
-        dl = io.LinguaLibreDownloader(lang="fra")
-        dl.download(os.path.join(args.target_path, "lingualibre"))
-
-    if args.mailabs_de:
-        print("Downloading mailabs-de ...")
-        dl = io.MailabsDownloader(tags=["de_DE"])
-        dl.download(os.path.join(args.target_path, "mailabs"))
-
-    if args.mailabs_es:
-        print("Downloading mailabs-es ...")
-        dl = io.MailabsDownloader(tags=["es_ES"])
-        dl.download(os.path.join(args.target_path, "mailabs"))
-
-    if args.mailabs_fr:
-        print("Downloading mailabs-fr ...")
-        dl = io.MailabsDownloader(tags=["fr_FR"])
-        dl.download(os.path.join(args.target_path, "mailabs"))
-
-    if args.swc_de:
-        print("Downloading swc-de ...")
-        dl = io.SWCDownloader(lang="de")
+    if args.swc:
+        dl = io.SWCDownloader(lang=args.language)
+        print("Downloading swc-{} ...".format(args.language))
         dl.download(os.path.join(args.target_path, "swc"))
 
-    if args.tatoeba_de:
-        print("Downloading tatoeba-de ...")
-        dl = io.TatoebaDownloader(include_languages=["deu"])
-        dl.download(os.path.join(args.target_path, "tatoeba"))
+    if args.tatoeba:
+        langs = {
+            "de": "deu",
+            "eo": "epo",
+            "es": "spa",
+            "fr": "fra",
+            "it": "ita",
+            "pl": "pol",
+        }
+        if args.language in langs:
+            print("Downloading tatoeba-{} ...".format(args.language))
+            dl = io.TatoebaDownloader(include_languages=[langs[args.language]])
+            dl.download(os.path.join(args.target_path, "tatoeba"))
+        else:
+            msg = "Language '{}' not supported for tatoeba"
+            raise ValueError(msg.format(args.language))
 
-    if args.tatoeba_es:
-        print("Downloading tatoeba-es ...")
-        dl = io.TatoebaDownloader(include_languages=["spa"])
-        dl.download(os.path.join(args.target_path, "tatoeba"))
-
-    if args.tatoeba_eo:
-        print("Downloading tatoeba-eo ...")
-        dl = io.TatoebaDownloader(include_languages=["epo"])
-        dl.download(os.path.join(args.target_path, "tatoeba"))
-
-    if args.tatoeba_fr:
-        print("Downloading tatoeba-fr ...")
-        dl = io.TatoebaDownloader(include_languages=["fra"])
-        dl.download(os.path.join(args.target_path, "tatoeba"))
-
-    if args.tuda_de:
-        print("Downloading tuda-de ...")
+    if args.tuda:
+        print("Downloading tuda-de ...".format(args.language))
         dl = io.TudaDownloader()
         dl.download(os.path.join(args.target_path, "tuda"))
 
-    if args.voxforge_de:
-        print("Downloading voxforge-de ...")
-        dl = io.VoxforgeDownloader(lang="de")
+    if args.voxforge:
+        dl = io.VoxforgeDownloader(lang=args.language)
+        print("Downloading voxforge-{} ...".format(args.language))
         dl.download(os.path.join(args.target_path, "voxforge"))
 
-    if args.voxforge_es:
-        print("Downloading voxforge-es ...")
-        dl = io.VoxforgeDownloader(lang="es")
-        dl.download(os.path.join(args.target_path, "voxforge"))
-
-    if args.voxforge_fr:
-        print("Downloading voxforge-fr ...")
-        dl = io.VoxforgeDownloader(lang="fr")
-        dl.download(os.path.join(args.target_path, "voxforge"))
-
-    if args.zamia_speech_de:
-        print("Downloading zamia-speech-de ...")
-        dl = io.ZamiaSpeechDownloader(lang="de")
+    if args.zamia_speech:
+        dl = io.ZamiaSpeechDownloader(lang=args.language)
+        print("Downloading zamia-speech-{} ...".format(args.language))
         dl.download(os.path.join(args.target_path, "zamia_speech"))
 
 

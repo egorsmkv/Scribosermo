@@ -111,17 +111,15 @@ Download datasets (Run in container):
 ```bash
 export LANGUAGE="de"
 
-# German
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --swc_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --tuda_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --zamia_speech_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
+# Base command
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --language "${LANGUAGE}" --target_path "/DeepSpeech/data_original/${LANGUAGE}/" [InsertDatasetHere]
 
-# German or French or Spanish
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --common_voice_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --lingualibre_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --mailabs_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --tatoeba_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --voxforge_${LANGUAGE} /DeepSpeech/data_original/${LANGUAGE}/
+# Check above dataset chapter for tested languages
+# Some flags support more languages, just test it, you will get an error message if it's not supported or existing
+# With '--lingualibre' and '--tatoeba' it's often possible to add support by finding out the language conversion codes
+--swc --tuda --zamia_speech
+--common_voice --mailabs --voxforge
+--lingualibre --tatoeba
 ```
 
 Download css10 german/spanish/french dataset (Requires kaggle account, see links above) \
@@ -134,19 +132,15 @@ Prepare datasets, this may take some time (Run in container):
 ```bash
 export LANGUAGE="de"
 
-# German
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --swc /DeepSpeech/data_original/${LANGUAGE}/swc/ /DeepSpeech/data_prepared/${LANGUAGE}/swc/
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /DeepSpeech/data_original/${LANGUAGE}/tuda/ /DeepSpeech/data_prepared/${LANGUAGE}/tuda/
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
-
-# German or French or Spanish
-# The spanish/french mailabs datasets have a different directory structure compared to the german dataset, you have to fix this first, see https://github.com/DanBmh/audiomate/issues/4
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/common_voice/${LANGUAGE}/ /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --css_ten /DeepSpeech/data_original/${LANGUAGE}/css_ten/ /DeepSpeech/data_prepared/${LANGUAGE}/css_ten/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --lingualibre /DeepSpeech/data_original/${LANGUAGE}/lingualibre/ /DeepSpeech/data_prepared/${LANGUAGE}/lingualibre/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --mailabs /DeepSpeech/data_original/${LANGUAGE}/mailabs/ /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --swc /DeepSpeech/data_original/${LANGUAGE}/swc/ /DeepSpeech/data_prepared/${LANGUAGE}/swc/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tatoeba /DeepSpeech/data_original/${LANGUAGE}/tatoeba/ /DeepSpeech/data_prepared/${LANGUAGE}/tatoeba/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /DeepSpeech/data_original/${LANGUAGE}/tuda/ /DeepSpeech/data_prepared/${LANGUAGE}/tuda/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --voxforge /DeepSpeech/data_original/${LANGUAGE}/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
 
 # To combine multiple datasets run: 
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py /DeepSpeech/data_prepared/de/ --tuda --voxforge
