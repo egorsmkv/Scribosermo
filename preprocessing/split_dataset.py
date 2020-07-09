@@ -71,9 +71,9 @@ def main():
         data_dev_test = pd.concat([data_dev, data_test])["filename"]
         data_train = data[~data["filename"].isin(data_dev_test)]
 
-        data_test.drop(columns=["filename"])
-        data_dev.drop(columns=["filename"])
-        data_train.drop(columns=["filename"])
+        data_test = data_test.drop(columns=["filename"])
+        data_dev = data_dev.drop(columns=["filename"])
+        data_train = data_train.drop(columns=["filename"])
 
     elif args.common_voice_test:
         data_test = pd.read_csv(args.csv_to_split_path, keep_default_na=False)
