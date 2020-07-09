@@ -100,8 +100,6 @@ docker build -t deepspeech_polyglot deepspeech-polyglot/
 ./deepspeech-polyglot/run_container.sh
 ```
 
-Set your language in `data/config/global_config.json.default` and save as `global_config.json`.
-
 <br/>
 
 
@@ -599,5 +597,5 @@ You can contribute to this project in multiple ways:
 
 Run test (Run in container):
 ```bash
-cd /Deepspeech/deepspeech-polyglot/ && pytest --cov=preprocessing
+cd /DeepSpeech/deepspeech-polyglot/ && pytest --cov=preprocessing
 ```

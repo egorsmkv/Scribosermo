@@ -13,8 +13,8 @@ import text_cleaning
 def test_clean_sentence():
     """ Only single sentence needed for output format test and coverage """
 
-    lang = "de"
-    text_cleaning.load_replacers(lang)
+    os.environ["LANGUAGE"] = "de"
+    text_cleaning.load_language()
 
     sentences = "Hi, wie geht's dir?"
     correct_sentence = "hi wie gehts dir"
@@ -29,8 +29,8 @@ def test_clean_sentence():
 
 
 def test_clean_sentence_list_de():
-    lang = "de"
-    text_cleaning.load_replacers(lang)
+    os.environ["LANGUAGE"] = "de"
+    text_cleaning.load_language()
 
     sentences = [
         "Hi, wie geht's dir?",
@@ -55,8 +55,8 @@ def test_clean_sentence_list_de():
 
 
 def test_clean_sentence_list_es():
-    lang = "es"
-    text_cleaning.load_replacers(lang)
+    os.environ["LANGUAGE"] = "es"
+    text_cleaning.load_language()
 
     sentences = ["¿Quién quiere casarse ...?"]
     correct_sentences = [
@@ -71,8 +71,8 @@ def test_clean_sentence_list_es():
 
 
 def test_clean_sentence_list_fr():
-    lang = "fr"
-    text_cleaning.load_replacers(lang)
+    os.environ["LANGUAGE"] = "fr"
+    text_cleaning.load_language()
 
     sentences = [
         "«Une chance qu'il est arrivé.",

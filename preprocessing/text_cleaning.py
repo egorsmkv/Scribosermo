@@ -1,16 +1,18 @@
 import collections
+import json
+import os
 import re
 from functools import partial
 from multiprocessing import Pool
 
 import num2words
 import tqdm
-import utils
 
 # ==================================================================================================
 
-lang = utils.load_global_config()["language"]
-langdicts = utils.get_langdicts()
+file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
+lang = None
+langdicts = None
 
 # Regex patterns, see www.regexr.com for good explanation
 decimal_pattern = None
@@ -26,6 +28,38 @@ all_bad_characters = set()
 umlaut_replacers = None
 special_replacers = None
 char_replacers = None
+
+
+# ==================================================================================================
+
+
+def load_language():
+    """ Load language and replacers in extra function that they are reloadable for testing """
+
+    global lang, langdicts
+
+    lang = os.getenv("LANGUAGE")
+    if lang is None:
+        print("Using default language 'de'")
+        lang = "de"
+    else:
+        print("Using language {}".format(lang))
+
+    if langdicts is None:
+        langdicts = load_langdicts()
+    load_replacers(lang)
+
+
+# ==================================================================================================
+
+
+def load_langdicts() -> dict:
+    """ Load the langdicts """
+
+    path = file_path + "../data/langdicts.json"
+    with open(path, "r", encoding="utf-8") as file:
+        content = json.load(file)
+    return content
 
 
 # ==================================================================================================
@@ -51,8 +85,7 @@ def load_replacers(lang):
 
 # ==================================================================================================
 
-# Load replacers in extra function that language is exchangeable for testing
-load_replacers(lang)
+load_language()
 
 
 # ==================================================================================================
