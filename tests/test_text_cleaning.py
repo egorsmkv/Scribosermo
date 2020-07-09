@@ -83,3 +83,39 @@ def test_clean_sentence_list_fr():
     cleaned_sentences = text_cleaning.clean_sentence_list(sentences)
 
     assert cleaned_sentences == correct_sentences
+
+
+# ==================================================================================================
+
+
+def test_clean_sentence_list_it():
+    os.environ["LANGUAGE"] = "it"
+    text_cleaning.load_language()
+
+    sentences = [
+        "sì, niente, insomma: né padre, né madre, né come fu o come non fu;",
+    ]
+    correct_sentences = [
+        "si niente insomma ne padre ne madre ne come fu o come non fu",
+    ]
+    cleaned_sentences = text_cleaning.clean_sentence_list(sentences)
+
+    assert cleaned_sentences == correct_sentences
+
+
+# ==================================================================================================
+
+
+def test_clean_sentence_list_pl():
+    os.environ["LANGUAGE"] = "pl"
+    text_cleaning.load_language()
+
+    sentences = [
+        "Lopez widząc, żem przyszedł do siebie, jął znowu rozwodzić narzekania:",
+    ]
+    correct_sentences = [
+        "lopez widząc żem przyszedł do siebie jął znowu rozwodzić narzekania",
+    ]
+    cleaned_sentences = text_cleaning.clean_sentence_list(sentences)
+
+    assert cleaned_sentences == correct_sentences
