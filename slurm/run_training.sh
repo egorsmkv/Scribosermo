@@ -16,4 +16,4 @@ singularity exec \
   --bind /cfs/share/cache/db_xds/data_prepared/:/DeepSpeech/data_prepared/ \
   --bind ~/deepspeech-polyglot/:/DeepSpeech/deepspeech-polyglot/ \
   /cfs/share/cache/db_xds/images/deepspeech_polyglot.sif \
-  /bin/bash -c 'chmod +x /DeepSpeech/deepspeech-polyglot/training/train.sh && /DeepSpeech/deepspeech-polyglot/training/train.sh'
+  /bin/bash -c 'export LANGUAGE="de" && chmod +x /DeepSpeech/deepspeech-polyglot/training/train.sh && /DeepSpeech/deepspeech-polyglot/training/train.sh'

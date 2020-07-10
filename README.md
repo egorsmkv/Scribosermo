@@ -560,6 +560,15 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 | CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge ES | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay | Test: 14.521997, Validation: 22.408368 | 51 | WER: 0.154061, CER: 0.055357 |
 ||
 
+Using new CommonVoice v5 releases: \
+(Default values: See flags.txt in released checkpoints) 
+
+| Language | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
+|----------|---------|------------------|--------|-------------------------------|--------|
+| IT | CommonVoice + LinguaLibre + Mailabs + Voxforge | test with CommonVoice others completely for training, with speech and noise overlay, top-51216 scorer (words occurring at least twice)  | Test: 25.536196, Validation: 23.048596 | 46 | WER: 0.249197, CER: 0.093717 |
+| PL | CommonVoice + LinguaLibre + Mailabs | test with CommonVoice others completely for training, with speech and noise overlay, top-39175 scorer (words occurring at least twice)  | Test: 14.902746, Validation: 15.508280 | 53 | WER: 0.040128, CER: 0.022947 |
+||
+
 <br/>
 
 
@@ -576,6 +585,14 @@ Checkpoints of CCMTV training, graph model and scorer: [Link](https://drive.goog
 **French:** \
 (WER: 0.30, Train: ~492h, Test: ~60h) \
 Checkpoints of CCMTV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1Nk_1uFVwM7lj2RQf4PaQOgdAdqhiKWyV?usp=sharing)
+
+**Italian:** \
+(WER: 0.25 Train: ~257h, Test: ~21h) \
+Checkpoints of CLMV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1BudQv6nUvRSas69SpD9zHN-TmjGyedaK?usp=sharing)
+
+**Polish:** \
+(WER: 0.04, Train: ~157h, Test: ~6h) \
+Checkpoints of CLM training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1_hia1rRmmsLRrFIHANH4254KKZhY3p1c?usp=sharing)
 
 <br/>
 
