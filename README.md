@@ -49,9 +49,14 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 * [Voxforge](http://www.voxforge.org/home/) ~37h
 
 #### Italian (it)
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~149h
+* [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~0h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~127h
+* [Voxforge](http://www.voxforge.org/home/) ~20h
 
 #### Polish (pl)
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~113h
+* [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~2h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~54h
 
 #### Noise
@@ -153,10 +158,10 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py /DeepS
 python3 deepspeech-polyglot/pre-processing/prepare_data.py --tuda data_original/de/tuda/ --voxforge data_original/de/voxforge/ data_prepared/de/tuda_voxforge/
 
 # Or to combine specific csv files:
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py "" --files_output /DeepSpeech/data_prepared/de/tvsmc/train_mix.csv --files "/DeepSpeech/data_prepared/de/common_voice/train.csv /DeepSpeech/data_prepared/de/mailabs/all.csv /DeepSpeech/data_prepared/de/swc/all.csv /DeepSpeech/data_prepared/de/tuda/train.csv /DeepSpeech/data_prepared/de/voxforge/train.csv"
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py "" --files_output /DeepSpeech/data_prepared/${LANGUAGE}/cmv/train_mix.csv --files "/DeepSpeech/data_prepared/${LANGUAGE}/common_voice/train.csv /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/all.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train.csv"
 
 
-# To shuffle and replace "äöü" characters and clean the files run (repeat for all 3 csv files):
+# To shuffle and replace non alphabet characters and clean the files run (repeat for all 3 csv files):
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/dataset_operations.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv --replace --shuffle --clean --exclude
 
 
@@ -164,7 +169,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/dataset_operations.py /Dee
 # (you will have to rename the [train/dev/test]_s.csv files before combining them with other datasets)
 python3 deepspeech-polyglot/preprocessing/split_dataset.py data_prepared/de/tuda/all.csv --tuda --file_appendix _s
 # To split common-voice into the correct train, dev and test splits run: 
-python3 deepspeech-polyglot/preprocessing/split_dataset.py data_prepared/${LANGUAGE}/common_voice/all.csv --common_voice --common_voice_org /DeepSpeech/data_original/${LANGUAGE}/common_voice/${LANGUAGE}/ --file_appendix _s
+python3 deepspeech-polyglot/preprocessing/split_dataset.py /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/all.csv --common_voice --common_voice_org /DeepSpeech/data_original/${LANGUAGE}/common_voice/${LANGUAGE}/ --file_appendix _s
 ```
 
 Preparation times for german datasets using Intel i7-8700K:

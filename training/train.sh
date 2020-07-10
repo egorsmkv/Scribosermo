@@ -23,7 +23,7 @@ if [[ "${START_FROM_CHECKPOINT}" != "--" ]]; then
   cp -a ${START_FROM_CHECKPOINT}"." ${CHECKPOINT_DIR}
 fi
 
-if [[ "${LANGUAGE}" == "de" ]]; then
+if [[ "${LANGUAGE}" == "de" ]] || [[ "${LANGUAGE}" == "it" ]]; then
   DROP_SOURCE_LAYERS=0
 else
   DROP_SOURCE_LAYERS=1
@@ -114,18 +114,20 @@ echo ""
 python3 -u /DeepSpeech/DeepSpeech.py ${DSARGS}
 
 # Convert output graph for inference
-if [[ -f ${CHECKPOINT_DIR}"output_graph.pb" ]]; then
-  echo ""
-  echo "Converting output graph for inference:"
-  echo ""
-  /DeepSpeech/convert_graphdef_memmapped_format --in_graph=${CHECKPOINT_DIR}"output_graph.pb" \
-    --out_graph=${CHECKPOINT_DIR}"output_graph_${LANGUAGE}.pbmm"
-
-  echo ""
+echo ""
+echo "Converting output graph for inference:"
+echo ""
+if [[ -f ${CHECKPOINT_DIR}"best_dev_checkpoint" ]]; then
   python3 -u /DeepSpeech/DeepSpeech.py --checkpoint_dir ${CHECKPOINT_DIR} \
+    --scorer /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer \
     --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt \
     --export_tflite --export_dir ${CHECKPOINT_DIR} \
     && mv ${CHECKPOINT_DIR}"output_graph.tflite" ${CHECKPOINT_DIR}"output_graph_${LANGUAGE}.tflite"
+fi
+echo ""
+if [[ -f ${CHECKPOINT_DIR}"output_graph.pb" ]]; then
+  /DeepSpeech/convert_graphdef_memmapped_format --in_graph=${CHECKPOINT_DIR}"output_graph.pb" \
+    --out_graph=${CHECKPOINT_DIR}"output_graph_${LANGUAGE}.pbmm"
 fi
 
 echo ""

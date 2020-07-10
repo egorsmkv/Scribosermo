@@ -43,7 +43,7 @@ def load_language():
         print("Cleaning texts with default language 'de'")
         lang = "de"
     else:
-        print("Cleaning texts with language {}".format(lang))
+        print("Cleaning texts with language '{}'".format(lang))
 
     if langdicts is None:
         langdicts = load_langdicts()
