@@ -33,7 +33,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 * [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
 
 #### Spanish (es)
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~187h
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~390h
 * [CSS10](https://www.kaggle.com/bryanpark/spanish-single-speaker-speech-dataset) ~24h
 * [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~1h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~108h
@@ -41,7 +41,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 * [Voxforge](http://www.voxforge.org/home/) ~52h
 
 #### French (fr)
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~370h
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~546h
 * [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) ~19h
 * [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~40h
 * [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~184h
@@ -158,7 +158,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py /DeepS
 python3 deepspeech-polyglot/pre-processing/prepare_data.py --tuda data_original/de/tuda/ --voxforge data_original/de/voxforge/ data_prepared/de/tuda_voxforge/
 
 # Or to combine specific csv files:
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py "" --files_output /DeepSpeech/data_prepared/${LANGUAGE}/cmv/train_mix.csv --files "/DeepSpeech/data_prepared/${LANGUAGE}/common_voice/train.csv /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/all.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train.csv"
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py "" --files_output /DeepSpeech/data_prepared/${LANGUAGE}/cmv/train_mix.csv --files "/DeepSpeech/data_prepared/${LANGUAGE}/common_voice/train_s.csv /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/all.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train.csv"
 
 
 # To shuffle and replace non alphabet characters and clean the files run (repeat for all 3 csv files):
@@ -558,16 +558,18 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 | Voxforge FR | speech and noise overlay | Test: 5.341695, Validation: 12.736551 | 49 | WER: 0.175954, CER: 0.045416 |
 | CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge FR | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay | Test: 20.404339, Validation: 21.920289 | 62 | WER: 0.302113, CER: 0.121300 |
 | CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge ES | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay | Test: 14.521997, Validation: 22.408368 | 51 | WER: 0.154061, CER: 0.055357 |
-||
+
+<br/>
 
 Using new CommonVoice v5 releases: \
-(Default values: See flags.txt in released checkpoints) 
+(Default values: See flags.txt in released checkpoints; using correct instead of random splits of CommonVoice) 
 
 | Language | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
 |----------|---------|------------------|--------|-------------------------------|--------|
-| IT | CommonVoice + LinguaLibre + Mailabs + Voxforge | test with CommonVoice others completely for training, with speech and noise overlay, top-51216 scorer (words occurring at least twice)  | Test: 25.536196, Validation: 23.048596 | 46 | WER: 0.249197, CER: 0.093717 |
-| PL | CommonVoice + LinguaLibre + Mailabs | test with CommonVoice others completely for training, with speech and noise overlay, top-39175 scorer (words occurring at least twice)  | Test: 14.902746, Validation: 15.508280 | 53 | WER: 0.040128, CER: 0.022947 |
-||
+| ES | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-303450 scorer (words occurring at least twice) | Test: 25.443010, Validation: 22.686161 | 42 | WER: 0.193316, CER: 0.093000  |
+| FR | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-316458 scorer (words occurring at least twice) | Test: 29.761099, Validation: 24.691544 | 52 | WER: 0.231981, CER: 0.116503 |
+| IT | CommonVoice + LinguaLibre + Mailabs + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-51216 scorer out of train transcriptions (words occurring at least twice) | Test: 25.536196, Validation: 23.048596 | 46 | WER: 0.249197, CER: 0.093717 |
+| PL | CommonVoice + LinguaLibre + Mailabs | test with CommonVoice, others completely for training; with speech and noise overlay; top-39175 scorer out of train transcriptions (words occurring at least twice) | Test: 14.902746, Validation: 15.508280 | 53 | WER: 0.040128, CER: 0.022947 |
 
 <br/>
 
@@ -579,12 +581,12 @@ Using new CommonVoice v5 releases: \
 Checkpoints of TVSMC training, graph model and scorer with training transcriptions: [Link](https://drive.google.com/drive/folders/1oO-N-VH_0P89fcRKWEUlVDm-_z18Kbkb?usp=sharing)
 
 **Spanish:** \
-(WER: 0.15, Train: ~357h, Test: ~35h) \
-Checkpoints of CCMTV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1-3UgQBtzEf8QcH2qc8TJHkUqCBp5BBmO?usp=sharing)
+(WER: 0.19, Train: ~630h, Test: ~25h) \
+Checkpoints of CCLMTV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1-3UgQBtzEf8QcH2qc8TJHkUqCBp5BBmO?usp=sharing)
 
 **French:** \
-(WER: 0.30, Train: ~492h, Test: ~60h) \
-Checkpoints of CCMTV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1Nk_1uFVwM7lj2RQf4PaQOgdAdqhiKWyV?usp=sharing)
+(WER: 0.23, Train: ~780h, Test: ~25h) \
+Checkpoints of CCLMTV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1Nk_1uFVwM7lj2RQf4PaQOgdAdqhiKWyV?usp=sharing)
 
 **Italian:** \
 (WER: 0.25 Train: ~257h, Test: ~21h) \
