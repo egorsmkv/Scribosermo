@@ -80,11 +80,6 @@ def clean(data):
     data = data[data["duration"] < 45]
     print("Excluded", length_old - len(data), "files with too long duration")
 
-    # Drop sentences with empty transcription
-    length_old = len(data)
-    data = data[data["text_length"] > 0]
-    print("Excluded", length_old - len(data), "files with empty transcriptions")
-
     # Drop files spoken to fast
     length_old = len(data)
     avg_time = data["avg_time_per_char"].mean()
@@ -141,6 +136,13 @@ def main():
 
     # Keep the german 0 as "null" string
     data = pd.read_csv(args.input_csv_path, keep_default_na=False)
+
+    # Drop sentences with empty transcription
+    length_old = len(data)
+    data["text_length"] = data.parallel_apply(lambda x: len(x.transcript), axis=1)
+    data = data[data["text_length"] > 0]
+    data = data.drop(columns=["text_length"])
+    print("\nExcluded", length_old - len(data), "files with empty transcriptions")
 
     if not args.nostats:
         # Add statistics columns, save start size and duration and print data statistics
