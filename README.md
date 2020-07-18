@@ -21,7 +21,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 ## Datasets
 
 #### German (de)
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~506h
+* [Mozilla Common Voice](https://voice.mozilla.org/) ~701h
 * [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
 * GoogleWavenet ~165h, artificial training data generated with the google text to speech service
 * [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~4h
@@ -167,7 +167,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/dataset_operations.py /Dee
 
 # To split tuda into the correct train, dev and test splits run: 
 # (you will have to rename the [train/dev/test]_s.csv files before combining them with other datasets)
-python3 deepspeech-polyglot/preprocessing/split_dataset.py data_prepared/de/tuda/all.csv --tuda --file_appendix _s
+python3 deepspeech-polyglot/preprocessing/split_dataset.py /DeepSpeech/data_prepared/de/tuda/all.csv --tuda --file_appendix _s
 # To split common-voice into the correct train, dev and test splits run: 
 python3 deepspeech-polyglot/preprocessing/split_dataset.py /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/all.csv --common_voice --common_voice_org /DeepSpeech/data_original/${LANGUAGE}/common_voice/${LANGUAGE}/ --file_appendix _s
 ```
@@ -566,6 +566,7 @@ Using new CommonVoice v5 releases: \
 
 | Language | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
 |----------|---------|------------------|--------|-------------------------------|--------|
+| DE | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | test with CommonVoice + Tuda + Voxforge, others completely for training; with speech and noise overlay; top-488538 scorer (words occurring at least five times) | Test: 29.286192, Validation: 26.864552 | 30 | WER: 0.182088, CER: 0.081321  |
 | ES | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-303450 scorer (words occurring at least twice) | Test: 25.443010, Validation: 22.686161 | 42 | WER: 0.193316, CER: 0.093000  |
 | FR | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-316458 scorer (words occurring at least twice) | Test: 29.761099, Validation: 24.691544 | 52 | WER: 0.231981, CER: 0.116503 |
 | IT | CommonVoice + LinguaLibre + Mailabs + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-51216 scorer out of train transcriptions (words occurring at least twice) | Test: 25.536196, Validation: 23.048596 | 46 | WER: 0.249197, CER: 0.093717 |
