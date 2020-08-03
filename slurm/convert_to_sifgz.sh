@@ -2,11 +2,11 @@
 
 if [[ "$1" == "d" ]]; then
     echo "Saving docker image as tar file ..."
-    docker save -o tmp_dimg.tar $2
+    docker save -o tmp_dimg.tar "$2"
 
 elif [[ "$1" == "p" ]]; then
     echo "Saving podman image as tar file ..."
-    podman save -o tmp_dimg.tar --format oci-archive $2
+    podman save -o tmp_dimg.tar --format oci-archive "$2"
 
 else
     echo "Image type not matching"

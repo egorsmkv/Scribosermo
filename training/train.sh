@@ -15,12 +15,12 @@ USE_AUGMENTATION=1
 NOISE_FILE="/DeepSpeech/data_prepared/noise/train.csv"
 
 if [[ "${DELETE_OLD_CHECKPOINTS}" == "1" ]] || [[ "${START_FROM_CHECKPOINT}" != "--" ]]; then
-  rm -rf ${CHECKPOINT_DIR}
-  mkdir -p ${CHECKPOINT_DIR}
+  rm -rf "${CHECKPOINT_DIR}"
+  mkdir -p "${CHECKPOINT_DIR}"
 fi
 
 if [[ "${START_FROM_CHECKPOINT}" != "--" ]]; then
-  cp -a ${START_FROM_CHECKPOINT}"." ${CHECKPOINT_DIR}
+  cp -a "${START_FROM_CHECKPOINT}." "${CHECKPOINT_DIR}"
 fi
 
 if [[ "${LANGUAGE}" == "de" ]] || [[ "${LANGUAGE}" == "it" ]]; then
@@ -108,26 +108,26 @@ DSARGS="--train_files ${TRAIN_FILE} \
 
 echo ""
 echo ""
-echo "Running training with arguments:" ${DSARGS}
+echo "Running training with arguments: ${DSARGS}"
 echo ""
 echo ""
-python3 -u /DeepSpeech/DeepSpeech.py ${DSARGS}
+python3 -u /DeepSpeech/DeepSpeech.py "${DSARGS}"
 
 # Convert output graph for inference
 echo ""
 echo "Converting output graph for inference:"
 echo ""
 if [[ -f ${CHECKPOINT_DIR}"best_dev_checkpoint" ]]; then
-  python3 -u /DeepSpeech/DeepSpeech.py --checkpoint_dir ${CHECKPOINT_DIR} \
+  python3 -u /DeepSpeech/DeepSpeech.py --checkpoint_dir "${CHECKPOINT_DIR}" \
     --scorer /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer \
     --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt \
-    --export_tflite --export_dir ${CHECKPOINT_DIR} \
-    && mv ${CHECKPOINT_DIR}"output_graph.tflite" ${CHECKPOINT_DIR}"output_graph_${LANGUAGE}.tflite"
+    --export_tflite --export_dir "${CHECKPOINT_DIR}" \
+    && mv "${CHECKPOINT_DIR}output_graph.tflite" "${CHECKPOINT_DIR}output_graph_${LANGUAGE}.tflite"
 fi
 echo ""
 if [[ -f ${CHECKPOINT_DIR}"output_graph.pb" ]]; then
-  /DeepSpeech/convert_graphdef_memmapped_format --in_graph=${CHECKPOINT_DIR}"output_graph.pb" \
-    --out_graph=${CHECKPOINT_DIR}"output_graph_${LANGUAGE}.pbmm"
+  /DeepSpeech/convert_graphdef_memmapped_format --in_graph="${CHECKPOINT_DIR}output_graph.pb" \
+    --out_graph="${CHECKPOINT_DIR}output_graph_${LANGUAGE}.pbmm"
 fi
 
 echo ""

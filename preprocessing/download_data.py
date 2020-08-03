@@ -3,7 +3,6 @@ import os
 
 from audiomate.corpus import io
 
-
 # ==================================================================================================
 
 
@@ -85,7 +84,7 @@ def main():
             raise ValueError(msg.format(args.language))
 
     if args.tuda:
-        print("Downloading tuda-de ...".format(args.language))
+        print("Downloading tuda-de ...")
         dl = io.TudaDownloader()
         dl.download(os.path.join(args.target_path, "tuda"))
 

@@ -11,7 +11,7 @@ import tqdm
 # ==================================================================================================
 
 file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
-lang = None
+language = None
 langdicts = None
 
 # Regex patterns, see www.regexr.com for good explanation
@@ -22,7 +22,6 @@ multi_space_pattern = re.compile(r"\s+")
 
 # Allowed characters
 allowed_chars = None
-all_bad_characters = set()
 
 # Special replacements
 umlaut_replacers = None
@@ -36,18 +35,18 @@ char_replacers = None
 def load_language():
     """ Load language and replacers in extra function that they are reloadable for testing """
 
-    global lang, langdicts
+    global language, langdicts
 
-    lang = os.getenv("LANGUAGE")
-    if lang is None:
+    language = os.getenv("LANGUAGE")
+    if language is None:
         print("Cleaning texts with default language 'de'")
-        lang = "de"
+        language = "de"
     else:
-        print("Cleaning texts with language '{}'".format(lang))
+        print("Cleaning texts with language '{}'".format(language))
 
     if langdicts is None:
         langdicts = load_langdicts()
-    load_replacers(lang)
+    load_replacers(language)
 
 
 # ==================================================================================================
@@ -77,9 +76,9 @@ def load_replacers(lang):
 
     replacer = langdicts["char_replacers"][lang]
     char_replacers = {}
-    for all, replacement in replacer.items():
+    for rep, replacement in replacer.items():
         # Switch keys and value
-        for to_replace in all:
+        for to_replace in rep:
             char_replacers[to_replace] = replacement
 
 
@@ -139,14 +138,16 @@ def word_to_num(word):
 
     matches = ordinal_pattern.findall(word)
     if len(matches) == 1:
-        num_word = num2words.num2words(int(matches[0][:-1]), lang=lang, to="ordinal")
+        num_word = num2words.num2words(
+            int(matches[0][:-1]), lang=language, to="ordinal"
+        )
         word = word.replace(matches[0], " {} ".format(num_word))
 
     matches = decimal_pattern.findall(word)
     for match in matches:
         num = match.replace(".", "")
         num = num.replace(",", ".")
-        num_word = num2words.num2words(float(num), lang=lang)
+        num_word = num2words.num2words(float(num), lang=language)
         word = word.replace(match, " {} ".format(num_word))
 
     # Make word lowercase again

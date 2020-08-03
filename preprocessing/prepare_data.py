@@ -9,11 +9,10 @@
 import argparse
 
 import audiomate
-import text_cleaning
 import tqdm
-from audiomate.corpus import io
-from audiomate.corpus import subset
+from audiomate.corpus import io, subset
 
+import text_cleaning
 
 # ==================================================================================================
 

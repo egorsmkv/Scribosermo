@@ -1,14 +1,15 @@
 import argparse
 import json
 import os
+import sys
 import time
 
 import librosa
 import numpy as np
 import pandas as pd
-import text_cleaning
 from pandarallel import pandarallel
 
+import text_cleaning
 
 # ==================================================================================================
 
@@ -130,7 +131,7 @@ def main():
 
     if not (args.shuffle or args.replace or args.clean or args.exclude):
         print("No operation given")
-        exit()
+        sys.exit()
 
     start_time = time.time()
 

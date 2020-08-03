@@ -5,6 +5,7 @@ https://cloud.google.com/text-to-speech/docs/reference/libraries#client-librarie
 
 import os
 import random
+import sys
 import time
 
 import tqdm
@@ -95,7 +96,7 @@ def main():
 
     if num_of_chars > max_allowed_chars:
         print("List has more chars than allowed")
-        exit()
+        sys.exit()
 
     for i, t in enumerate(tqdm.tqdm(text_data)):
         info = download(t, audio_path + str(i + line_start))

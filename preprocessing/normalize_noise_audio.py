@@ -14,9 +14,9 @@ from functools import partial
 from multiprocessing import Pool
 
 import tqdm
-from dataset_operations import get_duration, seconds_to_hours
 from pydub import AudioSegment
 
+from dataset_operations import get_duration, seconds_to_hours
 
 # ==================================================================================================
 
@@ -130,13 +130,13 @@ def convert(
 
 
 def get_noise_duration(dst_dir):
-    duration = 0
-    file_num = 0
+    dur = 0
+    num = 0
     for dirpath, _, filenames in os.walk(dst_dir):
         for f in filenames:
-            duration += get_duration(os.path.join(dirpath, f))
-            file_num += 1
-    return duration, file_num
+            dur += get_duration(os.path.join(dirpath, f))
+            num += 1
+    return dur, num
 
 
 # ==================================================================================================

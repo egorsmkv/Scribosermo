@@ -1,10 +1,10 @@
 import argparse
 import os
 
-import text_cleaning
 import tqdm
 from audiomate.utils import textfile
 
+import text_cleaning
 
 # ==================================================================================================
 
