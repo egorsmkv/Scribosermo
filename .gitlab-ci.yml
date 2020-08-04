@@ -39,7 +39,7 @@ before_script:
 linting:
   stage: test
   script:
-#    - seed-isort-config
+    #    - seed-isort-config
     - isort --recursive --check-only .
     - black --check --exclude venv .
     - npx prettylint "**/*.{json,md,yml}"
