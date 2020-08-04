@@ -21,7 +21,13 @@ cache:
     - venv/
 
 before_script:
-  # Print out python and pip version for debugging
+  # Print out program versions for debugging
+  - apt-get update && apt-get install -y libnode-dev npm
+  - npm install n -g && n stable
+  - node -v
+  - curl -0 -L https://npmjs.org/install.sh | sh
+  - /usr/local/bin/npm -v
+  - /usr/local/bin/npm install --save-dev --save-exact prettier prettylint
   - apt-get update && apt-get install -y shellcheck
   - python -V
   - pip install virtualenv
@@ -36,6 +42,7 @@ linting:
 #    - seed-isort-config
     - isort --recursive --check-only .
     - black --check --exclude venv .
+    - npx prettylint "**/*.{json,md,yml}"
     - pylint --disable=import-error ${SRC_DIRS}
     - flake8 ${SRC_DIRS}
     - shellcheck **/*.sh
