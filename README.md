@@ -14,67 +14,74 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 [![pipeline status](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/badges/master/pipeline.svg)](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/-/commits/master)
 [![coverage report](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/badges/master/coverage.svg)](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/-/commits/master)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![code complexity](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/-/jobs/artifacts/master/raw/badges/rcc.svg?job=analysis)](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/-/commits/master)
 
 <br/>
-
 
 ## Datasets
 
 #### German (de)
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~701h
-* [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
-* GoogleWavenet ~165h, artificial training data generated with the google text to speech service
-* [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~4h
-* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
-* [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
-* [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
-* [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
-* [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
-* [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
+
+- [Mozilla Common Voice](https://voice.mozilla.org/) ~701h
+- [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
+- GoogleWavenet ~165h, artificial training data generated with the google text to speech service
+- [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~4h
+- [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
+- [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
+- [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
+- [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
+- [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
+- [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
 
 #### Spanish (es)
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~390h
-* [CSS10](https://www.kaggle.com/bryanpark/spanish-single-speaker-speech-dataset) ~24h
-* [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~1h
-* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~108h
-* [Tatoeba](https://tatoeba.org/spa/sentences/search?query=&from=spa&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~59h
-* [Voxforge](http://www.voxforge.org/home/) ~52h
+
+- [Mozilla Common Voice](https://voice.mozilla.org/) ~390h
+- [CSS10](https://www.kaggle.com/bryanpark/spanish-single-speaker-speech-dataset) ~24h
+- [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~1h
+- [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~108h
+- [Tatoeba](https://tatoeba.org/spa/sentences/search?query=&from=spa&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~59h
+- [Voxforge](http://www.voxforge.org/home/) ~52h
 
 #### French (fr)
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~546h
-* [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) ~19h
-* [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~40h
-* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~184h
-* [Tatoeba](https://tatoeba.org/fra/sentences/search?query=&from=fra&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~2h
-* [Voxforge](http://www.voxforge.org/home/) ~37h
+
+- [Mozilla Common Voice](https://voice.mozilla.org/) ~546h
+- [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) ~19h
+- [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~40h
+- [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~184h
+- [Tatoeba](https://tatoeba.org/fra/sentences/search?query=&from=fra&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~2h
+- [Voxforge](http://www.voxforge.org/home/) ~37h
 
 #### Italian (it)
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~149h
-* [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~0h
-* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~127h
-* [Voxforge](http://www.voxforge.org/home/) ~20h
+
+- [Mozilla Common Voice](https://voice.mozilla.org/) ~149h
+- [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~0h
+- [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~127h
+- [Voxforge](http://www.voxforge.org/home/) ~20h
 
 #### Polish (pl)
-* [Mozilla Common Voice](https://voice.mozilla.org/) ~113h
-* [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~2h
-* [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~54h
+
+- [Mozilla Common Voice](https://voice.mozilla.org/) ~113h
+- [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~2h
+- [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~54h
 
 #### Noise
-* Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
-* Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
-* Noise data: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
+
+- Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
+- Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
+- Noise data: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
 
 <br>
 
 #### Links
-* [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no aligned transcriptions
-* [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html), seems to be paid only
-* [Many different languages](https://github.com/JRMeyer/open-speech-corpora)
-* [Many different languages](https://www.clarin.eu/resource-families/spoken-corpora), most with login or non commercial
-* GerTV1000h German Broadcast corpus and Difficult Speech Corpus (DiSCo), no links found
+
+- [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no aligned transcriptions
+- [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html), seems to be paid only
+- [Many different languages](https://github.com/JRMeyer/open-speech-corpora)
+- [Many different languages](https://www.clarin.eu/resource-families/spoken-corpora), most with login or non commercial
+- GerTV1000h German Broadcast corpus and Difficult Speech Corpus (DiSCo), no links found
 
 <br/>
-
 
 ## Usage
 
@@ -99,12 +106,13 @@ git clone https://github.com/mozilla/DeepSpeech.git
 git clone https://github.com/DanBmh/DeepSpeech.git
 
 cd DeepSpeech && make Dockerfile.train && cd ..
-# The currently used version's commit id is 188a6f2c1ee53dc79acf8abceaf729b5f9a05e7a, 
+# The currently used version's commit id is 188a6f2c1ee53dc79acf8abceaf729b5f9a05e7a,
 # edit the dockerfile and set DEEPSPEECH_SHA accordingly
 docker build -f DeepSpeech/Dockerfile.train -t mozilla_deepspeech DeepSpeech/
 ```
 
 Build and run our docker container:
+
 ```bash
 docker build -t deepspeech_polyglot deepspeech-polyglot/
 
@@ -113,10 +121,10 @@ docker build -t deepspeech_polyglot deepspeech-polyglot/
 
 <br/>
 
-
 #### Download and prepare voice data
 
 Download datasets (Run in container):
+
 ```bash
 export LANGUAGE="de"
 
@@ -132,12 +140,13 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --languag
 ```
 
 Download css10 german/spanish/french dataset (Requires kaggle account, see links above) \
-Extract and move it to datasets directory (data_original/${LANGUAGE}/css_ten/) \
+Extract and move it to datasets directory (data_original/\${LANGUAGE}/css_ten/) \
 It seems the files are saved all twice, so remove the duplicate folders
 
 <br/>
 
 Prepare datasets, this may take some time (Run in container):
+
 ```bash
 export LANGUAGE="de"
 
@@ -151,7 +160,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /De
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --voxforge /DeepSpeech/data_original/${LANGUAGE}/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
 
-# To combine multiple datasets run: 
+# To combine multiple datasets run:
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py /DeepSpeech/data_prepared/de/ --tuda --voxforge
 
 # To combine not only train, dev, test and all csv files run (not recommended because it's very slow):
@@ -165,22 +174,22 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/combine_datasets.py "" --f
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/dataset_operations.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv --replace --shuffle --clean --exclude
 
 
-# To split tuda into the correct train, dev and test splits run: 
+# To split tuda into the correct train, dev and test splits run:
 # (you will have to rename the [train/dev/test]_s.csv files before combining them with other datasets)
 python3 deepspeech-polyglot/preprocessing/split_dataset.py /DeepSpeech/data_prepared/de/tuda/all.csv --tuda --file_appendix _s
-# To split common-voice into the correct train, dev and test splits run: 
+# To split common-voice into the correct train, dev and test splits run:
 python3 deepspeech-polyglot/preprocessing/split_dataset.py /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/all.csv --common_voice --common_voice_org /DeepSpeech/data_original/${LANGUAGE}/common_voice/${LANGUAGE}/ --file_appendix _s
 ```
 
 Preparation times for german datasets using Intel i7-8700K:
-* voxforge: some seconds
-* tuda: some minutes
-* mailabs: ~20min
-* common_voice: ~12h
-* swc: ~6h
+
+- voxforge: some seconds
+- tuda: some minutes
+- mailabs: ~20min
+- common_voice: ~12h
+- swc: ~6h
 
 <br/>
-
 
 #### Download and prepare noise data
 
@@ -232,10 +241,10 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/split_dataset.py /DeepSpee
 
 <br/>
 
-
 #### Create the language model
 
 Download and prepare the text corpora [tuda](http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/), [europarl+news](https://www.statmt.org/wmt13/translation-task.html):
+
 ```bash
 export LANGUAGE="de"
 mkdir data_original/texts/ && mkdir data_original/texts/${LANGUAGE}/
@@ -264,6 +273,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_vocab.py /DeepSpee
 ```
 
 Generate scorer (Run in container):
+
 ```bash
 export LANGUAGE="de"
 
@@ -285,7 +295,6 @@ python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeec
 
 <br/>
 
-
 #### Fix some issues
 
 Following issues may or may not occur in your trainings, so try it first without changing the scripts.
@@ -296,6 +305,7 @@ For me only training with voxforge worked at first. With tuda dataset I got an e
 "Invalid argument: Not enough time for target transition sequence"
 
 To fix it you have to follow this [solution](https://github.com/mozilla/DeepSpeech/issues/1629#issuecomment-427423707):
+
 ```text
 # Add the parameter "ignore_longer_outputs_than_inputs=True" in DeepSpeech.py (~ line 231)
 
@@ -309,6 +319,7 @@ This will result in another error after some training steps: \
 "Invalid argument: WAV data chunk '[Some strange symbol here]"
 
 Just ignore this in the train steps:
+
 ```text
 # Add another exception (tf.errors.InvalidArgumentError) in the training loop in DeepSpeech.py (~ line 602):
 
@@ -348,7 +359,6 @@ sys.exit(1)
 
 <br/>
 
-
 #### Training
 
 Download pretrained deepspeech checkpoints.
@@ -360,22 +370,24 @@ rm checkpoints/deepspeech-0.7.3-checkpoint.tar.gz
 ```
 
 Adjust the parameters/scripts to your needs (Run in container):
+
 ```bash
 # Run a training using the english checkpoint:
 /bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/train_azce.csv /DeepSpeech/data_prepared/voxforge/dev_azce.csv /DeepSpeech/data_prepared/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.7.3-checkpoint/
 
 # Run test only
 # Don't forget to use the noiseaugmaster image if testing with noise
-/bin/bash /DeepSpeech/deepspeech-polyglot/training/test_noise.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/test_azce.csv 
+/bin/bash /DeepSpeech/deepspeech-polyglot/training/test_noise.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/test_azce.csv
 
 # Optimize scorer alpha and beta values
 # Requires a trained checkpoint and a scorer (used alpha and beta values are not important)
-/bin/bash /DeepSpeech/deepspeech-polyglot/training/optimize_scorer.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/dev_azce.csv 
+/bin/bash /DeepSpeech/deepspeech-polyglot/training/optimize_scorer.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/dev_azce.csv
 ```
 
 <br/>
 
 Other things you can do:
+
 ```bash
 # Delete old model files:
 rm -rf /root/.local/share/deepspeech/summaries && rm -rf /root/.local/share/deepspeech/checkpoints
@@ -394,7 +406,7 @@ python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/de/voxf
 python3 /DeepSpeech/deepspeech-polyglot/training/cycled_training.py /DeepSpeech/checkpoints/de/voxforge/ /DeepSpeech/data_prepared/de/ _azce --voxforge
 ```
 
-Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. 
+Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch.
 
 One epoch in tuda with batch size of 12 on single gpu needs about 1:15h. With both gpus it takes about 26min. For 10 cycled training with early stops it took about 15h.
 
@@ -403,7 +415,6 @@ One epoch with Tuda + Voxforge + SWC + Mailabs + CommonVoice did need about 3:30
 Training the German CCLMSTTV model with 10x augmentation took 5d7h on 8x Nvidia-V100, training the French and Spanish CCLMTV models took about a day.
 
 <br/>
-
 
 ## Results
 
@@ -418,171 +429,172 @@ Some results from the findings in the paper [German End-to-end Speech Recognitio
 - Tuda-De+Voxforge 15.1%
 - Tuda-De+Voxforge+Mozilla 21.5%
 
-To test their uploaded checkpoint you have to add a file `best_dev_checkpoint` next to the checkpoint files. 
+To test their uploaded checkpoint you have to add a file `best_dev_checkpoint` next to the checkpoint files.
 Insert following content:
+
 ```text
 model_checkpoint_path: "best_dev-22218"
 all_model_checkpoint_paths: "best_dev-22218"
-``` 
-Switch the DeepSpeech repository back to tag `v0.5.0` and build a new docker image. 
+```
+
+Switch the DeepSpeech repository back to tag `v0.5.0` and build a new docker image.
 Don't forget to fix the above issue in _evaluate.py_ again.
 Mount the checkpoint and data directories and run:
+
 ```bash
 python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/voxforge/test_azce.csv --checkpoint_dir /DeepSpeech/checkpoints/dsg05_models/checkpoints/ \
 --alphabet_config_path /DeepSpeech/checkpoints/dsg05_models/alphabet.txt --lm_trie_path /DeepSpeech/checkpoints/dsg05_models/trie --lm_binary_path /DeepSpeech/checkpoints/dsg05_models/lm.binary --test_batch_size 48
 ```
 
-| Dataset | Additional Infos | Losses | Result |
-|---------|------------------|--------|--------|
+| Dataset            | Additional Infos                                                                                                 | Losses           | Result                       |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------- |
 | Tuda + CommonVoice | used newer CommonVoice version, there may be overlaps between test and training data because of random splitting | Test: 105.747589 | WER: 0.683802, CER: 0.386331 |
-| Tuda | correct tuda test split, there may be overlaps between test and training data because of random splitting | Test: 402.696991 | WER: 0.785655, CER: 0.428786 |
+| Tuda               | correct tuda test split, there may be overlaps between test and training data because of random splitting        | Test: 402.696991 | WER: 0.785655, CER: 0.428786 |
 
 <br/>
 
-
 #### This repo
 
-Some results with a old code version (Default dropout is 0.4, learning rate 0.0005): 
+Some results with a old code version (Default dropout is 0.4, learning rate 0.0005):
 
-| Dataset | Additional Infos | Result |
-|---------|------------------|--------|
-| Voxforge | | WER: 0.676611, CER: 0.403916, loss: 82.185226 |
-| Voxforge | with augmentation | WER: 0.624573, CER: 0.348618, loss: 74.403786 |
-| Voxforge | without "äöü" | WER: 0.646702, CER: 0.364471, loss: 82.567413 |
-| Voxforge | cleaned data, without "äöü" | WER: 0.634828, CER: 0.353037, loss: 81.905258 |
-| Voxforge | above checkpoint, tested on not cleaned data | WER: 0.634556, CER: 0.352879, loss: 81.849220 |
-| Voxforge | checkpoint from english deepspeech, without "äöü" | WER: 0.394064, CER: 0.190184, loss: 49.066357 |
-| Voxforge | checkpoint from english deepspeech, with augmentation, without "äöü", dropout 0.25, learning rate 0.0001 | WER: 0.338685, CER: 0.150972, loss: 42.031754 |
-| Voxforge | reduce learning rate on plateau, with noise and standard augmentation, checkpoint from english deepspeech, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001, batch size 48 | WER: 0.320507, CER: 0.131948, loss: 39.923031 |
-| Voxforge | above with learning rate 0.00001 | WER: 0.350903, CER: 0.147837, loss: 43.451263 |
-| Voxforge | above with learning rate 0.001 | WER: 0.518670, CER: 0.252510, loss: 62.927200 |
-| Tuda + Voxforge | without "äöü", checkpoint from english deepspeech, cleaned train and dev data | WER: 0.740130, CER: 0.462036, loss: 156.115921 |
-| Tuda + Voxforge | first Tuda then Voxforge, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001 | WER: 0.653841, CER: 0.384577, loss: 159.509476 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | checkpoint from english deepspeech, with augmentation, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001 | WER: 0.306061, CER: 0.151266, loss: 33.218510 |
+| Dataset                                       | Additional Infos                                                                                                                                                                          | Result                                         |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Voxforge                                      |                                                                                                                                                                                           | WER: 0.676611, CER: 0.403916, loss: 82.185226  |
+| Voxforge                                      | with augmentation                                                                                                                                                                         | WER: 0.624573, CER: 0.348618, loss: 74.403786  |
+| Voxforge                                      | without "äöü"                                                                                                                                                                             | WER: 0.646702, CER: 0.364471, loss: 82.567413  |
+| Voxforge                                      | cleaned data, without "äöü"                                                                                                                                                               | WER: 0.634828, CER: 0.353037, loss: 81.905258  |
+| Voxforge                                      | above checkpoint, tested on not cleaned data                                                                                                                                              | WER: 0.634556, CER: 0.352879, loss: 81.849220  |
+| Voxforge                                      | checkpoint from english deepspeech, without "äöü"                                                                                                                                         | WER: 0.394064, CER: 0.190184, loss: 49.066357  |
+| Voxforge                                      | checkpoint from english deepspeech, with augmentation, without "äöü", dropout 0.25, learning rate 0.0001                                                                                  | WER: 0.338685, CER: 0.150972, loss: 42.031754  |
+| Voxforge                                      | reduce learning rate on plateau, with noise and standard augmentation, checkpoint from english deepspeech, cleaned data, without "äöü", dropout 0.25, learning rate 0.0001, batch size 48 | WER: 0.320507, CER: 0.131948, loss: 39.923031  |
+| Voxforge                                      | above with learning rate 0.00001                                                                                                                                                          | WER: 0.350903, CER: 0.147837, loss: 43.451263  |
+| Voxforge                                      | above with learning rate 0.001                                                                                                                                                            | WER: 0.518670, CER: 0.252510, loss: 62.927200  |
+| Tuda + Voxforge                               | without "äöü", checkpoint from english deepspeech, cleaned train and dev data                                                                                                             | WER: 0.740130, CER: 0.462036, loss: 156.115921 |
+| Tuda + Voxforge                               | first Tuda then Voxforge, without "äöü", cleaned train and dev data, dropout 0.25, learning rate 0.0001                                                                                   | WER: 0.653841, CER: 0.384577, loss: 159.509476 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | checkpoint from english deepspeech, with augmentation, without "äöü", cleaned data, dropout 0.25, learning rate 0.0001                                                                    | WER: 0.306061, CER: 0.151266, loss: 33.218510  |
 
 <br/>
 
 Some results with some older code version: \
 (Default values: batch size 12, dropout 0.25, learning rate 0.0001, without "äöü", cleaned data , checkpoint from english deepspeech, early stopping, reduce learning rate on plateau, evaluation with scorer and top-500k words)
 
-| Dataset | Additional Infos | Losses | Training epochs of best model | Result |
-|---------|------------------|--------|-------------------------------|--------|
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | test only with Tuda + CommonVoice others completely for training, language model with training transcriptions, with augmentation | Test: 29.363405, Validation: 23.509546 | 55 | WER: 0.190189, CER: 0.091737 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above checkpoint tested with 3-gram language model | Test: 29.363405 | | WER: 0.199709, CER: 0.095318 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above checkpoint tested on Tuda only | Test: 87.074394 | | WER: 0.378379, CER: 0.167380 |
+| Dataset                                       | Additional Infos                                                                                                                 | Losses                                 | Training epochs of best model | Result                       |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ---------------------------- |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | test only with Tuda + CommonVoice others completely for training, language model with training transcriptions, with augmentation | Test: 29.363405, Validation: 23.509546 | 55                            | WER: 0.190189, CER: 0.091737 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above checkpoint tested with 3-gram language model                                                                               | Test: 29.363405                        |                               | WER: 0.199709, CER: 0.095318 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above checkpoint tested on Tuda only                                                                                             | Test: 87.074394                        |                               | WER: 0.378379, CER: 0.167380 |
 
 <br/>
 
 Some results with some older code version: \
 (Default values: batch size 36, dropout 0.25, learning rate 0.0001, without "äöü", cleaned data , checkpoint from english deepspeech, early stopping, reduce learning rate on plateau, evaluation with scorer and top-500k words, data augmentation)
 
-| Dataset | Additional Infos | Losses | Training epochs of best model | Result |
-|---------|------------------|--------|-------------------------------|--------|
-| Voxforge | training from scratch | Test: 79.124008, Validation: 81.982976 | 29 | WER: 0.603879, CER: 0.298139 |
-| Voxforge | | Test: 44.312195, Validation: 47.915317 | 21 | WER: 0.343973, CER: 0.140119 |
-| Voxforge | without reduce learning rate on plateau | Test: 46.160049, Validation: 48.926518 | 13 | WER: 0.367125, CER: 0.163931 |
-| Voxforge | dropped last layer | Test: 49.844028, Validation: 52.722362 | 21 | WER: 0.389327, CER: 0.170563 |
-| Voxforge | 5 cycled training | Test: 42.973358 | | WER: 0.353841, CER: 0.158554 |
-||
-| Tuda | training from scratch, correct train/dev/test splitting | Test: 149.653427, Validation: 137.645307 | 9 | WER: 0.606629, CER: 0.296630 |
-| Tuda | correct train/dev/test splitting | Test: 103.179092, Validation: 132.243965 | 3 | WER: 0.436074, CER: 0.208135 |
-| Tuda | dropped last layer, correct train/dev/test splitting | Test: 107.047821, Validation: 101.219325 | 6 | WER: 0.431361, CER: 0.195361 |
-| Tuda | dropped last two layers, correct train/dev/test splitting | Test: 110.523621, Validation: 103.844562 | 5 | WER: 0.442421, CER: 0.204504 |
-| Tuda | checkpoint from Voxforge with WER 0.344, correct train/dev/test splitting | Test: 100.846367, Validation: 95.410456 | 3 | WER: 0.416950, CER: 0.198177 |
-| Tuda | 10 cycled training, checkpoint from Voxforge with WER 0.344, correct train/dev/test splitting | Test: 98.007607 | | WER: 0.410520, CER: 0.194091 |
-| Tuda | random dataset splitting, checkpoint from Voxforge with WER 0.344 <br> Important Note: These results are not meaningful, because same transcriptions can occur in train and test set, only recorded with different microphones | Test: 23.322618, Validation: 23.094230 | 27 | WER: 0.090285, CER: 0.036212 |
-||
-| CommonVoice | checkpoint from Tuda with WER 0.417 | Test: 24.688297, Validation: 17.460029 | 35 | WER: 0.217124, CER: 0.085427 |
-| CommonVoice | above tested with reduced testset where transcripts occurring in trainset were removed,  | Test: 33.376812 |  | WER: 0.211668, CER: 0.079157 |
-| CommonVoice + GoogleWavenet | above tested with GoogleWavenet | Test: 17.653290 | | WER: 0.035807, CER: 0.007342 |
-| CommonVoice | checkpoint from Voxforge with WER 0.344 | Test: 23.460932, Validation: 16.641201 | 35 | WER: 0.215584, CER: 0.084932 |
-| CommonVoice | dropped last layer | Test: 24.480028, Validation: 17.505738 | 36 | WER: 0.220435, CER: 0.086921 |
-||
-| Tuda + GoogleWavenet | added GoogleWavenet to train data, dev/test from Tuda, checkpoint from Voxforge with WER 0.344 | Test: 95.555939,  Validation: 90.392490 | 3 | WER: 0.390291, CER: 0.178549 |
-| Tuda + GoogleWavenet | GoogleWavenet as train data, dev/test from Tuda | Test: 346.486420,  Validation: 326.615474 | 0 | WER: 0.865683, CER: 0.517528 |
-| Tuda + GoogleWavenet | GoogleWavenet as train/dev data, test from Tuda | Test: 477.049591,  Validation: 3.320163 | 23 | WER: 0.923973, CER: 0.601015 |
-| Tuda + GoogleWavenet | above checkpoint tested with GoogleWavenet | Test: 3.406022 | | WER: 0.012919, CER: 0.001724 |
-| Tuda + GoogleWavenet | checkpoint from english deepspeech tested with Tuda | Test: 402.102661 | | WER: 0.985554, CER: 0.752787 |
-| Voxforge + GoogleWavenet | added all of GoogleWavenet to train data, dev/test from Voxforge | Test: 45.643063,  Validation: 49.620488 | 28 | WER: 0.349552, CER: 0.143108 |
-| CommonVoice + GoogleWavenet | added all of GoogleWavenet to train data, dev/test from CommonVoice | Test: 25.029057,  Validation: 17.511973 | 35 | WER: 0.214689, CER: 0.084206 |
-| CommonVoice + GoogleWavenet | above tested with reduced testset | Test: 34.191067 | | WER: 0.213164, CER: 0.079121 |
+| Dataset                     | Additional Infos                                                                                                                                                                                                               | Losses                                   | Training epochs of best model | Result                       |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------- | ----------------------------- | ---------------------------- |
+| Voxforge                    | training from scratch                                                                                                                                                                                                          | Test: 79.124008, Validation: 81.982976   | 29                            | WER: 0.603879, CER: 0.298139 |
+| Voxforge                    |                                                                                                                                                                                                                                | Test: 44.312195, Validation: 47.915317   | 21                            | WER: 0.343973, CER: 0.140119 |
+| Voxforge                    | without reduce learning rate on plateau                                                                                                                                                                                        | Test: 46.160049, Validation: 48.926518   | 13                            | WER: 0.367125, CER: 0.163931 |
+| Voxforge                    | dropped last layer                                                                                                                                                                                                             | Test: 49.844028, Validation: 52.722362   | 21                            | WER: 0.389327, CER: 0.170563 |
+| Voxforge                    | 5 cycled training                                                                                                                                                                                                              | Test: 42.973358                          |                               | WER: 0.353841, CER: 0.158554 |
+|                             |
+| Tuda                        | training from scratch, correct train/dev/test splitting                                                                                                                                                                        | Test: 149.653427, Validation: 137.645307 | 9                             | WER: 0.606629, CER: 0.296630 |
+| Tuda                        | correct train/dev/test splitting                                                                                                                                                                                               | Test: 103.179092, Validation: 132.243965 | 3                             | WER: 0.436074, CER: 0.208135 |
+| Tuda                        | dropped last layer, correct train/dev/test splitting                                                                                                                                                                           | Test: 107.047821, Validation: 101.219325 | 6                             | WER: 0.431361, CER: 0.195361 |
+| Tuda                        | dropped last two layers, correct train/dev/test splitting                                                                                                                                                                      | Test: 110.523621, Validation: 103.844562 | 5                             | WER: 0.442421, CER: 0.204504 |
+| Tuda                        | checkpoint from Voxforge with WER 0.344, correct train/dev/test splitting                                                                                                                                                      | Test: 100.846367, Validation: 95.410456  | 3                             | WER: 0.416950, CER: 0.198177 |
+| Tuda                        | 10 cycled training, checkpoint from Voxforge with WER 0.344, correct train/dev/test splitting                                                                                                                                  | Test: 98.007607                          |                               | WER: 0.410520, CER: 0.194091 |
+| Tuda                        | random dataset splitting, checkpoint from Voxforge with WER 0.344 <br> Important Note: These results are not meaningful, because same transcriptions can occur in train and test set, only recorded with different microphones | Test: 23.322618, Validation: 23.094230   | 27                            | WER: 0.090285, CER: 0.036212 |
+|                             |
+| CommonVoice                 | checkpoint from Tuda with WER 0.417                                                                                                                                                                                            | Test: 24.688297, Validation: 17.460029   | 35                            | WER: 0.217124, CER: 0.085427 |
+| CommonVoice                 | above tested with reduced testset where transcripts occurring in trainset were removed,                                                                                                                                        | Test: 33.376812                          |                               | WER: 0.211668, CER: 0.079157 |
+| CommonVoice + GoogleWavenet | above tested with GoogleWavenet                                                                                                                                                                                                | Test: 17.653290                          |                               | WER: 0.035807, CER: 0.007342 |
+| CommonVoice                 | checkpoint from Voxforge with WER 0.344                                                                                                                                                                                        | Test: 23.460932, Validation: 16.641201   | 35                            | WER: 0.215584, CER: 0.084932 |
+| CommonVoice                 | dropped last layer                                                                                                                                                                                                             | Test: 24.480028, Validation: 17.505738   | 36                            | WER: 0.220435, CER: 0.086921 |
+|                             |
+| Tuda + GoogleWavenet        | added GoogleWavenet to train data, dev/test from Tuda, checkpoint from Voxforge with WER 0.344                                                                                                                                 | Test: 95.555939, Validation: 90.392490   | 3                             | WER: 0.390291, CER: 0.178549 |
+| Tuda + GoogleWavenet        | GoogleWavenet as train data, dev/test from Tuda                                                                                                                                                                                | Test: 346.486420, Validation: 326.615474 | 0                             | WER: 0.865683, CER: 0.517528 |
+| Tuda + GoogleWavenet        | GoogleWavenet as train/dev data, test from Tuda                                                                                                                                                                                | Test: 477.049591, Validation: 3.320163   | 23                            | WER: 0.923973, CER: 0.601015 |
+| Tuda + GoogleWavenet        | above checkpoint tested with GoogleWavenet                                                                                                                                                                                     | Test: 3.406022                           |                               | WER: 0.012919, CER: 0.001724 |
+| Tuda + GoogleWavenet        | checkpoint from english deepspeech tested with Tuda                                                                                                                                                                            | Test: 402.102661                         |                               | WER: 0.985554, CER: 0.752787 |
+| Voxforge + GoogleWavenet    | added all of GoogleWavenet to train data, dev/test from Voxforge                                                                                                                                                               | Test: 45.643063, Validation: 49.620488   | 28                            | WER: 0.349552, CER: 0.143108 |
+| CommonVoice + GoogleWavenet | added all of GoogleWavenet to train data, dev/test from CommonVoice                                                                                                                                                            | Test: 25.029057, Validation: 17.511973   | 35                            | WER: 0.214689, CER: 0.084206 |
+| CommonVoice + GoogleWavenet | above tested with reduced testset                                                                                                                                                                                              | Test: 34.191067                          |                               | WER: 0.213164, CER: 0.079121 |
 
 <br/>
 
 Updated to DeepSpeech v0.7.3 and new english checkpoint: \
-(Default values: See flags.txt in releases, scorer with kaldi-tuda sentences only) 
+(Default values: See flags.txt in releases, scorer with kaldi-tuda sentences only)
 (Testing with noise and speech overlay is done with older _noiseaugmaster_ branch, which implemented this functionality)
 
-| Dataset | Additional Infos | Losses | Training epochs of best model | Result |
-|---------|------------------|--------|-------------------------------|--------|
-| Voxforge | | Test: 32.844025, Validation: 36.912005 | 14 | WER: 0.240091, CER: 0.087971 |
-| Voxforge | without _freq_and_time_masking_ augmentation | Test: 33.698494, Validation: 38.071722 | 10 | WER: 0.244600, CER: 0.094577 |
-| Voxforge | using new audio augmentation options | Test: 29.280865, Validation: 33.294815 | 21 | WER: 0.220538, CER: 0.079463 |
-||
-| Voxforge | updated augmentations again | Test: 28.846869, Validation: 32.680268 | 16 | WER: 0.225360, CER: 0.083504 |
-| Voxforge | test above with older _noiseaugmaster_ branch | Test: 28.831675 | | WER: 0.238961, CER: 0.081555 |
-| Voxforge | test with speech overlay | Test: 89.661995 | | WER: 0.570903, CER: 0.301745 |
-| Voxforge | test with noise overlay | Test: 53.461609 | | WER: 0.438126, CER: 0.213890 |
-| Voxforge | test with speech and noise overlay | Test: 79.736122 | | WER: 0.581259, CER: 0.310365 |
-| Voxforge | second test with speech and noise to check random influence | Test: 81.241333 | | WER: 0.595410, CER: 0.319077 |
-||
-| Voxforge | add speech overlay augmentation | Test: 28.843914, Validation: 32.341234 | 27 | WER: 0.222024, CER: 0.083036 |
-| Voxforge | change snr=50:20~9m to snr=30:15~9 | Test: 28.502413, Validation: 32.236247 | 28 |WER: 0.226005, CER: 0.085475 |
-| Voxforge | test above with older _noiseaugmaster_ branch | Test: 28.488537 | | WER: 0.239530, CER: 0.083855 |
-| Voxforge | test with speech overlay | Test: 47.783081 | | WER: 0.383612, CER: 0.175735 |
-| Voxforge | test with noise overlay | Test: 51.682060 | | WER: 0.428566, CER: 0.209789 |
-| Voxforge | test with speech and noise overlay | Test: 60.275940 | | WER: 0.487709, CER: 0.255167 |
-||
-| Voxforge | add noise overlay augmentation | Test: 27.940659, Validation: 31.988175 | 28 | WER: 0.219143, CER: 0.076050 |
-| Voxforge | change snr=50:20~6 to snr=24:12~6 | Test: 26.588453, Validation: 31.151855 | 34 | WER: 0.206141, CER: 0.072018 |
-| Voxforge | change to snr=18:9~6 | Test: 26.311581, Validation: 30.531299 | 30 | WER: 0.211865, CER: 0.074281 |
-| Voxforge | test above with older _noiseaugmaster_ branch | Test: 26.300938 | | WER: 0.227466, CER: 0.073827 |
-| Voxforge | test with speech overlay | Test: 76.401451 | | WER: 0.499962, CER: 0.254203 |
-| Voxforge | test with noise overlay | Test: 44.011471 | | WER: 0.376783, CER: 0.165329 |
-| Voxforge | test with speech and noise overlay | Test: 65.408264 | | WER: 0.496168, CER: 0.246516 |
-||
-| Voxforge | speech and noise overlay | Test: 27.101889, Validation: 31.407527 | 44 | WER: 0.220243, CER: 0.082179 |
-| Voxforge | test above with older _noiseaugmaster_ branch | Test: 27.087360 | | WER: 0.232094, CER: 0.080319 |
-| Voxforge | test with speech overlay | Test: 46.012951 | | WER: 0.362291, CER: 0.164134 |
-| Voxforge | test with noise overlay | Test: 44.035809 | | WER: 0.377276, CER: 0.171528 |
-| Voxforge | test with speech and noise overlay | Test: 53.832214 | | WER: 0.441768, CER: 0.218798 |
-||
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | test with Voxforge + Tuda + CommonVoice others completely for training, with noise and speech overlay | Test: 22.055849, Validation: 17.613633 | 46 | WER: 0.208809, CER: 0.087215 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above tested on Voxforge devdata | Test: 16.395443 | | WER: 0.163827, CER: 0.056596 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | optimized scorer alpha and beta on Voxforge devdata | Test: 16.395443 | | WER: 0.162842 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | test with Voxforge + Tuda + CommonVoice, optimized scorer alpha and beta | Test: 22.055849 | | WER: 0.206960, CER: 0.086306 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | scorer (kaldi-tuda) with train transcriptions, optimized scorer alpha and beta | Test: 22.055849 | | WER: 0.134221, CER: 0.064267 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | scorer only out of train transcriptions, optimized scorer alpha and beta | Test: 22.055849 | | WER: 0.142880, CER: 0.064958 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | scorer (kaldi-tuda + europarl + news) with train transcriptions, optimized scorer alpha and beta | Test: 22.055849 | | WER: 0.135759, CER: 0.064773 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | above scorer with 1m instead of 500k top words, optimized scorer alpha and beta | Test: 22.055849 | | WER: 0.136650, CER: 0.066470 |
-| Tuda + Voxforge + SWC + Mailabs + CommonVoice | test with Tuda only | Test: 54.977085 | | WER: 0.250665, CER: 0.103428 |
-||
-| Voxforge FR | speech and noise overlay | Test: 5.341695, Validation: 12.736551 | 49 | WER: 0.175954, CER: 0.045416 |
-| CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge FR | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay | Test: 20.404339, Validation: 21.920289 | 62 | WER: 0.302113, CER: 0.121300 |
-| CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge ES | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay | Test: 14.521997, Validation: 22.408368 | 51 | WER: 0.154061, CER: 0.055357 |
+| Dataset                                               | Additional Infos                                                                                      | Losses                                 | Training epochs of best model | Result                       |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ---------------------------- |
+| Voxforge                                              |                                                                                                       | Test: 32.844025, Validation: 36.912005 | 14                            | WER: 0.240091, CER: 0.087971 |
+| Voxforge                                              | without _freq_and_time_masking_ augmentation                                                          | Test: 33.698494, Validation: 38.071722 | 10                            | WER: 0.244600, CER: 0.094577 |
+| Voxforge                                              | using new audio augmentation options                                                                  | Test: 29.280865, Validation: 33.294815 | 21                            | WER: 0.220538, CER: 0.079463 |
+|                                                       |
+| Voxforge                                              | updated augmentations again                                                                           | Test: 28.846869, Validation: 32.680268 | 16                            | WER: 0.225360, CER: 0.083504 |
+| Voxforge                                              | test above with older _noiseaugmaster_ branch                                                         | Test: 28.831675                        |                               | WER: 0.238961, CER: 0.081555 |
+| Voxforge                                              | test with speech overlay                                                                              | Test: 89.661995                        |                               | WER: 0.570903, CER: 0.301745 |
+| Voxforge                                              | test with noise overlay                                                                               | Test: 53.461609                        |                               | WER: 0.438126, CER: 0.213890 |
+| Voxforge                                              | test with speech and noise overlay                                                                    | Test: 79.736122                        |                               | WER: 0.581259, CER: 0.310365 |
+| Voxforge                                              | second test with speech and noise to check random influence                                           | Test: 81.241333                        |                               | WER: 0.595410, CER: 0.319077 |
+|                                                       |
+| Voxforge                                              | add speech overlay augmentation                                                                       | Test: 28.843914, Validation: 32.341234 | 27                            | WER: 0.222024, CER: 0.083036 |
+| Voxforge                                              | change snr=50:20~9m to snr=30:15~9                                                                    | Test: 28.502413, Validation: 32.236247 | 28                            | WER: 0.226005, CER: 0.085475 |
+| Voxforge                                              | test above with older _noiseaugmaster_ branch                                                         | Test: 28.488537                        |                               | WER: 0.239530, CER: 0.083855 |
+| Voxforge                                              | test with speech overlay                                                                              | Test: 47.783081                        |                               | WER: 0.383612, CER: 0.175735 |
+| Voxforge                                              | test with noise overlay                                                                               | Test: 51.682060                        |                               | WER: 0.428566, CER: 0.209789 |
+| Voxforge                                              | test with speech and noise overlay                                                                    | Test: 60.275940                        |                               | WER: 0.487709, CER: 0.255167 |
+|                                                       |
+| Voxforge                                              | add noise overlay augmentation                                                                        | Test: 27.940659, Validation: 31.988175 | 28                            | WER: 0.219143, CER: 0.076050 |
+| Voxforge                                              | change snr=50:20~6 to snr=24:12~6                                                                     | Test: 26.588453, Validation: 31.151855 | 34                            | WER: 0.206141, CER: 0.072018 |
+| Voxforge                                              | change to snr=18:9~6                                                                                  | Test: 26.311581, Validation: 30.531299 | 30                            | WER: 0.211865, CER: 0.074281 |
+| Voxforge                                              | test above with older _noiseaugmaster_ branch                                                         | Test: 26.300938                        |                               | WER: 0.227466, CER: 0.073827 |
+| Voxforge                                              | test with speech overlay                                                                              | Test: 76.401451                        |                               | WER: 0.499962, CER: 0.254203 |
+| Voxforge                                              | test with noise overlay                                                                               | Test: 44.011471                        |                               | WER: 0.376783, CER: 0.165329 |
+| Voxforge                                              | test with speech and noise overlay                                                                    | Test: 65.408264                        |                               | WER: 0.496168, CER: 0.246516 |
+|                                                       |
+| Voxforge                                              | speech and noise overlay                                                                              | Test: 27.101889, Validation: 31.407527 | 44                            | WER: 0.220243, CER: 0.082179 |
+| Voxforge                                              | test above with older _noiseaugmaster_ branch                                                         | Test: 27.087360                        |                               | WER: 0.232094, CER: 0.080319 |
+| Voxforge                                              | test with speech overlay                                                                              | Test: 46.012951                        |                               | WER: 0.362291, CER: 0.164134 |
+| Voxforge                                              | test with noise overlay                                                                               | Test: 44.035809                        |                               | WER: 0.377276, CER: 0.171528 |
+| Voxforge                                              | test with speech and noise overlay                                                                    | Test: 53.832214                        |                               | WER: 0.441768, CER: 0.218798 |
+|                                                       |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice         | test with Voxforge + Tuda + CommonVoice others completely for training, with noise and speech overlay | Test: 22.055849, Validation: 17.613633 | 46                            | WER: 0.208809, CER: 0.087215 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice         | above tested on Voxforge devdata                                                                      | Test: 16.395443                        |                               | WER: 0.163827, CER: 0.056596 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice         | optimized scorer alpha and beta on Voxforge devdata                                                   | Test: 16.395443                        |                               | WER: 0.162842                |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice         | test with Voxforge + Tuda + CommonVoice, optimized scorer alpha and beta                              | Test: 22.055849                        |                               | WER: 0.206960, CER: 0.086306 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice         | scorer (kaldi-tuda) with train transcriptions, optimized scorer alpha and beta                        | Test: 22.055849                        |                               | WER: 0.134221, CER: 0.064267 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice         | scorer only out of train transcriptions, optimized scorer alpha and beta                              | Test: 22.055849                        |                               | WER: 0.142880, CER: 0.064958 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice         | scorer (kaldi-tuda + europarl + news) with train transcriptions, optimized scorer alpha and beta      | Test: 22.055849                        |                               | WER: 0.135759, CER: 0.064773 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice         | above scorer with 1m instead of 500k top words, optimized scorer alpha and beta                       | Test: 22.055849                        |                               | WER: 0.136650, CER: 0.066470 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice         | test with Tuda only                                                                                   | Test: 54.977085                        |                               | WER: 0.250665, CER: 0.103428 |
+|                                                       |
+| Voxforge FR                                           | speech and noise overlay                                                                              | Test: 5.341695, Validation: 12.736551  | 49                            | WER: 0.175954, CER: 0.045416 |
+| CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge FR | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay        | Test: 20.404339, Validation: 21.920289 | 62                            | WER: 0.302113, CER: 0.121300 |
+| CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge ES | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay        | Test: 14.521997, Validation: 22.408368 | 51                            | WER: 0.154061, CER: 0.055357 |
 
 <br/>
 
 Using new CommonVoice v5 releases: \
-(Default values: See flags.txt in released checkpoints; using correct instead of random splits of CommonVoice; Old german scorer alpha+beta for all) 
+(Default values: See flags.txt in released checkpoints; using correct instead of random splits of CommonVoice; Old german scorer alpha+beta for all)
 
-| Language | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
-|----------|---------|------------------|--------|-------------------------------|--------|
-| DE | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | test with CommonVoice + Tuda + Voxforge, others completely for training; with speech and noise overlay; top-488538 scorer (words occurring at least five times) | Test: 29.286192, Validation: 26.864552 | 30 | WER: 0.182088, CER: 0.081321 |
-| DE | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | like above, but using each file 10x with different augmentations | Test: 25.694464, Validation: 23.128045 | 16 | WER: 0.166629, CER: 0.071999 |
-| DE | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | above checkpoint, tested on Tuda only | Test: 57.932476 | | WER: 0.260319, CER: 0.109301 |
-| DE | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | optimized scorer alpha+beta | Test: 25.694464 | | WER: 0.166330, CER: 0.070268 |
-| ES | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-303450 scorer (words occurring at least twice) | Test: 25.443010, Validation: 22.686161 | 42 | WER: 0.193316, CER: 0.093000 |
-| ES | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | optimized scorer alpha+beta | Test: 25.443010 | | WER: 0.187535, CER: 0.083490 |
-| FR | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-316458 scorer (words occurring at least twice) | Test: 29.761099, Validation: 24.691544 | 52 | WER: 0.231981, CER: 0.116503 |
-| FR | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | optimized scorer alpha+beta | Test: 29.761099 | | WER: 0.228851, CER: 0.109247 |
-| IT | CommonVoice + LinguaLibre + Mailabs + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-51216 scorer out of train transcriptions (words occurring at least twice) | Test: 25.536196, Validation: 23.048596 | 46 | WER: 0.249197, CER: 0.093717 |
-| IT | CommonVoice + LinguaLibre + Mailabs + Voxforge | optimized scorer alpha+beta | Test: 25.536196 | | WER: 0.247785, CER: 0.096247 |
-| PL | CommonVoice + LinguaLibre + Mailabs | test with CommonVoice, others completely for training; with speech and noise overlay; top-39175 scorer out of train transcriptions (words occurring at least twice) | Test: 14.902746, Validation: 15.508280 | 53 | WER: 0.040128, CER: 0.022947 |
-| PL | CommonVoice + LinguaLibre + Mailabs | optimized scorer alpha+beta | Test: 14.902746 | | WER: 0.034115, CER: 0.020230 |
+| Language | Dataset                                                                                      | Additional Infos                                                                                                                                                    | Losses                                 | Training epochs of best model | Result                       |
+| -------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ---------------------------- |
+| DE       | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | test with CommonVoice + Tuda + Voxforge, others completely for training; with speech and noise overlay; top-488538 scorer (words occurring at least five times)     | Test: 29.286192, Validation: 26.864552 | 30                            | WER: 0.182088, CER: 0.081321 |
+| DE       | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | like above, but using each file 10x with different augmentations                                                                                                    | Test: 25.694464, Validation: 23.128045 | 16                            | WER: 0.166629, CER: 0.071999 |
+| DE       | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | above checkpoint, tested on Tuda only                                                                                                                               | Test: 57.932476                        |                               | WER: 0.260319, CER: 0.109301 |
+| DE       | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | optimized scorer alpha+beta                                                                                                                                         | Test: 25.694464                        |                               | WER: 0.166330, CER: 0.070268 |
+| ES       | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge                            | test with CommonVoice, others completely for training; with speech and noise overlay; top-303450 scorer (words occurring at least twice)                            | Test: 25.443010, Validation: 22.686161 | 42                            | WER: 0.193316, CER: 0.093000 |
+| ES       | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge                            | optimized scorer alpha+beta                                                                                                                                         | Test: 25.443010                        |                               | WER: 0.187535, CER: 0.083490 |
+| FR       | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge                            | test with CommonVoice, others completely for training; with speech and noise overlay; top-316458 scorer (words occurring at least twice)                            | Test: 29.761099, Validation: 24.691544 | 52                            | WER: 0.231981, CER: 0.116503 |
+| FR       | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge                            | optimized scorer alpha+beta                                                                                                                                         | Test: 29.761099                        |                               | WER: 0.228851, CER: 0.109247 |
+| IT       | CommonVoice + LinguaLibre + Mailabs + Voxforge                                               | test with CommonVoice, others completely for training; with speech and noise overlay; top-51216 scorer out of train transcriptions (words occurring at least twice) | Test: 25.536196, Validation: 23.048596 | 46                            | WER: 0.249197, CER: 0.093717 |
+| IT       | CommonVoice + LinguaLibre + Mailabs + Voxforge                                               | optimized scorer alpha+beta                                                                                                                                         | Test: 25.536196                        |                               | WER: 0.247785, CER: 0.096247 |
+| PL       | CommonVoice + LinguaLibre + Mailabs                                                          | test with CommonVoice, others completely for training; with speech and noise overlay; top-39175 scorer out of train transcriptions (words occurring at least twice) | Test: 14.902746, Validation: 15.508280 | 53                            | WER: 0.040128, CER: 0.022947 |
+| PL       | CommonVoice + LinguaLibre + Mailabs                                                          | optimized scorer alpha+beta                                                                                                                                         | Test: 14.902746                        |                               | WER: 0.034115, CER: 0.020230 |
 
 <br/>
-
 
 #### Language Models and Checkpoints
 
@@ -608,34 +620,29 @@ Checkpoints of CLM training, graph model and scorer: [Link](https://drive.google
 
 <br/>
 
-
 ## Contribution
 
 You can contribute to this project in multiple ways:
 
-* Add a new language:
-    - Extend `data/langdicts.json` and `tests/test_text_cleaning.py`
-    - Add speech datasets 
-    - Find text corpora for the language model
-    
-* Help to solve the open issues
+- Add a new language:
+  - Extend `data/langdicts.json` and `tests/test_text_cleaning.py`
+  - Add speech datasets
+  - Find text corpora for the language model
+- Help to solve the open issues
 
-* Train new models or improve the existing \
-    (Requires a gpu and a lot of time, or multiple gpus and some time)
-    
-* Experiment with the language models
-    
-* Last but not least, you can also donate for my electricity bill. \
-    And if you are using this commercially, I suggest to think about some gpus instead;)
-    
-    [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HMN45MDHCNJNQ) (PayPal)
+- Train new models or improve the existing \
+   (Requires a gpu and a lot of time, or multiple gpus and some time)
+- Experiment with the language models
+- Last but not least, you can also donate for my electricity bill. \
+   And if you are using this commercially, I suggest to think about some gpus instead;)
+  [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HMN45MDHCNJNQ) (PayPal)
 
 <br/>
-
 
 ## Testing
 
 Run test (Run in container):
+
 ```bash
 cd /DeepSpeech/deepspeech-polyglot/ && pytest --cov=preprocessing
 ```

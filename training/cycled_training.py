@@ -2,6 +2,7 @@ import argparse
 import os
 import shutil
 import subprocess
+import sys
 
 import numpy as np
 import pandas as pd
@@ -40,7 +41,7 @@ def main():
 
     if len(datasets) == 0:
         print("No datasets to train with")
-        exit()
+        sys.exit()
 
     data_train_all = None
     data_dev_all = None
@@ -80,6 +81,7 @@ def main():
     data_test_all.to_csv(data_test_path_cycled, index=False, encoding="utf-8")
 
     # Run the cycled training
+    use_checkpoint = start_with_checkpoint
     for j, d in enumerate(datasets):
         file = "train" + args.data_appendix + ".csv"
         data_train_path = os.path.join(args.prepared_data_path, d, file)
@@ -118,11 +120,11 @@ def main():
                 data_train_path_cycled,
                 data_dev_path_cycled,
                 data_test_path_cycled,
-                start_with_checkpoint,
+                use_checkpoint,
             )
 
-            if start_with_checkpoint != "--":
-                start_with_checkpoint = "--"
+            if use_checkpoint != "--":
+                use_checkpoint = "--"
 
             loginfo = "\nDataset {}/{} - Cycle {}/{}"
             loginfo += "\nRunning next trainstep with {} training samples"

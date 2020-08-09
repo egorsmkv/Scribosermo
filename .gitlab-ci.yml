@@ -1,12 +1,13 @@
 # This file is a template, and might need editing before it works on your project.
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/python/tags/
-image: python:latest
+image: python:3
 
 # Change pip's cache directory to be inside the project directory since we can
 # only cache local items.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  SRC_DIRS: "preprocessing tests training"
 
 # Pip's cache doesn't store the python packages
 # https://pip.pypa.io/en/stable/reference/pip_install/#caching
@@ -14,28 +15,52 @@ variables:
 # If you want to also cache the installed packages, you have to install
 # them in a virtualenv and cache it as well.
 cache:
+  key: ${CI_COMMIT_REF_SLUG}
   paths:
     - .cache/pip
     - venv/
 
 before_script:
-  - python3 -V  # Print out python version for debugging
-  - pip3 install virtualenv
+  # Print out program versions for debugging
+  - apt-get update && apt-get install -y libnode-dev npm
+  - npm install n -g && n stable
+  - node -v
+  - curl -0 -L https://npmjs.org/install.sh | sh
+  - /usr/local/bin/npm -v
+  - /usr/local/bin/npm install --save-dev --save-exact prettier prettylint
+  - apt-get update && apt-get install -y shellcheck
+  - python -V
+  - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
-  - pip install --upgrade pip
-  - pip3 install pytest pytest-cov
-  - pip3 install black
-  - pip3 install num2words tqdm
-  
-stages:
-- formatting
-- test
-  
-formatting:
+  - pip --version
+  - pip install -r requirements_test.txt
+
+linting:
+  stage: test
   script:
-    - black .
+    #    - seed-isort-config
+    - isort --recursive --check-only .
+    - black --check --exclude venv .
+    - npx prettylint "**/*.{json,md,yml}"
+    - pylint --disable=import-error ${SRC_DIRS}
+    - flake8 ${SRC_DIRS}
+    - shellcheck **/*.sh
 
 test:
   script:
     - pytest --cov=preprocessing
+
+analysis:
+  stage: test
+  # The following pipe allows using a ':' in the 'sed' command, also remove the '-' list indicator
+  script: |
+    mkdir ./badges/
+    radon cc -a ${SRC_DIRS} | tee ./badges/radon.log
+    RCC_SCORE=$(sed -n 's/^Average complexity: \([A-F]\) .*/\1/p' ./badges/radon.log)
+    anybadge --label=complexity --file=badges/rcc.svg --overwrite --value=$RCC_SCORE A=green B=yellow C=orange D=red E=red F=red
+    echo "Radon cyclomatic complexity score is: $RCC_SCORE"
+    pygount --folders-to-skip "venv,.*" --format=summary ./
+  artifacts:
+    paths:
+      - ./badges/

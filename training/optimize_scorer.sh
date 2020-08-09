@@ -17,10 +17,10 @@ DSARGS="--test_files ${DEV_FILE} \
 
 echo ""
 echo ""
-echo "Running optimization with arguments:" ${DSARGS}
+echo "Running optimization with arguments: ${DSARGS}"
 echo ""
 echo ""
-python3 -u /DeepSpeech/lm_optimizer.py ${DSARGS}
+python3 -u /DeepSpeech/lm_optimizer.py "${DSARGS}"
 
 echo ""
 echo "FINISHED OPTIMIZATION"

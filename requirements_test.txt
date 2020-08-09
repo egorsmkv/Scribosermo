@@ -1,0 +1,12 @@
+anybadge
+black
+flake8
+isort<5
+num2words
+pygount
+pylint
+pytest
+pytest-cov
+radon
+seed-isort-config
+tqdm
