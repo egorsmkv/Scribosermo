@@ -284,15 +284,20 @@ python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeec
     --vocab /DeepSpeech/data_prepared/texts/${LANGUAGE}/vocab-500000.txt --package /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer --default_alpha 0.8223176270809696 --default_beta 0.25566134318440037
 
 # Optimized scorer alpha and beta values:
-# German: --default_alpha 0.8223176270809696 --default_beta 0.25566134318440037
-# English: --default_alpha 0.931289039105002 --default_beta 1.1834137581510284
+# English (taken from DeepSpeech repo): --default_alpha 0.931289039105002 --default_beta 1.1834137581510284
+# German: --default_alpha 0.7842902115058261 --default_beta 0.6346150241906542
+# Spanish: --default_alpha 0.749166959347089 --default_beta 1.6627453128820517
+# French: --default_alpha 0.9000153993017823 --default_beta 2.478779501401466
+# Italian: --default_alpha 0.910619981788069 --default_beta 0.15660475671195578
+# Polish: --default_alpha 1.3060110864019918 --default_beta 3.5010876706821334
+
 ```
 
 <br/>
 
 #### Fix some issues
 
-Following issues may or may not occur in your trainings, so better try it first without changing the scripts.
+Following issues may or may not occur in your trainings, so try it first without changing the scripts.
 
 <br/>
 
@@ -401,17 +406,13 @@ python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/de/voxf
 python3 /DeepSpeech/deepspeech-polyglot/training/cycled_training.py /DeepSpeech/checkpoints/de/voxforge/ /DeepSpeech/data_prepared/de/ _azce --voxforge
 ```
 
-Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. Training until early stop took 22min for 10 epochs.
+Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch. 
 
 One epoch in tuda with batch size of 12 on single gpu needs about 1:15h. With both gpus it takes about 26min. For 10 cycled training with early stops it took about 15h.
 
-One epoch in mailabs with batch size of 24/12/12 needs about 19min, testing about 21 min.
+One epoch with Tuda + Voxforge + SWC + Mailabs + CommonVoice did need about 3:30h. Training for 55 epochs took 8d 6h, testing about 1h.
 
-One epoch in swc with batch size of 12/12/12 needs about 1:08h, testing about 17 min.
-
-One epoch with all datasets and batch size of 12 needs about 2:50h, testing about 1:30h. Training until early stop took 37h for 11 epochs.
-
-One epoch with all datasets and only Tuda + CommonVoice as testset needs about 3:30h. Training for 55 epochs took 8d 6h, testing about 1h.
+Training the German CCLMSTTV model with 10x augmentation took 5d7h on 8x Nvidia-V100, training the French and Spanish CCLMTV models took about a day.
 
 <br/>
 
@@ -567,6 +568,7 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice         | scorer only out of train transcriptions, optimized scorer alpha and beta                              | Test: 22.055849                        |                               | WER: 0.142880, CER: 0.064958 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice         | scorer (kaldi-tuda + europarl + news) with train transcriptions, optimized scorer alpha and beta      | Test: 22.055849                        |                               | WER: 0.135759, CER: 0.064773 |
 | Tuda + Voxforge + SWC + Mailabs + CommonVoice         | above scorer with 1m instead of 500k top words, optimized scorer alpha and beta                       | Test: 22.055849                        |                               | WER: 0.136650, CER: 0.066470 |
+| Tuda + Voxforge + SWC + Mailabs + CommonVoice | test with Tuda only | Test: 54.977085 | | WER: 0.250665, CER: 0.103428 |
 |                                                       |
 | Voxforge FR                                           | speech and noise overlay                                                                              | Test: 5.341695, Validation: 12.736551  | 49                            | WER: 0.175954, CER: 0.045416 |
 | CommonVoice + Css10 + Mailabs + Tatoeba + Voxforge FR | test with Voxforge + CommonVoice others completely for training, with speech and noise overlay        | Test: 20.404339, Validation: 21.920289 | 62                            | WER: 0.302113, CER: 0.121300 |
@@ -575,38 +577,45 @@ Updated to DeepSpeech v0.7.3 and new english checkpoint: \
 <br/>
 
 Using new CommonVoice v5 releases: \
-(Default values: See flags.txt in released checkpoints; using correct instead of random splits of CommonVoice)
+(Default values: See flags.txt in released checkpoints; using correct instead of random splits of CommonVoice; Old german scorer alpha+beta for all) 
 
-| Language | Dataset                                                                                      | Additional Infos                                                                                                                                                    | Losses                                 | Training epochs of best model | Result                       |
-| -------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ---------------------------- |
-| DE       | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | test with CommonVoice + Tuda + Voxforge, others completely for training; with speech and noise overlay; top-488538 scorer (words occurring at least five times)     | Test: 29.286192, Validation: 26.864552 | 30                            | WER: 0.182088, CER: 0.081321 |
-| ES       | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge                            | test with CommonVoice, others completely for training; with speech and noise overlay; top-303450 scorer (words occurring at least twice)                            | Test: 25.443010, Validation: 22.686161 | 42                            | WER: 0.193316, CER: 0.093000 |
-| FR       | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge                            | test with CommonVoice, others completely for training; with speech and noise overlay; top-316458 scorer (words occurring at least twice)                            | Test: 29.761099, Validation: 24.691544 | 52                            | WER: 0.231981, CER: 0.116503 |
-| IT       | CommonVoice + LinguaLibre + Mailabs + Voxforge                                               | test with CommonVoice, others completely for training; with speech and noise overlay; top-51216 scorer out of train transcriptions (words occurring at least twice) | Test: 25.536196, Validation: 23.048596 | 46                            | WER: 0.249197, CER: 0.093717 |
-| PL       | CommonVoice + LinguaLibre + Mailabs                                                          | test with CommonVoice, others completely for training; with speech and noise overlay; top-39175 scorer out of train transcriptions (words occurring at least twice) | Test: 14.902746, Validation: 15.508280 | 53                            | WER: 0.040128, CER: 0.022947 |
+| Language | Dataset | Additional Infos | Losses | Training epochs of best model | Result |
+|----------|---------|------------------|--------|-------------------------------|--------|
+| DE | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | test with CommonVoice + Tuda + Voxforge, others completely for training; with speech and noise overlay; top-488538 scorer (words occurring at least five times) | Test: 29.286192, Validation: 26.864552 | 30 | WER: 0.182088, CER: 0.081321 |
+| DE | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | like above, but using each file 10x with different augmentations | Test: 25.694464, Validation: 23.128045 | 16 | WER: 0.166629, CER: 0.071999 |
+| DE | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | above checkpoint, tested on Tuda only | Test: 57.932476 | | WER: 0.260319, CER: 0.109301 |
+| DE | CommonVoice + CssTen + LinguaLibre + Mailabs + SWC + Tatoeba + Tuda + Voxforge + ZamiaSpeech | optimized scorer alpha+beta | Test: 25.694464 | | WER: 0.166330, CER: 0.070268 |
+| ES | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-303450 scorer (words occurring at least twice) | Test: 25.443010, Validation: 22.686161 | 42 | WER: 0.193316, CER: 0.093000 |
+| ES | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | optimized scorer alpha+beta | Test: 25.443010 | | WER: 0.187535, CER: 0.083490 |
+| FR | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-316458 scorer (words occurring at least twice) | Test: 29.761099, Validation: 24.691544 | 52 | WER: 0.231981, CER: 0.116503 |
+| FR | CommonVoice + CssTen + LinguaLibre + Mailabs + Tatoeba + Voxforge | optimized scorer alpha+beta | Test: 29.761099 | | WER: 0.228851, CER: 0.109247 |
+| IT | CommonVoice + LinguaLibre + Mailabs + Voxforge | test with CommonVoice, others completely for training; with speech and noise overlay; top-51216 scorer out of train transcriptions (words occurring at least twice) | Test: 25.536196, Validation: 23.048596 | 46 | WER: 0.249197, CER: 0.093717 |
+| IT | CommonVoice + LinguaLibre + Mailabs + Voxforge | optimized scorer alpha+beta | Test: 25.536196 | | WER: 0.247785, CER: 0.096247 |
+| PL | CommonVoice + LinguaLibre + Mailabs | test with CommonVoice, others completely for training; with speech and noise overlay; top-39175 scorer out of train transcriptions (words occurring at least twice) | Test: 14.902746, Validation: 15.508280 | 53 | WER: 0.040128, CER: 0.022947 |
+| PL | CommonVoice + LinguaLibre + Mailabs | optimized scorer alpha+beta | Test: 14.902746 | | WER: 0.034115, CER: 0.020230 |
 
 <br/>
 
 #### Language Models and Checkpoints
 
 **German:** \
-(WER: 0.13, Train: ~1015h, Test: ~100h) \
-Checkpoints of TVSMC training, graph model and scorer with training transcriptions: [Link](https://drive.google.com/drive/folders/1oO-N-VH_0P89fcRKWEUlVDm-_z18Kbkb?usp=sharing)
+(WER: 0.166, Train: ~1358h, Test: ~41h) \
+Checkpoints of CCLMSTTVZ training, graph model and scorer with training transcriptions: [Link](https://drive.google.com/drive/folders/1oO-N-VH_0P89fcRKWEUlVDm-_z18Kbkb?usp=sharing)
 
 **Spanish:** \
-(WER: 0.19, Train: ~630h, Test: ~25h) \
+(WER: 0.188, Train: ~630h, Test: ~25h) \
 Checkpoints of CCLMTV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1-3UgQBtzEf8QcH2qc8TJHkUqCBp5BBmO?usp=sharing)
 
 **French:** \
-(WER: 0.23, Train: ~780h, Test: ~25h) \
+(WER: 0.229, Train: ~780h, Test: ~25h) \
 Checkpoints of CCLMTV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1Nk_1uFVwM7lj2RQf4PaQOgdAdqhiKWyV?usp=sharing)
 
 **Italian:** \
-(WER: 0.25 Train: ~257h, Test: ~21h) \
+(WER: 0.248 Train: ~257h, Test: ~21h) \
 Checkpoints of CLMV training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1BudQv6nUvRSas69SpD9zHN-TmjGyedaK?usp=sharing)
 
 **Polish:** \
-(WER: 0.04, Train: ~157h, Test: ~6h) \
+(WER: 0.034, Train: ~157h, Test: ~6h) \
 Checkpoints of CLM training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1_hia1rRmmsLRrFIHANH4254KKZhY3p1c?usp=sharing)
 
 <br/>
