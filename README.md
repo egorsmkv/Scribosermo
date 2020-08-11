@@ -106,8 +106,6 @@ git clone https://github.com/mozilla/DeepSpeech.git
 git clone https://github.com/DanBmh/DeepSpeech.git
 
 cd DeepSpeech && make Dockerfile.train && cd ..
-# The currently used version's commit id is 188a6f2c1ee53dc79acf8abceaf729b5f9a05e7a,
-# edit the dockerfile and set DEEPSPEECH_SHA accordingly
 docker build -f DeepSpeech/Dockerfile.train -t mozilla_deepspeech DeepSpeech/
 ```
 
@@ -286,7 +284,7 @@ export LANGUAGE="de"
 python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab.txt --output_dir /DeepSpeech/data_prepared/texts/${LANGUAGE}/ \
     --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie --discount_fallback
 
-python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary \
+/DeepSpeech/data/lm/generate_scorer_package --alphabet /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary \
     --vocab /DeepSpeech/data_prepared/texts/${LANGUAGE}/vocab-500000.txt --package /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer --default_alpha 0.8223176270809696 --default_beta 0.25566134318440037
 
 # Optimized scorer alpha and beta values:

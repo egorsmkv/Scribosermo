@@ -47,6 +47,10 @@ def main():
     if os.path.exists(args.target_path):
         os.remove(args.target_path)
 
+    dir_path = os.path.dirname(args.target_path)
+    if not os.path.isdir(dir_path):
+        os.makedirs(dir_path, exist_ok=True)
+
     if args.source_dir is not None:
         print("Loading text corpora ...")
 
