@@ -49,6 +49,7 @@ RUN cd /DeepSpeech/native_client/ && rm -r kenlm/ \
     && make -j 4
 
 RUN pip3 install --upgrade --no-cache-dir pytest pytest-cov
+RUN pip3 install --upgrade --no-cache-dir progressist
 
 # Install audiomate
 RUN pip3 install --upgrade git+https://github.com/danbmh/audiomate.git@new_features

@@ -137,6 +137,11 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --languag
 --swc --tuda --zamia_speech
 --common_voice --mailabs --voxforge
 --lingualibre --tatoeba
+
+# Download common-voice single-word datasets
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --language "xx" --target_path "/DeepSpeech/data_original/xx/" --cv_singleword
+mkdir /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/
+mv /DeepSpeech/data_original/xx/cv-corpus-5-singleword/${LANGUAGE}/ /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/${LANGUAGE}/
 ```
 
 Download css10 german/spanish/french dataset (Requires kaggle account, see links above) \
@@ -152,6 +157,7 @@ export LANGUAGE="de"
 
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/common_voice/${LANGUAGE}/ /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --css_ten /DeepSpeech/data_original/${LANGUAGE}/css_ten/ /DeepSpeech/data_prepared/${LANGUAGE}/css_ten/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/${LANGUAGE}/ /DeepSpeech/data_prepared/${LANGUAGE}/cv_singleword/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --lingualibre /DeepSpeech/data_original/${LANGUAGE}/lingualibre/ /DeepSpeech/data_prepared/${LANGUAGE}/lingualibre/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --mailabs /DeepSpeech/data_original/${LANGUAGE}/mailabs/ /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --swc /DeepSpeech/data_original/${LANGUAGE}/swc/ /DeepSpeech/data_prepared/${LANGUAGE}/swc/
