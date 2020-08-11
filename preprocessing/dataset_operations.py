@@ -71,9 +71,9 @@ def print_statistics(data):
 
 
 def clean(data):
-    # Keep only files longer than 1 second
+    # Keep only files longer than 0.5 seconds
     length_old = len(data)
-    data = data[data["duration"] > 1]
+    data = data[data["duration"] > 0.5]
     print("Excluded", length_old - len(data), "files with too short duration")
 
     # Keep only files less than 45 seconds
@@ -87,9 +87,9 @@ def clean(data):
     data = data[data["avg_time_per_char"] > avg_time / 3]
     print("Excluded", length_old - len(data), "files with too fast char rate")
 
-    # Drop files with a char rate below a second
+    # Drop files spoken to slow
     length_old = len(data)
-    data = data[data["avg_time_per_char"] < 1]
+    data = data[data["avg_time_per_char"] < avg_time * 5]
     print("Excluded", length_old - len(data), "files with a much too slow char rate")
 
     # Keep only files which are not to slowly spoken,
