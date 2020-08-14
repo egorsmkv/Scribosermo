@@ -24,6 +24,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 #### German (de)
 
 - [Mozilla Common Voice](https://voice.mozilla.org/) ~701h
+- [Common Voice Single Words](https://voice.mozilla.org/) ~9h, included in the main dataset
 - [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
 - GoogleWavenet ~165h, artificial training data generated with the google text to speech service
 - [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~4h
