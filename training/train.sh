@@ -8,10 +8,11 @@ DEV_FILE=${3:-"/DeepSpeech/data_prepared/${LANGUAGE}/voxforge/dev_azce.csv"}
 TEST_FILE=${4:-"/DeepSpeech/data_prepared/${LANGUAGE}/voxforge/test_azce.csv"}
 
 DELETE_OLD_CHECKPOINTS=${5:-0}
-START_FROM_CHECKPOINT=${6:-"/DeepSpeech/checkpoints/deepspeech-0.7.3-checkpoint/"}
+START_FROM_CHECKPOINT=${6:-"/DeepSpeech/checkpoints/deepspeech-0.8.1-checkpoint/"}
 
-BATCH_SIZE=24
-USE_AUGMENTATION=1
+BATCH_SIZE=48
+USE_AUGMENTATION=0
+FREEZE_SOURCE_LAYERS=0
 NOISE_FILE="/DeepSpeech/data_prepared/noise/train.csv"
 
 if [[ "${DELETE_OLD_CHECKPOINTS}" == "1" ]] || [[ "${START_FROM_CHECKPOINT}" != "--" ]]; then
@@ -27,6 +28,7 @@ if [[ "${LANGUAGE}" == "de" ]] || [[ "${LANGUAGE}" == "it" ]]; then
   DROP_SOURCE_LAYERS=0
 else
   DROP_SOURCE_LAYERS=1
+  FREEZE_SOURCE_LAYERS=1
 fi
 
 #if [[ "${USE_AUGMENTATION}" == "1" ]]; then
@@ -89,11 +91,14 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --es_epochs 7 \
         --reduce_lr_on_plateau True \
         --plateau_epochs 3 \
+        --es_min_delta 0.9 \
         --force_initialize_learning_rate True \
         --learning_rate 0.0001 \
         --dropout_rate 0.25 \
         --use_allow_growth  \
         --drop_source_layers ${DROP_SOURCE_LAYERS} \
+        --freeze_source_layers ${FREEZE_SOURCE_LAYERS} \
+        --load_frozen_graph True \
         --train_cudnn \
         --export_dir ${CHECKPOINT_DIR} \
         --checkpoint_dir ${CHECKPOINT_DIR} \
@@ -111,14 +116,14 @@ echo ""
 echo "Running training with arguments: ${DSARGS}"
 echo ""
 echo ""
-python3 -u /DeepSpeech/DeepSpeech.py "${DSARGS}"
+/bin/bash -c "python3 -u /STT/DeepSpeech.py ${DSARGS}"
 
 # Convert output graph for inference
 echo ""
 echo "Converting output graph for inference:"
 echo ""
 if [[ -f ${CHECKPOINT_DIR}"best_dev_checkpoint" ]]; then
-  python3 -u /DeepSpeech/DeepSpeech.py --checkpoint_dir "${CHECKPOINT_DIR}" \
+  python3 -u /STT/DeepSpeech.py --checkpoint_dir "${CHECKPOINT_DIR}" \
     --scorer /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer \
     --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt \
     --export_tflite --export_dir "${CHECKPOINT_DIR}" \
@@ -126,7 +131,7 @@ if [[ -f ${CHECKPOINT_DIR}"best_dev_checkpoint" ]]; then
 fi
 echo ""
 if [[ -f ${CHECKPOINT_DIR}"output_graph.pb" ]]; then
-  /DeepSpeech/convert_graphdef_memmapped_format --in_graph="${CHECKPOINT_DIR}output_graph.pb" \
+  /STT/convert_graphdef_memmapped_format --in_graph="${CHECKPOINT_DIR}output_graph.pb" \
     --out_graph="${CHECKPOINT_DIR}output_graph_${LANGUAGE}.pbmm"
 fi
 

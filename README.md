@@ -80,6 +80,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 - [Many different languages](https://github.com/JRMeyer/open-speech-corpora)
 - [Many different languages](https://www.clarin.eu/resource-families/spoken-corpora), most with login or non commercial
 - GerTV1000h German Broadcast corpus and Difficult Speech Corpus (DiSCo), no links found
+- [Bundestag Plenarsitzungen](https://www.bundestag.de/mediathek), very much data, but not aligned
 
 <br/>
 
@@ -368,16 +369,16 @@ sys.exit(1)
 Download pretrained deepspeech checkpoints.
 
 ```bash
-wget https://github.com/mozilla/DeepSpeech/releases/download/v0.7.3/deepspeech-0.7.3-checkpoint.tar.gz -P checkpoints/
-tar xvfz checkpoints/deepspeech-0.7.3-checkpoint.tar.gz -C checkpoints/
-rm checkpoints/deepspeech-0.7.3-checkpoint.tar.gz
+wget https://github.com/mozilla/DeepSpeech/releases/download/v0.8.1/deepspeech-0.8.1-checkpoint.tar.gz -P checkpoints/
+tar xvfz checkpoints/deepspeech-0.8.1-checkpoint.tar.gz -C checkpoints/
+rm checkpoints/deepspeech-0.8.1-checkpoint.tar.gz
 ```
 
 Adjust the parameters/scripts to your needs (Run in container):
 
 ```bash
 # Run a training using the english checkpoint:
-/bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/train_azce.csv /DeepSpeech/data_prepared/voxforge/dev_azce.csv /DeepSpeech/data_prepared/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.7.3-checkpoint/
+/bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/de/voxforge/train_azce.csv /DeepSpeech/data_prepared/de/voxforge/dev_azce.csv /DeepSpeech/data_prepared/de/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.8.1-checkpoint/
 
 # Run test only
 # Don't forget to use the noiseaugmaster image if testing with noise
@@ -597,6 +598,15 @@ Using new CommonVoice v5 releases: \
 | IT       | CommonVoice + LinguaLibre + Mailabs + Voxforge                                               | optimized scorer alpha+beta                                                                                                                                         | Test: 25.536196                        |                               | WER: 0.247785, CER: 0.096247 |
 | PL       | CommonVoice + LinguaLibre + Mailabs                                                          | test with CommonVoice, others completely for training; with speech and noise overlay; top-39175 scorer out of train transcriptions (words occurring at least twice) | Test: 14.902746, Validation: 15.508280 | 53                            | WER: 0.040128, CER: 0.022947 |
 | PL       | CommonVoice + LinguaLibre + Mailabs                                                          | optimized scorer alpha+beta                                                                                                                                         | Test: 14.902746                        |                               | WER: 0.034115, CER: 0.020230 |
+
+<br/>
+
+| Language | Dataset  | Additional Infos                                                           | Losses                                 | Training epochs of best model | Total training duration |
+| -------- | -------- | -------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ----------------------- |
+| DE       | Voxforge | updated rlrop; frozen transfer-learning; no augmentation; es_min_delta=0.9 | Test: 37.707958, Validation: 41.832220 | 12 + 3                        | 42 min                  |
+| DE       | Voxforge | like above; without frozen transfer-learning;                              | Test: 36.630890, Validation: 41.208125 | 7                             | 28 min                  |
+| DE       | Voxforge | dropped last layer                                                         | Test: 42.516270, Validation: 47.105518 | 8                             | 28 min                  |
+| DE       | Voxforge | with frozen transfer-learning in two steps                                 | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42min                   |
 
 <br/>
 

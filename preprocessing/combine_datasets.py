@@ -41,6 +41,10 @@ def main():
     if args.google_wavenet:
         datasets.append("google_wavenet")
 
+    dir_path = os.path.dirname(args.files_output)
+    if not os.path.isdir(dir_path):
+        os.makedirs(dir_path, exist_ok=True)
+
     if len(datasets) > 0:
         data_train = []
         data_dev = []

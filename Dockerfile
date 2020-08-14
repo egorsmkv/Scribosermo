@@ -42,10 +42,10 @@ RUN pip3 install --upgrade git+https://github.com/danbmh/audiomate.git@new_featu
 #RUN pip3 install --no-cache-dir audiomate
 
 # Download scorer generator script
-RUN cd /DeepSpeech/data/lm/ \
+RUN cd /STT/data/lm/ \
     && curl -LO https://github.com/mozilla/DeepSpeech/releases/latest/download/native_client.amd64.cpu.linux.tar.xz \
     && tar xvf native_client.*.tar.xz
 
-COPY . /DeepSpeech/deepspeech-polyglot/
+COPY . /STT/deepspeech-polyglot/
 
 CMD ["/bin/bash"]
