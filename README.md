@@ -23,10 +23,13 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 
 #### German (de)
 
+- [BAS-Formtask](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/FORMTASK/FORMTASK.2.php) ~18h
+- [BAS-Sprecherinnen](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/SprecherInnen/SprecherInnen.1.php) ~2h
 - [Mozilla Common Voice](https://voice.mozilla.org/) ~701h
 - [Common Voice Single Words](https://voice.mozilla.org/) ~9h, included in the main dataset
 - [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
 - GoogleWavenet ~165h, artificial training data generated with the google text to speech service
+- Gothic ~39h, extracted from Gothic 1-3 games
 - [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~4h
 - [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
 - [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
@@ -77,7 +80,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 #### Links
 
 - [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no aligned transcriptions
-- [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html), seems to be paid only
+- [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html) and [Here](https://clarin.phonetik.uni-muenchen.de/BASRepository/index.php), seems to be paid only
 - [Many different languages](https://github.com/JRMeyer/open-speech-corpora)
 - [Many different languages](https://www.clarin.eu/resource-families/spoken-corpora), most with login or non commercial
 - GerTV1000h German Broadcast corpus and Difficult Speech Corpus (DiSCo), no links found
