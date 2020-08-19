@@ -71,9 +71,9 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 
 #### Noise
 
-- Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
-- Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
-- Noise data: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
+- [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
+- [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
+- [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
 
 <br>
 
@@ -106,9 +106,14 @@ my_deepspeech_folder
 Clone DeepSpeech and build container:
 
 ```bash
-git clone https://github.com/mozilla/DeepSpeech.git
-# or for noise augmentation testing
+# git clone https://github.com/mozilla/DeepSpeech.git
 git clone https://github.com/DanBmh/DeepSpeech.git
+
+# checkout older version because I have the feeling that augmentations did work better
+cd DeepSpeech && git checkout before_new_augs2 && cd ..
+
+# or for for testing with noise
+cd DeepSpeech && git checkout noiseaugmaster && cd ..
 
 cd DeepSpeech && make Dockerfile.train && cd ..
 docker build -f DeepSpeech/Dockerfile.train -t mozilla_deepspeech DeepSpeech/
@@ -610,11 +615,16 @@ Using new CommonVoice v5 releases: \
 | DE       | Voxforge | updated rlrop; frozen transfer-learning; no augmentation; es_min_delta=0.9 | Test: 37.707958, Validation: 41.832220 | 12 + 3                        | 42 min                  |
 | DE       | Voxforge | like above; without frozen transfer-learning;                              | Test: 36.630890, Validation: 41.208125 | 7                             | 28 min                  |
 | DE       | Voxforge | dropped last layer                                                         | Test: 42.516270, Validation: 47.105518 | 8                             | 28 min                  |
-| DE       | Voxforge | with frozen transfer-learning in two steps                                 | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42min                   |
+| DE       | Voxforge | dropped last layer; with frozen transfer-learning in two steps                                 | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42 min                  |
+| DE       | Voxforge | updated rlrop; with augmentation; es_min_delta=0.9                         | Test: 35.540062, Validation: 39.974685 | 6                             | 46 min                  |
 
 <br/>
 
 #### Language Models and Checkpoints
+
+By default the checkpoints are provided under the same licence as this repository,
+but some of the datasets have extra conditions which also have to be applied. \
+Please check this yourself for the models you want to use.
 
 **German:** \
 (WER: 0.166, Train: ~1358h, Test: ~41h) \

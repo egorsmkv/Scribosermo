@@ -11,9 +11,11 @@
 # Actual singularity call with nvidia capabilities, mounted folder and call to script
 singularity exec \
   --nv \
+  --bind ~/DeepSpeech/training/:/DeepSpeech/training/ \
+  --bind ~/DeepSpeech/DeepSpeech.py:/DeepSpeech/DeepSpeech.py \
   --bind ~/checkpoints/:/DeepSpeech/checkpoints/ \
   --bind /cfs/share/cache/db_xds/data_original/:/DeepSpeech/data_original/ \
   --bind /cfs/share/cache/db_xds/data_prepared/:/DeepSpeech/data_prepared/ \
   --bind ~/deepspeech-polyglot/:/DeepSpeech/deepspeech-polyglot/ \
   /cfs/share/cache/db_xds/images/deepspeech_polyglot.sif \
-  /bin/bash -c 'export LANGUAGE="de" && chmod +x /DeepSpeech/deepspeech-polyglot/training/train.sh && /DeepSpeech/deepspeech-polyglot/training/train.sh'
+  /bin/bash -c 'export LANGUAGE="de" && /DeepSpeech/deepspeech-polyglot/training/train.sh'

@@ -6,7 +6,7 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get update && apt-get install -y --no-install-recommends nano file zip
 RUN apt-get update && apt-get install -y --no-install-recommends sox libsox-dev
 
-# Dependencies for noise normalization
+# Dependencies for noise normalization and some dataset preparations
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg
 RUN pip install --no-cache-dir --upgrade pydub
 
@@ -42,7 +42,7 @@ RUN pip3 install --upgrade git+https://github.com/danbmh/audiomate.git@new_featu
 #RUN pip3 install --no-cache-dir audiomate
 
 # Download scorer generator script
-RUN cd /STT/data/lm/ \
+RUN cd /DeepSpeech/data/lm/ \
     && curl -LO https://github.com/mozilla/DeepSpeech/releases/latest/download/native_client.amd64.cpu.linux.tar.xz \
     && tar xvf native_client.*.tar.xz
 
