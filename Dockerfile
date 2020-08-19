@@ -46,6 +46,8 @@ RUN cd /DeepSpeech/data/lm/ \
     && curl -LO https://github.com/mozilla/DeepSpeech/releases/latest/download/native_client.amd64.cpu.linux.tar.xz \
     && tar xvf native_client.*.tar.xz
 
-COPY . /STT/deepspeech-polyglot/
+RUN pip3 install --upgrade --no-cache-dir install youtube_dl
+RUN pip3 install --upgrade --no-cache-dir install youtube_transcript_api
+RUN pip3 install --upgrade git+https://github.com/DanBmh/aud-crawler@some_improvements
 
 CMD ["/bin/bash"]

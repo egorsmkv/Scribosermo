@@ -36,6 +36,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 - [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
 - [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
 - [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
+- [Y-Kollektiv](https://www.youtube.com/c/ykollektiv/videos) ~52h
 - [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
 
 #### Spanish (es)
@@ -147,9 +148,13 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --languag
 --lingualibre --tatoeba
 
 # Download common-voice single-word datasets
-python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --language "xx" --target_path "/DeepSpeech/data_original/xx/" --cv_singleword
+python3 /DeepSpeech/deepspeech-polyglot/corpora/get_datasets.py "/DeepSpeech/data_original/xx/" --cv_singleword
 mkdir /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/
 mv /DeepSpeech/data_original/xx/cv-corpus-5-singleword/${LANGUAGE}/ /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/${LANGUAGE}/
+
+# Downloads from youtube
+python3 /DeepSpeech/deepspeech-polyglot/corpora/get_datasets.py "/DeepSpeech/data_original/de/ykollektiv/" --ykollektiv
+
 ```
 
 Download css10 german/spanish/french dataset (Requires kaggle account, see links above) \
@@ -172,6 +177,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --swc /Dee
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tatoeba /DeepSpeech/data_original/${LANGUAGE}/tatoeba/ /DeepSpeech/data_prepared/${LANGUAGE}/tatoeba/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /DeepSpeech/data_original/${LANGUAGE}/tuda/ /DeepSpeech/data_prepared/${LANGUAGE}/tuda/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --voxforge /DeepSpeech/data_original/${LANGUAGE}/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/ykollektiv/ /DeepSpeech/data_prepared/${LANGUAGE}/ykollektiv/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
 
 # To combine multiple datasets run:
