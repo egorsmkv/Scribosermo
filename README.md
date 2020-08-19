@@ -34,6 +34,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 - [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
 - [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
 - [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
+- [TerraX](https://www.youtube.com/c/terra-x/videos) ~38h
 - [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
 - [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
 - [Y-Kollektiv](https://www.youtube.com/c/ykollektiv/videos) ~52h
@@ -154,6 +155,7 @@ mv /DeepSpeech/data_original/xx/cv-corpus-5-singleword/${LANGUAGE}/ /DeepSpeech/
 
 # Downloads from youtube
 python3 /DeepSpeech/deepspeech-polyglot/corpora/get_datasets.py "/DeepSpeech/data_original/de/ykollektiv/" --ykollektiv
+python3 /DeepSpeech/deepspeech-polyglot/corpora/get_datasets.py "/DeepSpeech/data_original/de/terrax/" --terrax
 
 ```
 
@@ -177,6 +179,7 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --swc /Dee
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tatoeba /DeepSpeech/data_original/${LANGUAGE}/tatoeba/ /DeepSpeech/data_prepared/${LANGUAGE}/tatoeba/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /DeepSpeech/data_original/${LANGUAGE}/tuda/ /DeepSpeech/data_prepared/${LANGUAGE}/tuda/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --voxforge /DeepSpeech/data_original/${LANGUAGE}/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/terrax/ /DeepSpeech/data_prepared/${LANGUAGE}/terrax/
 python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/ykollektiv/ /DeepSpeech/data_prepared/${LANGUAGE}/ykollektiv/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
 
@@ -621,7 +624,7 @@ Using new CommonVoice v5 releases: \
 | DE       | Voxforge | updated rlrop; frozen transfer-learning; no augmentation; es_min_delta=0.9 | Test: 37.707958, Validation: 41.832220 | 12 + 3                        | 42 min                  |
 | DE       | Voxforge | like above; without frozen transfer-learning;                              | Test: 36.630890, Validation: 41.208125 | 7                             | 28 min                  |
 | DE       | Voxforge | dropped last layer                                                         | Test: 42.516270, Validation: 47.105518 | 8                             | 28 min                  |
-| DE       | Voxforge | dropped last layer; with frozen transfer-learning in two steps                                 | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42 min                  |
+| DE       | Voxforge | dropped last layer; with frozen transfer-learning in two steps             | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42 min                  |
 | DE       | Voxforge | updated rlrop; with augmentation; es_min_delta=0.9                         | Test: 35.540062, Validation: 39.974685 | 6                             | 46 min                  |
 
 <br/>
@@ -668,7 +671,7 @@ You can contribute to this project in multiple ways:
    (Requires a gpu and a lot of time, or multiple gpus and some time)
 - Experiment with the language models
 - Last but not least, you can also donate for my electricity bill. \
-   And if you are using this commercially, I suggest to think about some gpus instead;)
+   And if you are using this commercially, I suggest to think about some gpus instead;) \
   [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HMN45MDHCNJNQ) (PayPal)
 
 <br/>

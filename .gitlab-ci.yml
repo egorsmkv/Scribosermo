@@ -41,7 +41,7 @@ linting:
   stage: test
   script:
     # - seed-isort-config
-    - isort --recursive --check-only .
+    - isort --recursive --check-only --diff .
     - black --check --exclude venv .
     - npx prettylint "**/*.{json,md,yml}"
     - pylint --disable=import-error ${SRC_DIRS}
