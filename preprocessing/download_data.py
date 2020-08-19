@@ -1,10 +1,7 @@
 import argparse
 import os
-import tarfile
-import urllib
 
 from audiomate.corpus import io
-from progressist import ProgressBar
 
 # ==================================================================================================
 

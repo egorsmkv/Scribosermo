@@ -52,7 +52,9 @@ def convert_and_clean(entry, target_path):
     out_file = os.path.join(target_path, name + ".wav")
 
     audio = AudioSegment.from_file(entry["file"], extension)
-    audio.export(out_file, format="wav", bitrate="16k", parameters=["-ac", "1"])
+    audio = audio.set_frame_rate(16000)
+    audio = audio.set_channels(1)
+    audio.export(out_file, format="wav")
 
     cleaned_transcript = text_cleaning.clean_sentence(entry["transcription"])[0]
 
