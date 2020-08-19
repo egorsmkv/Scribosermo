@@ -20,8 +20,8 @@ def download_youtube_playlist(output_dir, playlist_url, lang):
 
 def download_and_extract(link, target_path):
     path = os.path.join(target_path, "tmp.tar.gz")
-    bar = ProgressBar(template="Download |{animation}| {done:B}/{total:B}")
-    urllib.request.urlretrieve(link, path, reporthook=bar.on_urlretrieve)
+    pbar = ProgressBar(template="Download |{animation}| {done:B}/{total:B}")
+    urllib.request.urlretrieve(link, path, reporthook=pbar.on_urlretrieve)
 
     tf = tarfile.open(path)
     tf.extractall(path=target_path)

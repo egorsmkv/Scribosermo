@@ -15,7 +15,6 @@ def main():
     parser.add_argument("--language", type=str, required=True)
     parser.add_argument("--common_voice", action="store_true")
     parser.add_argument("--css_ten", action="store_true")
-    parser.add_argument("--cv_singleword", action="store_true")
     parser.add_argument("--lingualibre", action="store_true")
     parser.add_argument("--mailabs", action="store_true")
     parser.add_argument("--swc", action="store_true")
@@ -32,18 +31,6 @@ def main():
         dl = io.CommonVoiceDownloader(lang=args.language)
         print("Downloading common-voice-{} ...".format(args.language))
         dl.download(os.path.join(args.target_path, "common_voice"))
-
-    if args.cv_singleword:
-        print("Downloading cv-singleword ...")
-        link = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-5-singleword/cv-corpus-5-singleword.tar.gz"
-        path = os.path.join(args.target_path, "cv_singleword.tar.gz")
-
-        bar = ProgressBar(template="Download |{animation}| {done:B}/{total:B}")
-        urllib.request.urlretrieve(link, path, reporthook=bar.on_urlretrieve)
-
-        tf = tarfile.open(path)
-        tf.extractall(path=args.target_path)
-        os.remove(path)
 
     if args.lingualibre:
         langs = {

@@ -626,6 +626,7 @@ Using new CommonVoice v5 releases: \
 | DE       | Voxforge | dropped last layer                                                         | Test: 42.516270, Validation: 47.105518 | 8                             | 28 min                  |
 | DE       | Voxforge | dropped last layer; with frozen transfer-learning in two steps             | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42 min                  |
 | DE       | Voxforge | updated rlrop; with augmentation; es_min_delta=0.9                         | Test: 35.540062, Validation: 39.974685 | 6                             | 46 min                  |
+| DE       | Voxforge | updated rlrop; with old augmentations; es_min_delta=0.1                    | Test: 30.655203, Validation: 33.655750 | 9                             | 48 min                  |
 
 <br/>
 
