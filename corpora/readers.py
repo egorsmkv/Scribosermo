@@ -16,6 +16,7 @@ def load_basformtask(path):
     tags_pattern = re.compile("<.*?>")
 
     dataset = []
+    dropped = 0
     for d in tqdm.tqdm(dir_names):
         files = os.listdir(d)
         files = [os.path.join(d, f) for f in files]
@@ -31,6 +32,11 @@ def load_basformtask(path):
             trans = annot["levels"][0]["items"][0]["labels"][1]["value"]
             trans = re.sub(tags_pattern, "", trans)
 
+            # Drop files including signs for incomplete words or repetitions
+            if any([s in trans for s in "*~"]):
+                dropped += 1
+                continue
+
             entry = {
                 "file": wav,
                 "transcription": trans,
@@ -38,15 +44,9 @@ def load_basformtask(path):
             }
             dataset.append(entry)
 
-    # Drop file including signs for incomplete words or repetitions
-    cleaned_set = []
-    for entry in dataset:
-        if not "~" in entry["transcription"] and not "*" in entry["transcription"]:
-            cleaned_set.append(entry)
     msg = "Dropped {}/{} files with speech errors"
-    print(msg.format(len(dataset) - len(cleaned_set), len(dataset)))
-
-    return cleaned_set
+    print(msg.format(dropped, len(dataset) + dropped))
+    return dataset
 
 
 # ==================================================================================================
@@ -61,6 +61,7 @@ def load_bassprecherinnen(path):
     tags_pattern = re.compile("<.*?>")
 
     dataset = []
+    dropped = 0
     for d in tqdm.tqdm(dir_names):
         files = os.listdir(d)
         files = [os.path.join(d, f) for f in files]
@@ -79,6 +80,11 @@ def load_bassprecherinnen(path):
             trans = " ".join(trans)
             trans = re.sub(tags_pattern, "", trans)
 
+            # Drop files including signs for incomplete words or repetitions
+            if any([s in trans for s in "*~"]):
+                dropped += 1
+                continue
+
             entry = {
                 "file": wav,
                 "transcription": trans,
@@ -86,15 +92,9 @@ def load_bassprecherinnen(path):
             }
             dataset.append(entry)
 
-    # Drop file including signs for incomplete words or repetitions
-    cleaned_set = []
-    for entry in dataset:
-        if not "~" in entry["transcription"] and not "*" in entry["transcription"]:
-            cleaned_set.append(entry)
     msg = "Dropped {}/{} files with speech errors"
-    print(msg.format(len(dataset) - len(cleaned_set), len(dataset)))
-
-    return cleaned_set
+    print(msg.format(dropped, len(dataset) + dropped))
+    return dataset
 
 
 # ==================================================================================================
@@ -108,11 +108,20 @@ def load_youtube(path):
         aligns = json.load(file)
 
     dataset = []
+    dropped = 0
     for a in tqdm.tqdm(aligns):
+        # Drop files including signs for notes
+        if any([aligns[a].startswith(s) for s in "*(["]):
+            dropped += 1
+            continue
+
         entry = {
             "file": a,
             "transcription": aligns[a],
         }
         dataset.append(entry)
+
+    msg = "Dropped {}/{} files with notes"
+    print(msg.format(dropped, len(aligns)))
 
     return dataset

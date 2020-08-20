@@ -30,8 +30,11 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 - [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
 - GoogleWavenet ~165h, artificial training data generated with the google text to speech service
 - Gothic ~39h, extracted from Gothic 1-3 games
+- [Kurzgesagt](https://www.youtube.com/c/KurzgesagtDE/videos) ~8h
 - [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~4h
 - [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
+- MussteWissen [Deutsch](https://www.youtube.com/c/musstewissenDeutsch/videos) [Mathe](https://www.youtube.com/c/musstewissenMathe/videos) [Physik](https://www.youtube.com/c/musstewissenPhysik/videos) [Chemie](https://www.youtube.com/c/musstewissenChemie/videos) ~11h
+- [PULS-Reportage](https://www.youtube.com/puls/videos) ~12h
 - [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
 - [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
 - [TerraX](https://www.youtube.com/c/terra-x/videos) ~38h
@@ -154,8 +157,11 @@ mkdir /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/
 mv /DeepSpeech/data_original/xx/cv-corpus-5-singleword/${LANGUAGE}/ /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/${LANGUAGE}/
 
 # Downloads from youtube
-python3 /DeepSpeech/deepspeech-polyglot/corpora/get_datasets.py "/DeepSpeech/data_original/de/ykollektiv/" --ykollektiv
-python3 /DeepSpeech/deepspeech-polyglot/corpora/get_datasets.py "/DeepSpeech/data_original/de/terrax/" --terrax
+# If you run into space issues you can delete the original dataset after dataset peparation
+python3 /DeepSpeech/deepspeech-polyglot/corpora/get_datasets.py "/DeepSpeech/data_original/de/" [InsertDatasetHere]
+
+# Choose one of those datasets
+--kurzgesagt --musstewissen --pulsreportage --terrax --ykollektiv
 
 ```
 
@@ -170,6 +176,8 @@ Prepare datasets, this may take some time (Run in container):
 ```bash
 export LANGUAGE="de"
 
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --bas_formtask /DeepSpeech/data_original/de/FORMTASK/ /DeepSpeech/data_prepared/de/bas_formtask/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --bas_sprecherinnen /DeepSpeech/data_original/de/SprecherInnen/ /DeepSpeech/data_prepared/de/bas_sprecherinnen/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/common_voice/${LANGUAGE}/ /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --css_ten /DeepSpeech/data_original/${LANGUAGE}/css_ten/ /DeepSpeech/data_prepared/${LANGUAGE}/css_ten/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/${LANGUAGE}/ /DeepSpeech/data_prepared/${LANGUAGE}/cv_singleword/
@@ -179,6 +187,12 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --swc /Dee
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tatoeba /DeepSpeech/data_original/${LANGUAGE}/tatoeba/ /DeepSpeech/data_prepared/${LANGUAGE}/tatoeba/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /DeepSpeech/data_original/${LANGUAGE}/tuda/ /DeepSpeech/data_prepared/${LANGUAGE}/tuda/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --voxforge /DeepSpeech/data_original/${LANGUAGE}/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/kurzgesagt/ /DeepSpeech/data_prepared/${LANGUAGE}/kurzgesagt/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/musstewissen_deutsch/ /DeepSpeech/data_prepared/${LANGUAGE}/musstewissen_deutsch/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/musstewissen_mathe/ /DeepSpeech/data_prepared/${LANGUAGE}/musstewissen_mathe/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/musstewissen_physik/ /DeepSpeech/data_prepared/${LANGUAGE}/musstewissen_physik/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/musstewissen_chemie/ /DeepSpeech/data_prepared/${LANGUAGE}/musstewissen_chemie/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/pulsreportage/ /DeepSpeech/data_prepared/${LANGUAGE}/pulsreportage/
 python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/terrax/ /DeepSpeech/data_prepared/${LANGUAGE}/terrax/
 python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/ykollektiv/ /DeepSpeech/data_prepared/${LANGUAGE}/ykollektiv/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
@@ -619,14 +633,16 @@ Using new CommonVoice v5 releases: \
 
 <br/>
 
-| Language | Dataset  | Additional Infos                                                           | Losses                                 | Training epochs of best model | Total training duration |
-| -------- | -------- | -------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ----------------------- |
-| DE       | Voxforge | updated rlrop; frozen transfer-learning; no augmentation; es_min_delta=0.9 | Test: 37.707958, Validation: 41.832220 | 12 + 3                        | 42 min                  |
-| DE       | Voxforge | like above; without frozen transfer-learning;                              | Test: 36.630890, Validation: 41.208125 | 7                             | 28 min                  |
-| DE       | Voxforge | dropped last layer                                                         | Test: 42.516270, Validation: 47.105518 | 8                             | 28 min                  |
-| DE       | Voxforge | dropped last layer; with frozen transfer-learning in two steps             | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42 min                  |
-| DE       | Voxforge | updated rlrop; with augmentation; es_min_delta=0.9                         | Test: 35.540062, Validation: 39.974685 | 6                             | 46 min                  |
-| DE       | Voxforge | updated rlrop; with old augmentations; es_min_delta=0.1                    | Test: 30.655203, Validation: 33.655750 | 9                             | 48 min                  |
+| Language | Dataset                        | Additional Infos                                                             | Losses                                 | Training epochs of best model | Total training duration |
+| -------- | ------------------------------ | ---------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ----------------------- |
+| DE       | Voxforge                       | updated rlrop; frozen transfer-learning; no augmentation; es_min_delta=0.9   | Test: 37.707958, Validation: 41.832220 | 12 + 3                        | 42 min                  |
+| DE       | Voxforge                       | like above; without frozen transfer-learning;                                | Test: 36.630890, Validation: 41.208125 | 7                             | 28 min                  |
+| DE       | Voxforge                       | dropped last layer                                                           | Test: 42.516270, Validation: 47.105518 | 8                             | 28 min                  |
+| DE       | Voxforge                       | dropped last layer; with frozen transfer-learning in two steps               | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42 min                  |
+| DE       | Voxforge                       | updated rlrop; with augmentation; es_min_delta=0.9                           | Test: 35.540062, Validation: 39.974685 | 6                             | 46 min                  |
+| DE       | Voxforge                       | updated rlrop; with old augmentations; es_min_delta=0.1                      | Test: 30.655203, Validation: 33.655750 | 9                             | 48 min                  |
+| DE       | TerraX + Voxforge + YKollektiv | Voxforge only for dev+test; rest like above                                  | Test: 32.936977, Validation: 36.828410 | 19                            | 4:53 h                  |
+| DE       | Voxforge                       | layer normalization; updated rlrop; with old augmentations; es_min_delta=0.1 | Test: 57.330410, Validation: 61.025009 | 45                            | 2:37 h                  |
 
 <br/>
 
@@ -634,7 +650,13 @@ Using new CommonVoice v5 releases: \
 
 By default the checkpoints are provided under the same licence as this repository,
 but some of the datasets have extra conditions which also have to be applied. \
-Please check this yourself for the models you want to use.
+Please check this yourself for the models you want to use. Some important ones are:
+
+- Gothic: Non commercial
+- Voxforge: GPL
+- All extractions from Youtube videos: Non commercial
+
+<br/>
 
 **German:** \
 (WER: 0.166, Train: ~1358h, Test: ~41h) \
