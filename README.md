@@ -643,6 +643,9 @@ Using new CommonVoice v5 releases: \
 | DE       | Voxforge                       | updated rlrop; with old augmentations; es_min_delta=0.1                      | Test: 30.655203, Validation: 33.655750 | 9                             | 48 min                  |
 | DE       | TerraX + Voxforge + YKollektiv | Voxforge only for dev+test; rest like above                                  | Test: 32.936977, Validation: 36.828410 | 19                            | 4:53 h                  |
 | DE       | Voxforge                       | layer normalization; updated rlrop; with old augmentations; es_min_delta=0.1 | Test: 57.330410, Validation: 61.025009 | 45                            | 2:37 h                  |
+| DE       | Voxforge                       | dropout=0.3; updated rlrop; with old augmentations; es_min_delta=0.1         | Test: 30.353968, Validation: 33.144178 | 20                            | 1:15 h                  |
+| DE       | Voxforge                       | es_min_delta=0.05; updated rlrop; with old augmentations                     | Test: 29.884317, Validation: 32.944382 | 12                            | 54 min                  |
+| DE       | Voxforge                       | fixed updated rlrop; es_min_delta=0.05; with old augmentations               | Test: 28.903509, Validation: 32.322064 | 34                            | 1:40 h                  |
 
 <br/>
 

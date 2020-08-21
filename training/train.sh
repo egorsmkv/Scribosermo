@@ -85,7 +85,6 @@ DSARGS="--train_files ${TRAIN_FILE} \
         --es_epochs 7 \
         --reduce_lr_on_plateau True \
         --plateau_epochs 3 \
-        --es_min_delta 0.1 \
         --force_initialize_learning_rate True \
         --learning_rate 0.0001 \
         --dropout_rate 0.25 \
