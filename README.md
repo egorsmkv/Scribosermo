@@ -3,7 +3,8 @@
 _This project is build upon the paper [German End-to-end Speech Recognition based on DeepSpeech](https://www.researchgate.net/publication/336532830_German_End-to-end_Speech_Recognition_based_on_DeepSpeech)._
 _Original paper code can be found [here](https://github.com/AASHISHAG/deepspeech-german)._
 
-This project aims to develop a working Speech to Text module using [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech), which can be used for any Audio processing pipeline. [Mozillla DeepSpeech](https://github.com/mozilla/DeepSpeech) is a state-of-the-art open-source automatic speech recognition (ASR) toolkit. DeepSpeech is using a model trained by machine learning techniques based on [Baidu's Deep Speech](https://gigaom2.files.wordpress.com/2014/12/deep_speech3_12_17.pdf) research paper. Project DeepSpeech uses Google's TensorFlow to make the implementation easier.
+This project uses [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech) to train the speech-to-text network.
+But it also has some experimental support for [Wav2Letter](https://github.com/facebookresearch/wav2letter/).
 
 <div align="center">
     <img src="media/deep_speech_architecture.png" alt="deepspeech graph" width="45%"/>
@@ -90,6 +91,7 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 - [Many different languages](https://www.clarin.eu/resource-families/spoken-corpora), most with login or non commercial
 - GerTV1000h German Broadcast corpus and Difficult Speech Corpus (DiSCo), no links found
 - [Bundestag Plenarsitzungen](https://www.bundestag.de/mediathek), very much data, but not aligned
+- [LibriVox](https://librivox.org/search?primary_key=0&search_category=language&search_page=1&search_form=get_results), very much data but not aligned, get transcriptions from [Project Gutenberg](https://www.gutenberg.org/)
 
 <br/>
 
@@ -327,7 +329,6 @@ python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared
 # French: --default_alpha 0.9000153993017823 --default_beta 2.478779501401466
 # Italian: --default_alpha 0.910619981788069 --default_beta 0.15660475671195578
 # Polish: --default_alpha 1.3060110864019918 --default_beta 3.5010876706821334
-
 ```
 
 <br/>
@@ -441,6 +442,33 @@ python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/de/voxf
 
 # Or to run a cycled training as described in the paper, run:
 python3 /DeepSpeech/deepspeech-polyglot/training/cycled_training.py /DeepSpeech/checkpoints/de/voxforge/ /DeepSpeech/data_prepared/de/ _azce --voxforge
+```
+
+<br/>
+
+Training with wav2letter:
+
+```bash
+export LANGUAGE="de"
+
+# Build docker container
+git clone https://github.com/facebookresearch/wav2letter.git
+cd wav2letter && git checkout v0.2
+docker build --no-cache -f ./Dockerfile-CUDA -t wav2letter .
+cd ..
+
+# Convert csv files to lst files:
+python3 deepspeech-polyglot/preprocessing/ds_to_w2l.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv /DeepSpeech/data_prepared/${LANGUAGE}/w2l_voxforge/train_azce.lst
+
+# Generate lexicon file:
+python3 deepspeech-polyglot/preprocessing/create_w2l_lexicon.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/dev_azce.csv /DeepSpeech/data_prepared/texts/${LANGUAGE}/lexicon.txt
+
+Run training with single gpu (Uncomment according parts in run_container.sh to run this):
+mpirun -n 1 --allow-run-as-root /root/wav2letter/build/Train continue --flagsfile /root/deepspeech-polyglot/training/train.cfg
+mpirun -n 1 --allow-run-as-root /root/wav2letter/build/Decoder --flagsfile /root/deepspeech-polyglot/training/decode.cfg
+
+Continue training:
+mpirun -n 1 --allow-run-as-root /root/wav2letter/build/Train continue checkpoints/w2l/voxforge_conv_glu/
 ```
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch.
@@ -633,19 +661,21 @@ Using new CommonVoice v5 releases: \
 
 <br/>
 
-| Language | Dataset                        | Additional Infos                                                             | Losses                                 | Training epochs of best model | Total training duration |
-| -------- | ------------------------------ | ---------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ----------------------- |
-| DE       | Voxforge                       | updated rlrop; frozen transfer-learning; no augmentation; es_min_delta=0.9   | Test: 37.707958, Validation: 41.832220 | 12 + 3                        | 42 min                  |
-| DE       | Voxforge                       | like above; without frozen transfer-learning;                                | Test: 36.630890, Validation: 41.208125 | 7                             | 28 min                  |
-| DE       | Voxforge                       | dropped last layer                                                           | Test: 42.516270, Validation: 47.105518 | 8                             | 28 min                  |
-| DE       | Voxforge                       | dropped last layer; with frozen transfer-learning in two steps               | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42 min                  |
-| DE       | Voxforge                       | updated rlrop; with augmentation; es_min_delta=0.9                           | Test: 35.540062, Validation: 39.974685 | 6                             | 46 min                  |
-| DE       | Voxforge                       | updated rlrop; with old augmentations; es_min_delta=0.1                      | Test: 30.655203, Validation: 33.655750 | 9                             | 48 min                  |
-| DE       | TerraX + Voxforge + YKollektiv | Voxforge only for dev+test; rest like above                                  | Test: 32.936977, Validation: 36.828410 | 19                            | 4:53 h                  |
-| DE       | Voxforge                       | layer normalization; updated rlrop; with old augmentations; es_min_delta=0.1 | Test: 57.330410, Validation: 61.025009 | 45                            | 2:37 h                  |
-| DE       | Voxforge                       | dropout=0.3; updated rlrop; with old augmentations; es_min_delta=0.1         | Test: 30.353968, Validation: 33.144178 | 20                            | 1:15 h                  |
-| DE       | Voxforge                       | es_min_delta=0.05; updated rlrop; with old augmentations                     | Test: 29.884317, Validation: 32.944382 | 12                            | 54 min                  |
-| DE       | Voxforge                       | fixed updated rlrop; es_min_delta=0.05; with old augmentations               | Test: 28.903509, Validation: 32.322064 | 34                            | 1:40 h                  |
+| Dataset                        | Additional Infos                                                                                      | Losses                                 | Training epochs of best model | Total training duration | WER       |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ----------------------- | --------- |
+| Voxforge                       | updated rlrop; frozen transfer-learning; no augmentation; es_min_delta=0.9                            | Test: 37.707958, Validation: 41.832220 | 12 + 3                        | 42 min                  |           |
+| Voxforge                       | like above; without frozen transfer-learning;                                                         | Test: 36.630890, Validation: 41.208125 | 7                             | 28 min                  |           |
+| Voxforge                       | dropped last layer                                                                                    | Test: 42.516270, Validation: 47.105518 | 8                             | 28 min                  |           |
+| Voxforge                       | dropped last layer; with frozen transfer-learning in two steps                                        | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42 min                  |           |
+| Voxforge                       | updated rlrop; with augmentation; es_min_delta=0.9                                                    | Test: 35.540062, Validation: 39.974685 | 6                             | 46 min                  |           |
+| Voxforge                       | updated rlrop; with old augmentations; es_min_delta=0.1                                               | Test: 30.655203, Validation: 33.655750 | 9                             | 48 min                  |           |
+| TerraX + Voxforge + YKollektiv | Voxforge only for dev+test but not in train; rest like above                                          | Test: 32.936977, Validation: 36.828410 | 19                            | 4:53 h                  |           |
+| Voxforge                       | layer normalization; updated rlrop; with old augmentations; es_min_delta=0.1                          | Test: 57.330410, Validation: 61.025009 | 45                            | 2:37 h                  |           |
+| Voxforge                       | dropout=0.3; updated rlrop; with old augmentations; es_min_delta=0.1                                  | Test: 30.353968, Validation: 33.144178 | 20                            | 1:15 h                  |           |
+| Voxforge                       | es_min_delta=0.05; updated rlrop; with old augmentations                                              | Test: 29.884317, Validation: 32.944382 | 12                            | 54 min                  |           |
+| Voxforge                       | fixed updated rlrop; es_min_delta=0.05; with old augmentations                                        | Test: 28.903509, Validation: 32.322064 | 34                            | 1:40 h                  |           |
+| Voxforge                       | from scratch; no augmentations; fixed updated rlrop; es_min_delta=0.05                                | Test: 74.347054, Validation: 79.838900 | 28                            | 1:26 h                  | 0.38      |
+| Voxforge                       | wav2letter; stopped by hand after one/two overnight runs; from scratch; no augmentations; single gpu; |                                        | 18/37                         | 16/33 h                 | 0.61/0.61 |
 
 <br/>
 
@@ -656,6 +686,7 @@ but some of the datasets have extra conditions which also have to be applied. \
 Please check this yourself for the models you want to use. Some important ones are:
 
 - Gothic: Non commercial
+- Tatoeba: Various, depending on speakers
 - Voxforge: GPL
 - All extractions from Youtube videos: Non commercial
 
