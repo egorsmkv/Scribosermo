@@ -21,6 +21,9 @@ def main():
     parser.add_argument("--zamia_speech", action="store_true")
     args = parser.parse_args()
 
+    if not os.path.isdir(args.target_path):
+        os.makedirs(args.target_path, exist_ok=True)
+
     if args.common_voice:
         dl = io.CommonVoiceDownloader(lang=args.language)
         print("Downloading common-voice-{} ...".format(args.language))

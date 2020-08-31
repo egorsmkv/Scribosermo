@@ -3,7 +3,8 @@
 _This project is build upon the paper [German End-to-end Speech Recognition based on DeepSpeech](https://www.researchgate.net/publication/336532830_German_End-to-end_Speech_Recognition_based_on_DeepSpeech)._
 _Original paper code can be found [here](https://github.com/AASHISHAG/deepspeech-german)._
 
-This project aims to develop a working Speech to Text module using [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech), which can be used for any Audio processing pipeline. [Mozillla DeepSpeech](https://github.com/mozilla/DeepSpeech) is a state-of-the-art open-source automatic speech recognition (ASR) toolkit. DeepSpeech is using a model trained by machine learning techniques based on [Baidu's Deep Speech](https://gigaom2.files.wordpress.com/2014/12/deep_speech3_12_17.pdf) research paper. Project DeepSpeech uses Google's TensorFlow to make the implementation easier.
+This project uses [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech) to train the speech-to-text network.
+But it also has some experimental support for [Wav2Letter](https://github.com/facebookresearch/wav2letter/).
 
 <div align="center">
     <img src="media/deep_speech_architecture.png" alt="deepspeech graph" width="45%"/>
@@ -23,15 +24,24 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 
 #### German (de)
 
+- [BAS-Formtask](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/FORMTASK/FORMTASK.2.php) ~18h
+- [BAS-Sprecherinnen](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/SprecherInnen/SprecherInnen.1.php) ~2h
 - [Mozilla Common Voice](https://voice.mozilla.org/) ~701h
+- [Common Voice Single Words](https://voice.mozilla.org/) ~9h, included in the main dataset
 - [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) ~16h
 - GoogleWavenet ~165h, artificial training data generated with the google text to speech service
+- Gothic ~39h, extracted from Gothic 1-3 games
+- [Kurzgesagt](https://www.youtube.com/c/KurzgesagtDE/videos) ~8h
 - [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) ~4h
 - [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) ~234h
+- MussteWissen [Deutsch](https://www.youtube.com/c/musstewissenDeutsch/videos) [Mathe](https://www.youtube.com/c/musstewissenMathe/videos) [Physik](https://www.youtube.com/c/musstewissenPhysik/videos) [Chemie](https://www.youtube.com/c/musstewissenChemie/videos) ~11h
+- [PULS-Reportage](https://www.youtube.com/puls/videos) ~12h
 - [Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) ~248h
 - [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) ~7h
+- [TerraX](https://www.youtube.com/c/terra-x/videos) ~38h
 - [German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) ~185h
 - [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) ~32h
+- [Y-Kollektiv](https://www.youtube.com/c/ykollektiv/videos) ~52h
 - [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) ~19h
 
 #### Spanish (es)
@@ -67,19 +77,21 @@ This project aims to develop a working Speech to Text module using [Mozilla Deep
 
 #### Noise
 
-- Noise data: [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
-- Noise data: [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
-- Noise data: [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
+- [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) ~103h
+- [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) ~44h
+- [Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) ~5h
 
 <br>
 
 #### Links
 
 - [Forschergeist](https://forschergeist.de/archiv/) ~100-150h, no aligned transcriptions
-- [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html), seems to be paid only
+- [Verbmobil + Others](https://www.phonetik.uni-muenchen.de/Bas/BasKorporaeng.html) and [Here](https://clarin.phonetik.uni-muenchen.de/BASRepository/index.php), seems to be paid only
 - [Many different languages](https://github.com/JRMeyer/open-speech-corpora)
 - [Many different languages](https://www.clarin.eu/resource-families/spoken-corpora), most with login or non commercial
 - GerTV1000h German Broadcast corpus and Difficult Speech Corpus (DiSCo), no links found
+- [Bundestag Plenarsitzungen](https://www.bundestag.de/mediathek), very much data, but not aligned
+- [LibriVox](https://librivox.org/search?primary_key=0&search_category=language&search_page=1&search_form=get_results), very much data but not aligned, get transcriptions from [Project Gutenberg](https://www.gutenberg.org/)
 
 <br/>
 
@@ -101,13 +113,16 @@ my_deepspeech_folder
 Clone DeepSpeech and build container:
 
 ```bash
-git clone https://github.com/mozilla/DeepSpeech.git
-# or for noise augmentation testing
+# git clone https://github.com/mozilla/DeepSpeech.git
 git clone https://github.com/DanBmh/DeepSpeech.git
 
+# checkout older version because I have the feeling that augmentations did work better
+cd DeepSpeech && git checkout before_new_augs2 && cd ..
+
+# or for for testing with noise
+cd DeepSpeech && git checkout noiseaugmaster && cd ..
+
 cd DeepSpeech && make Dockerfile.train && cd ..
-# The currently used version's commit id is 188a6f2c1ee53dc79acf8abceaf729b5f9a05e7a,
-# edit the dockerfile and set DEEPSPEECH_SHA accordingly
 docker build -f DeepSpeech/Dockerfile.train -t mozilla_deepspeech DeepSpeech/
 ```
 
@@ -137,6 +152,19 @@ python3 /DeepSpeech/deepspeech-polyglot/preprocessing/download_data.py --languag
 --swc --tuda --zamia_speech
 --common_voice --mailabs --voxforge
 --lingualibre --tatoeba
+
+# Download common-voice single-word datasets
+python3 /DeepSpeech/deepspeech-polyglot/corpora/get_datasets.py "/DeepSpeech/data_original/xx/" --cv_singleword
+mkdir /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/
+mv /DeepSpeech/data_original/xx/cv-corpus-5-singleword/${LANGUAGE}/ /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/${LANGUAGE}/
+
+# Downloads from youtube
+# If you run into space issues you can delete the original dataset after dataset peparation
+python3 /DeepSpeech/deepspeech-polyglot/corpora/get_datasets.py "/DeepSpeech/data_original/de/" [InsertDatasetHere]
+
+# Choose one of those datasets
+--kurzgesagt --musstewissen --pulsreportage --terrax --ykollektiv
+
 ```
 
 Download css10 german/spanish/french dataset (Requires kaggle account, see links above) \
@@ -150,14 +178,25 @@ Prepare datasets, this may take some time (Run in container):
 ```bash
 export LANGUAGE="de"
 
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --bas_formtask /DeepSpeech/data_original/de/FORMTASK/ /DeepSpeech/data_prepared/de/bas_formtask/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --bas_sprecherinnen /DeepSpeech/data_original/de/SprecherInnen/ /DeepSpeech/data_prepared/de/bas_sprecherinnen/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/common_voice/${LANGUAGE}/ /DeepSpeech/data_prepared/${LANGUAGE}/common_voice/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --css_ten /DeepSpeech/data_original/${LANGUAGE}/css_ten/ /DeepSpeech/data_prepared/${LANGUAGE}/css_ten/
+python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --common_voice /DeepSpeech/data_original/${LANGUAGE}/cv_singleword/${LANGUAGE}/ /DeepSpeech/data_prepared/${LANGUAGE}/cv_singleword/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --lingualibre /DeepSpeech/data_original/${LANGUAGE}/lingualibre/ /DeepSpeech/data_prepared/${LANGUAGE}/lingualibre/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --mailabs /DeepSpeech/data_original/${LANGUAGE}/mailabs/ /DeepSpeech/data_prepared/${LANGUAGE}/mailabs/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --swc /DeepSpeech/data_original/${LANGUAGE}/swc/ /DeepSpeech/data_prepared/${LANGUAGE}/swc/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tatoeba /DeepSpeech/data_original/${LANGUAGE}/tatoeba/ /DeepSpeech/data_prepared/${LANGUAGE}/tatoeba/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --tuda /DeepSpeech/data_original/${LANGUAGE}/tuda/ /DeepSpeech/data_prepared/${LANGUAGE}/tuda/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --voxforge /DeepSpeech/data_original/${LANGUAGE}/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/kurzgesagt/ /DeepSpeech/data_prepared/${LANGUAGE}/kurzgesagt/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/musstewissen_deutsch/ /DeepSpeech/data_prepared/${LANGUAGE}/musstewissen_deutsch/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/musstewissen_mathe/ /DeepSpeech/data_prepared/${LANGUAGE}/musstewissen_mathe/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/musstewissen_physik/ /DeepSpeech/data_prepared/${LANGUAGE}/musstewissen_physik/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/musstewissen_chemie/ /DeepSpeech/data_prepared/${LANGUAGE}/musstewissen_chemie/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/pulsreportage/ /DeepSpeech/data_prepared/${LANGUAGE}/pulsreportage/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/terrax/ /DeepSpeech/data_prepared/${LANGUAGE}/terrax/
+python3 /DeepSpeech/deepspeech-polyglot/corpora/prepare_datasets.py --youtube_dir /DeepSpeech/data_original/${LANGUAGE}/ykollektiv/ /DeepSpeech/data_prepared/${LANGUAGE}/ykollektiv/
 python3 /DeepSpeech/deepspeech-polyglot/preprocessing/prepare_data.py --zamia_speech /DeepSpeech/data_original/${LANGUAGE}/zamia_speech/ /DeepSpeech/data_prepared/${LANGUAGE}/zamia_speech/
 
 # To combine multiple datasets run:
@@ -280,7 +319,7 @@ export LANGUAGE="de"
 python3 /DeepSpeech/data/lm/generate_lm.py --input_txt /DeepSpeech/data_prepared/texts/${LANGUAGE}/clean_vocab.txt --output_dir /DeepSpeech/data_prepared/texts/${LANGUAGE}/ \
     --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ --arpa_order 5 --max_arpa_memory "85%" --arpa_prune "0|0|1" --binary_a_bits 255 --binary_q_bits 8 --binary_type trie --discount_fallback
 
-python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary \
+/DeepSpeech/data/lm/generate_scorer_package --alphabet /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt --lm /DeepSpeech/data_prepared/texts/${LANGUAGE}/lm.binary \
     --vocab /DeepSpeech/data_prepared/texts/${LANGUAGE}/vocab-500000.txt --package /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer --default_alpha 0.8223176270809696 --default_beta 0.25566134318440037
 
 # Optimized scorer alpha and beta values:
@@ -290,7 +329,6 @@ python3 /DeepSpeech/data/lm/generate_package.py --alphabet /DeepSpeech/deepspeec
 # French: --default_alpha 0.9000153993017823 --default_beta 2.478779501401466
 # Italian: --default_alpha 0.910619981788069 --default_beta 0.15660475671195578
 # Polish: --default_alpha 1.3060110864019918 --default_beta 3.5010876706821334
-
 ```
 
 <br/>
@@ -364,16 +402,16 @@ sys.exit(1)
 Download pretrained deepspeech checkpoints.
 
 ```bash
-wget https://github.com/mozilla/DeepSpeech/releases/download/v0.7.3/deepspeech-0.7.3-checkpoint.tar.gz -P checkpoints/
-tar xvfz checkpoints/deepspeech-0.7.3-checkpoint.tar.gz -C checkpoints/
-rm checkpoints/deepspeech-0.7.3-checkpoint.tar.gz
+wget https://github.com/mozilla/DeepSpeech/releases/download/v0.8.1/deepspeech-0.8.1-checkpoint.tar.gz -P checkpoints/
+tar xvfz checkpoints/deepspeech-0.8.1-checkpoint.tar.gz -C checkpoints/
+rm checkpoints/deepspeech-0.8.1-checkpoint.tar.gz
 ```
 
 Adjust the parameters/scripts to your needs (Run in container):
 
 ```bash
 # Run a training using the english checkpoint:
-/bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/train_azce.csv /DeepSpeech/data_prepared/voxforge/dev_azce.csv /DeepSpeech/data_prepared/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.7.3-checkpoint/
+/bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/de/voxforge/train_azce.csv /DeepSpeech/data_prepared/de/voxforge/dev_azce.csv /DeepSpeech/data_prepared/de/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.8.1-checkpoint/
 
 # Run test only
 # Don't forget to use the noiseaugmaster image if testing with noise
@@ -404,6 +442,33 @@ python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/de/voxf
 
 # Or to run a cycled training as described in the paper, run:
 python3 /DeepSpeech/deepspeech-polyglot/training/cycled_training.py /DeepSpeech/checkpoints/de/voxforge/ /DeepSpeech/data_prepared/de/ _azce --voxforge
+```
+
+<br/>
+
+Training with wav2letter:
+
+```bash
+export LANGUAGE="de"
+
+# Build docker container
+git clone https://github.com/facebookresearch/wav2letter.git
+cd wav2letter && git checkout v0.2
+docker build --no-cache -f ./Dockerfile-CUDA -t wav2letter .
+cd ..
+
+# Convert csv files to lst files:
+python3 deepspeech-polyglot/preprocessing/ds_to_w2l.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv /DeepSpeech/data_prepared/${LANGUAGE}/w2l_voxforge/train_azce.lst
+
+# Generate lexicon file:
+python3 deepspeech-polyglot/preprocessing/create_w2l_lexicon.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/dev_azce.csv /DeepSpeech/data_prepared/texts/${LANGUAGE}/lexicon.txt
+
+Run training with single gpu (Uncomment according parts in run_container.sh to run this):
+mpirun -n 1 --allow-run-as-root /root/wav2letter/build/Train continue --flagsfile /root/deepspeech-polyglot/training/train.cfg
+mpirun -n 1 --allow-run-as-root /root/wav2letter/build/Decoder --flagsfile /root/deepspeech-polyglot/training/decode.cfg
+
+Continue training:
+mpirun -n 1 --allow-run-as-root /root/wav2letter/build/Train continue checkpoints/w2l/voxforge_conv_glu/
 ```
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch.
@@ -596,11 +661,47 @@ Using new CommonVoice v5 releases: \
 
 <br/>
 
+| Dataset                        | Additional Infos                                                                                      | Losses                                 | Training epochs of best model | Total training duration | WER       |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ----------------------- | --------- |
+| Voxforge                       | updated rlrop; frozen transfer-learning; no augmentation; es_min_delta=0.9                            | Test: 37.707958, Validation: 41.832220 | 12 + 3                        | 42 min                  |           |
+| Voxforge                       | like above; without frozen transfer-learning;                                                         | Test: 36.630890, Validation: 41.208125 | 7                             | 28 min                  |           |
+| Voxforge                       | dropped last layer                                                                                    | Test: 42.516270, Validation: 47.105518 | 8                             | 28 min                  |           |
+| Voxforge                       | dropped last layer; with frozen transfer-learning in two steps                                        | Test: 36.600590, Validation: 40.640134 | 14 + 8                        | 42 min                  |           |
+| Voxforge                       | updated rlrop; with augmentation; es_min_delta=0.9                                                    | Test: 35.540062, Validation: 39.974685 | 6                             | 46 min                  |           |
+| Voxforge                       | updated rlrop; with old augmentations; es_min_delta=0.1                                               | Test: 30.655203, Validation: 33.655750 | 9                             | 48 min                  |           |
+| TerraX + Voxforge + YKollektiv | Voxforge only for dev+test but not in train; rest like above                                          | Test: 32.936977, Validation: 36.828410 | 19                            | 4:53 h                  |           |
+| Voxforge                       | layer normalization; updated rlrop; with old augmentations; es_min_delta=0.1                          | Test: 57.330410, Validation: 61.025009 | 45                            | 2:37 h                  |           |
+| Voxforge                       | dropout=0.3; updated rlrop; with old augmentations; es_min_delta=0.1                                  | Test: 30.353968, Validation: 33.144178 | 20                            | 1:15 h                  |           |
+| Voxforge                       | es_min_delta=0.05; updated rlrop; with old augmentations                                              | Test: 29.884317, Validation: 32.944382 | 12                            | 54 min                  |           |
+| Voxforge                       | fixed updated rlrop; es_min_delta=0.05; with old augmentations                                        | Test: 28.903509, Validation: 32.322064 | 34                            | 1:40 h                  |           |
+| Voxforge                       | from scratch; no augmentations; fixed updated rlrop; es_min_delta=0.05                                | Test: 74.347054, Validation: 79.838900 | 28                            | 1:26 h                  | 0.38      |
+| Voxforge                       | wav2letter; stopped by hand after one/two overnight runs; from scratch; no augmentations; single gpu; |                                        | 18/37                         | 16/33 h                 | 0.61/0.61 |
+
+<br/>
+
+| Datasets                                                                                                                                                                                                                                  | Additional Infos                                                                                                                                                                                                                                                                                                                                                                                                | Training epochs of best model <br><br> Total training duration | Losses <br><br> Result                                                       |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| BasFormtask + BasSprecherinnen + CommonVoice + CssTen + Gothic + LinguaLibre + Kurzgesagt + Mailabs + MussteWissen + PulsReportage + SWC + Tatoeba + TerraX + Tuda + Voxforge + YKollektiv + ZamiaSpeech + 5x CV-SingleWords <br> (D17S5) | test with Voxforge + Tuda + CommonVoice others completely for training; files 10x with different augmentations; noise overlay; fixed updated rlrop; optimized german scorer; updated dataset cleaning algorithm -> include more short files; added the CV-SingleWords dataset five times because the last checkpoint had problems detecting short speech commands -> a bit more focus on training shorter words | 24 <br><br> 7d 8h (7x V100-GPU)                                | Test: 25.082140, Validation: 23.345149 <br><br> WER: 0.161870, CER: 0.068542 |
+
+<br/>
+
 #### Language Models and Checkpoints
 
+By default the checkpoints are provided under the same licence as this repository,
+but some of the datasets have extra conditions which also have to be applied. \
+Please check this yourself for the models you want to use. Some important ones are:
+
+- Gothic: Non commercial
+- Tatoeba: Various, depending on speakers
+- Voxforge: GPL
+- All extractions from Youtube videos: Non commercial
+
+<br/>
+
 **German:** \
-(WER: 0.166, Train: ~1358h, Test: ~41h) \
-Checkpoints of CCLMSTTVZ training, graph model and scorer with training transcriptions: [Link](https://drive.google.com/drive/folders/1oO-N-VH_0P89fcRKWEUlVDm-_z18Kbkb?usp=sharing)
+(WER: 0.162, Train: ~1582h, Test: ~41h) \
+Checkpoints of D17S5 training, graph model and scorer with training transcriptions: [Link](https://drive.google.com/drive/folders/1oO-N-VH_0P89fcRKWEUlVDm-_z18Kbkb?usp=sharing) \
+You can also find some older checkpoints there.
 
 **Spanish:** \
 (WER: 0.188, Train: ~630h, Test: ~25h) \
@@ -620,6 +721,29 @@ Checkpoints of CLM training, graph model and scorer: [Link](https://drive.google
 
 <br/>
 
+Create checkpoint sharing file:
+
+```bash
+export LANGUAGE="de"
+export ReadFrom="d17s5_0162"
+export SaveTo="d17s5"
+
+# Copy files
+cd ~/checkpoints/${LANGUAGE}/
+mkdir ${SaveTo}
+cp "${ReadFrom}/flags.txt" "${SaveTo}/"
+cp "${ReadFrom}/best_dev_checkpoint" "${SaveTo}/"
+cp "${ReadFrom}/"best_dev-* "${SaveTo}/"
+
+# Delete english transfer learning checkpoint
+rm "${SaveTo}/"best_dev-732522.*
+
+# Compress
+GZIP=-9 tar cvzf "${SaveTo}_${LANGUAGE}.tar.gz" "${SaveTo}/"
+```
+
+<br/>
+
 ## Contribution
 
 You can contribute to this project in multiple ways:
@@ -633,8 +757,8 @@ You can contribute to this project in multiple ways:
 - Train new models or improve the existing \
    (Requires a gpu and a lot of time, or multiple gpus and some time)
 - Experiment with the language models
-- Last but not least, you can also donate for my electricity bill. \
-   And if you are using this commercially, I suggest to think about some gpus instead;)
+- Last but not least, you can also buy me a coffee. \
+   And if you are using this commercially, I suggest to think about a coffee machine instead;) \
   [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HMN45MDHCNJNQ) (PayPal)
 
 <br/>

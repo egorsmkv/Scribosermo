@@ -64,6 +64,9 @@ def print_statistics(data):
     msg = "Time per char --- AVG: {:.2f}   STD: {:.2f}   MIN: {:.2f}   MAX: {:.2f}"
     print(msg.format(col_data.mean(), col_data.std(), col_data.min(), col_data.max()))
 
+    avg_time = data["duration"].mean() / data["text_length"].mean()
+    print("Average time per char weighted by duration: {:.4f}".format(avg_time))
+
     print("")
 
 
@@ -71,9 +74,9 @@ def print_statistics(data):
 
 
 def clean(data):
-    # Keep only files longer than 1 second
+    # Keep only files longer than 0.5 seconds
     length_old = len(data)
-    data = data[data["duration"] > 1]
+    data = data[data["duration"] > 0.5]
     print("Excluded", length_old - len(data), "files with too short duration")
 
     # Keep only files less than 45 seconds
@@ -81,26 +84,26 @@ def clean(data):
     data = data[data["duration"] < 45]
     print("Excluded", length_old - len(data), "files with too long duration")
 
-    # Drop files spoken to fast
+    # Drop files which need more than 3 seconds per char
     length_old = len(data)
-    avg_time = data["avg_time_per_char"].mean()
-    data = data[data["avg_time_per_char"] > avg_time / 3]
-    print("Excluded", length_old - len(data), "files with too fast char rate")
+    data = data[data["avg_time_per_char"] < 3]
+    print("Excluded", length_old - len(data), "files with too slow char rate")
 
-    # Drop files with a char rate below a second
+    # Drop files spoken too fast
     length_old = len(data)
-    data = data[data["avg_time_per_char"] < 1]
-    print("Excluded", length_old - len(data), "files with a much too slow char rate")
+    avg_time = data["duration"].mean() / data["text_length"].mean()
+    data = data[data["avg_time_per_char"] > avg_time / 2]
+    print("Excluded", length_old - len(data), "files with too fast speaking speed")
 
-    # Keep only files which are not to slowly spoken,
-    # except for very short files which may have longer pauses
+    # Drop files spoken much too slow, this often means they have a wrong transcription
+    # Except for very short files which may have longer pauses
     length_old = len(data)
-    avg_time = data["avg_time_per_char"].mean()
+    avg_time = data["duration"].mean() / data["text_length"].mean()
     avg_length = data["text_length"].mean()
     std_avg_time = data["avg_time_per_char"].std()
     data = data[
         (data["avg_time_per_char"] < avg_time + 3 * std_avg_time)
-        | (data["text_length"] < avg_length / 3)
+        | (data["text_length"] < avg_length / 5)
     ]
     print("Excluded", length_old - len(data), "files with too slow speaking speed")
 
