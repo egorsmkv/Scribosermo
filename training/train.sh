@@ -50,7 +50,7 @@ if [[ "${USE_AUGMENTATION}" == "1" ]]; then
       --augment codec[p=0.1,bitrate=48000:16000] \
       --augment volume[p=0.1,dbfs=-10:-40]"
     AUG_SPEECH="--augment overlay[p=0.3,source=$TRAIN_FILE,layers=7:1,snr=30:15~9]"
-    AUG_NOISE="--augment overlay[p=0.5,source=$NOISE_FILE,layers=2:1,snr=15:9~5]"
+    AUG_NOISE="--augment overlay[p=0.5,source=$NOISE_FILE,layers=2:1,snr=18:9~5]"
     CACHING="--feature_cache /tmp/ \
       --augmentations_per_epoch 10"
 

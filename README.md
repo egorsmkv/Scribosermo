@@ -679,6 +679,12 @@ Using new CommonVoice v5 releases: \
 
 <br/>
 
+| Dataset                                                                                                                                                                                                                              | Additional Infos                                                                                                                                                                                                                                                                                                                                                                    | Losses                                 | Training epochs of best model | Total training duration | Result                       |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ----------------------- | ---------------------------- |
+| BasFormtask + BasSprecherinnen + CommonVoice + CssTen + Gothic + LinguaLibre + Kurzgesagt + Mailabs + MussteWissen + PulsReportage + SWC + Tatoeba + TerraX + Tuda + Voxforge + YKollektiv + ZamiaSpeech + 5x CV-SingleWords (D17S5) | test with Voxforge + Tuda + CommonVoice others completely for training; noise overlay; fixed updated rlrop; optimized german scorer; updated dataset cleaning algorithm -> include more short files; reason for adding the CV-SingleWords dataset five times is that the last checkpoint had problems detecting short speech commands -> a bit more focus on training shorter words | Test: 25.082140, Validation: 23.345149 | 24                            | 7d 8h (7x V100-GPU)     | WER: 0.161870, CER: 0.068542 |
+
+<br/>
+
 #### Language Models and Checkpoints
 
 By default the checkpoints are provided under the same licence as this repository,
@@ -693,8 +699,9 @@ Please check this yourself for the models you want to use. Some important ones a
 <br/>
 
 **German:** \
-(WER: 0.166, Train: ~1358h, Test: ~41h) \
-Checkpoints of CCLMSTTVZ training, graph model and scorer with training transcriptions: [Link](https://drive.google.com/drive/folders/1oO-N-VH_0P89fcRKWEUlVDm-_z18Kbkb?usp=sharing)
+(WER: 0.162, Train: ~1582h, Test: ~41h) \
+Checkpoints of D17S5 training, graph model and scorer with training transcriptions: [Link](https://drive.google.com/drive/folders/1oO-N-VH_0P89fcRKWEUlVDm-_z18Kbkb?usp=sharing) \
+You can also find some older checkpoints there.
 
 **Spanish:** \
 (WER: 0.188, Train: ~630h, Test: ~25h) \
@@ -727,8 +734,8 @@ You can contribute to this project in multiple ways:
 - Train new models or improve the existing \
    (Requires a gpu and a lot of time, or multiple gpus and some time)
 - Experiment with the language models
-- Last but not least, you can also donate for my electricity bill. \
-   And if you are using this commercially, I suggest to think about some gpus instead;) \
+- Last but not least, you can also buy me a coffee. \
+   And if you are using this commercially, I suggest to think about a coffee machine instead;) \
   [![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HMN45MDHCNJNQ) (PayPal)
 
 <br/>
