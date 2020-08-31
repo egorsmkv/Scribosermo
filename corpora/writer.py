@@ -19,8 +19,8 @@ if True:  # pylint: disable=using-constant-test
 
 
 def write_dataset(dataset, path):
-    """ Saves a dataset in DeepSpeech format.
-    Input a list of dicts containing at least 'file' and 'transcription' keys. """
+    """Saves a dataset in DeepSpeech format.
+    Input a list of dicts containing at least 'file' and 'transcription' keys."""
     print("\nSaving dataset ...")
 
     # Create or delete and recreate target directory
@@ -35,9 +35,7 @@ def write_dataset(dataset, path):
     new_dataset = [d for d in new_dataset if d is not None]
 
     dataset = pd.DataFrame(new_dataset)
-    dataset.to_csv(
-        os.path.join(path, "all.csv"), index=False, encoding="utf-8",
-    )
+    dataset.to_csv(os.path.join(path, "all.csv"), index=False, encoding="utf-8")
 
 
 # ==================================================================================================

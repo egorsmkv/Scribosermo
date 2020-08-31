@@ -108,7 +108,7 @@ def main():
         data_test = data.iloc[int(datasize * splits[0] + datasize * splits[1]) :]
 
     msg = "Length of train, dev and test files: {} {} {}"
-    print(msg.format(len(data_train), len(data_dev), len(data_test),))
+    print(msg.format(len(data_train), len(data_dev), len(data_test)))
 
     outpath = os.path.dirname(args.csv_to_split_path)
     data_train.to_csv(
