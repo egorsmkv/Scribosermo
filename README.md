@@ -679,9 +679,9 @@ Using new CommonVoice v5 releases: \
 
 <br/>
 
-| Dataset                                                                                                                                                                                                                              | Additional Infos                                                                                                                                                                                                                                                                                                                                                                    | Losses                                 | Training epochs of best model | Total training duration | Result                       |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------- | ----------------------- | ---------------------------- |
-| BasFormtask + BasSprecherinnen + CommonVoice + CssTen + Gothic + LinguaLibre + Kurzgesagt + Mailabs + MussteWissen + PulsReportage + SWC + Tatoeba + TerraX + Tuda + Voxforge + YKollektiv + ZamiaSpeech + 5x CV-SingleWords (D17S5) | test with Voxforge + Tuda + CommonVoice others completely for training; noise overlay; fixed updated rlrop; optimized german scorer; updated dataset cleaning algorithm -> include more short files; reason for adding the CV-SingleWords dataset five times is that the last checkpoint had problems detecting short speech commands -> a bit more focus on training shorter words | Test: 25.082140, Validation: 23.345149 | 24                            | 7d 8h (7x V100-GPU)     | WER: 0.161870, CER: 0.068542 |
+| Datasets                                                                                                                                                                                                                                  | Additional Infos                                                                                                                                                                                                                                                                                                                                                                                                | Training epochs of best model <br><br> Total training duration | Losses <br><br> Result                                                       |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| BasFormtask + BasSprecherinnen + CommonVoice + CssTen + Gothic + LinguaLibre + Kurzgesagt + Mailabs + MussteWissen + PulsReportage + SWC + Tatoeba + TerraX + Tuda + Voxforge + YKollektiv + ZamiaSpeech + 5x CV-SingleWords <br> (D17S5) | test with Voxforge + Tuda + CommonVoice others completely for training; files 10x with different augmentations; noise overlay; fixed updated rlrop; optimized german scorer; updated dataset cleaning algorithm -> include more short files; added the CV-SingleWords dataset five times because the last checkpoint had problems detecting short speech commands -> a bit more focus on training shorter words | 24 <br><br> 7d 8h (7x V100-GPU)                                | Test: 25.082140, Validation: 23.345149 <br><br> WER: 0.161870, CER: 0.068542 |
 
 <br/>
 
@@ -718,6 +718,29 @@ Checkpoints of CLMV training, graph model and scorer: [Link](https://drive.googl
 **Polish:** \
 (WER: 0.034, Train: ~157h, Test: ~6h) \
 Checkpoints of CLM training, graph model and scorer: [Link](https://drive.google.com/drive/folders/1_hia1rRmmsLRrFIHANH4254KKZhY3p1c?usp=sharing)
+
+<br/>
+
+Create checkpoint sharing file:
+
+```bash
+export LANGUAGE="de"
+export ReadFrom="d17s5_0162"
+export SaveTo="d17s5"
+
+# Copy files
+cd ~/checkpoints/${LANGUAGE}/
+mkdir ${SaveTo}
+cp "${ReadFrom}/flags.txt" "${SaveTo}/"
+cp "${ReadFrom}/best_dev_checkpoint" "${SaveTo}/"
+cp "${ReadFrom}/"best_dev-* "${SaveTo}/"
+
+# Delete english transfer learning checkpoint
+rm "${SaveTo}/"best_dev-732522.*
+
+# Compress
+GZIP=-9 tar cvzf "${SaveTo}_${LANGUAGE}.tar.gz" "${SaveTo}/"
+```
 
 <br/>
 
