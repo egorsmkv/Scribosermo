@@ -38,7 +38,7 @@ echo ""
 echo "Running test with arguments: ${DSARGS}"
 echo ""
 echo ""
-python3 -u /DeepSpeech/DeepSpeech.py "${DSARGS}"
+/bin/bash -c "python3 -u /DeepSpeech/DeepSpeech.py ${DSARGS}"
 
 echo ""
 echo "FINISHED TESTING"

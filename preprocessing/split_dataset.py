@@ -48,6 +48,12 @@ def main():
         data_dev = data[data["wav_filename"].str.contains("/dev/")]
         data_test = data[data["wav_filename"].str.contains("/test/")]
 
+        # Drop all recordings with Realtek microphone, because they're not in the official test set
+        # See chapter 3.2 of the paper:
+        # https://edoc.sub.uni-hamburg.de/informatik/volltexte/2018/243/pdf/milde_koehn_german_asr.pdf
+        data_dev = data_dev[~data_dev["wav_filename"].str.contains("Realtek")]
+        data_test = data_test[~data_test["wav_filename"].str.contains("Realtek")]
+
     elif args.common_voice:
         # Extract filename from path
         data["filename"] = data.apply(
