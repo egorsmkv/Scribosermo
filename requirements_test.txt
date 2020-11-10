@@ -1,6 +1,7 @@
 anybadge
 black
 flake8
+flake8_polyfill
 isort<5
 num2words
 pygount
