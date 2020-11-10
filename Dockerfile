@@ -10,17 +10,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends sox libsox-dev
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg
 RUN pip install --no-cache-dir --upgrade pydub
 
-# Delete apt cache to save space
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
-
 # Update pip
 RUN python3 -m pip install --upgrade pip
 
 # Install python packages
 RUN pip3 install --no-cache-dir --upgrade \
     num2words \
-    google-cloud-texttospeech
+    google-cloud-texttospeech \
+    pytest pytest-cov \
+    progressist
 
 # Fix error: AttributeError: module 'gast' has no attribute 'Num'
 RUN pip3 install --no-cache-dir gast==0.2.2
@@ -34,9 +32,6 @@ RUN pip3 install --upgrade --no-cache-dir setuptools
 # Update pandas version to fix an error
 RUN pip3 install --upgrade --no-cache-dir pandas
 
-RUN pip3 install --upgrade --no-cache-dir pytest pytest-cov
-RUN pip3 install --upgrade --no-cache-dir progressist
-
 # Install audiomate
 RUN pip3 install --upgrade git+https://github.com/danbmh/audiomate.git@new_features
 #RUN pip3 install --no-cache-dir audiomate
@@ -46,8 +41,9 @@ RUN cd /DeepSpeech/data/lm/ \
     && curl -LO https://github.com/mozilla/DeepSpeech/releases/latest/download/native_client.amd64.cpu.linux.tar.xz \
     && tar xvf native_client.*.tar.xz
 
-RUN pip3 install --upgrade --no-cache-dir install youtube_dl
-RUN pip3 install --upgrade --no-cache-dir install youtube_transcript_api
+# Youtube downloading requirements
+RUN pip3 install --upgrade --no-cache-dir youtube_dl
+RUN pip3 install --upgrade --no-cache-dir youtube_transcript_api
 RUN pip3 install --upgrade git+https://github.com/DanBmh/aud-crawler@some_improvements
 
 CMD ["/bin/bash"]
