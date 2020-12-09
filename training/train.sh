@@ -1,7 +1,5 @@
 #! /bin/bash
 
-LANGUAGE="de"
-
 CHECKPOINT_DIR=${1:-"/DeepSpeech/checkpoints/${LANGUAGE}/voxforge/"}
 TRAIN_FILE=${2:-"/DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv"}
 DEV_FILE=${3:-"/DeepSpeech/data_prepared/${LANGUAGE}/voxforge/dev_azce.csv"}
@@ -118,8 +116,8 @@ echo "Converting output graph for inference:"
 echo ""
 if [[ -f ${CHECKPOINT_DIR}"best_dev_checkpoint" ]]; then
   python3 -u /DeepSpeech/DeepSpeech.py --checkpoint_dir "${CHECKPOINT_DIR}" \
-    --scorer /DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer \
-    --alphabet_config_path /DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt \
+    --scorer "/DeepSpeech/data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer" \
+    --alphabet_config_path "/DeepSpeech/deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt" \
     --export_tflite --export_dir "${CHECKPOINT_DIR}" \
     && mv "${CHECKPOINT_DIR}output_graph.tflite" "${CHECKPOINT_DIR}output_graph_${LANGUAGE}.tflite"
 fi

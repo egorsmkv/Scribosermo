@@ -1,7 +1,5 @@
 #! /bin/bash
 
-LANGUAGE="de"
-
 CHECKPOINT_DIR=${1:-"/DeepSpeech/checkpoints/${LANGUAGE}/voxforge/"}
 TEST_FILE=${2:-"/DeepSpeech/data_prepared/${LANGUAGE}/voxforge/test_azce.csv"}
 
