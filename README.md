@@ -410,16 +410,18 @@ rm checkpoints/deepspeech-0.8.1-checkpoint.tar.gz
 Adjust the parameters/scripts to your needs (Run in container):
 
 ```bash
+export LANGUAGE="de"
+
 # Run a training using the english checkpoint:
-/bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/de/voxforge/train_azce.csv /DeepSpeech/data_prepared/de/voxforge/dev_azce.csv /DeepSpeech/data_prepared/de/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.8.1-checkpoint/
+/bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/dev_azce.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/test_azce.csv 1 /DeepSpeech/checkpoints/deepspeech-0.8.1-checkpoint/
 
 # Run test only
 # Don't forget to use the noiseaugmaster image if testing with noise
-/bin/bash /DeepSpeech/deepspeech-polyglot/training/test_noise.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/test_azce.csv
+/bin/bash /DeepSpeech/deepspeech-polyglot/training/test_noise.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/test_azce.csv
 
 # Optimize scorer alpha and beta values
 # Requires a trained checkpoint and a scorer (used alpha and beta values are not important)
-/bin/bash /DeepSpeech/deepspeech-polyglot/training/optimize_scorer.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/voxforge/dev_azce.csv
+/bin/bash /DeepSpeech/deepspeech-polyglot/training/optimize_scorer.sh /DeepSpeech/checkpoints/voxforge/ /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/dev_azce.csv
 ```
 
 <br/>

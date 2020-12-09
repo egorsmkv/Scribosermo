@@ -1,6 +1,5 @@
 #! /bin/bash
 
-LANGUAGE="de"
 BATCH_SIZE=24
 TRIALS=800
 
