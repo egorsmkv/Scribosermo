@@ -225,7 +225,7 @@ def main():
     # tf.summary.trace_on(graph=True, profiler=True)
     # tf.summary.trace_on(graph=True, profiler=False)
 
-    model = nets.deepspeech.DeepSpeech(batch_size=batch_size)
+    model = nets.deepspeech1.MyModel()
     model.build(input_shape=(None, None, 26))
     model.summary()
 
