@@ -11,7 +11,6 @@ class MyModel(Model):
         super(MyModel, self).__init__()
 
         self.n_input = 26
-        self.n_context = 9
         self.n_hidden = 2048
         self.relu_clip = 20
         self.dropout_rate = 0.05
@@ -19,16 +18,24 @@ class MyModel(Model):
         alphabet = " abcdefghijklmnopqrstuvwxyz'"
         self.n_output = len(alphabet) + 1
 
-        # Create a constant convolution filter using an identity matrix, so that the
-        # convolution returns patches of the input tensor as is,
-        # and we can create overlapping windows over the features.
-        window_width = 2 * self.n_context + 1
-        window_size = window_width * self.n_input
-        filter = np.eye(window_size)
-        filter = filter.reshape(window_width, self.n_input, window_size)
-        self.eye_filter = tf.constant(filter, tf.float32)
+        self.n_context = 9
+        self.window_width = 2 * self.n_context + 1
+        self.window_size = self.window_width * self.n_input
 
         self.model = self.make_model()
+
+    # ==============================================================================================
+
+    def window_kernel_init(self, shape, dtype=None):
+        """Create a constant convolution filter using an identity matrix, so that the
+        convolution returns patches of the input tensor as is, and we can create
+        overlapping windows over the features.
+        Using extra kernel init function to make the window layer exportable as saved model"""
+
+        filter = np.eye(self.window_size)
+        filter = filter.reshape(self.window_width, self.n_input, self.window_size)
+        eye_filter = tf.constant(filter, dtype=dtype)
+        return eye_filter
 
     # ==============================================================================================
 
@@ -39,10 +46,14 @@ class MyModel(Model):
         model.add(tfl.Input(shape=[None, self.n_input], name="input"))
 
         # Create overlapping windows, returns shape [batch_size, steps, window_width * n_input]
-        lfunc = lambda x: tf.nn.conv1d(
-            x, filters=self.eye_filter, stride=1, padding="SAME"
+        window_conv = tfl.Conv1D(
+            self.window_size,
+            [self.window_width],
+            kernel_initializer=self.window_kernel_init,
+            padding="SAME",
+            trainable=False,
         )
-        model.add(tfl.Lambda(lfunc))
+        model.add(window_conv)
 
         # Dense 1
         model.add(tfl.TimeDistributed(tfl.Dense(self.n_hidden)))
