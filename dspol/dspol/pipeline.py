@@ -124,7 +124,7 @@ def create_pipeline(csv_path: str, batch_size: int, is_training: bool = False):
         ),
     )
 
-    ds = ds.cache("/tmp/dspol_cache")
+    # ds = ds.cache("/tmp/dspol_cache")
     ds = ds.repeat(50)
     ds = ds.prefetch(buffer_size=AUTOTUNE)
     return ds

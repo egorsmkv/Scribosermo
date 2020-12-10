@@ -14,6 +14,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
+        "numpy",
         "pandas",
         "tensorflow",
         "tqdm",
