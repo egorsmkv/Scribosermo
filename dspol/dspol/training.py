@@ -68,6 +68,7 @@ def loss_function(predictions, logit_lengths, samples):
         label_length=label_lengths,
         logit_length=logit_lengths,
         blank_index=-1,
+        logits_time_major=False,
     )
 
     loss = tf.reduce_mean(loss)
@@ -81,7 +82,7 @@ def get_loss(predictions, samples):
     # Calculate logit length here, that we can decorate the loss calculation
     # with a tf-function call for much faster calculations
     logit_lengths = tf.constant(
-        tf.shape(predictions)[0], shape=tf.shape(predictions)[1]
+        tf.shape(predictions)[1], shape=tf.shape(predictions)[0]
     )
     # logit_lengths = samples["feature_length"]
     loss = loss_function(predictions, logit_lengths, samples)
@@ -117,8 +118,7 @@ def train_step(samples, step):
 
 def log_greedy_text(predictions, samples):
 
-    # Drop all except first sample (shape is [n_steps, batch_size, n_hidden_6])
-    predictions = tf.transpose(predictions, perm=[1, 0, 2])
+    # Drop all except first sample, and switch batch_size and time_steps
     predictions = tf.expand_dims(predictions[0], axis=0)
     predictions = tf.transpose(predictions, perm=[1, 0, 2])
 
@@ -149,10 +149,6 @@ def train(dataset_train, dataset_val, start_epoch, stop_epoch):
         for samples in dataset_train:
 
             # tf.summary.trace_on(graph=True, profiler=False)
-
-            # Reset lstm states between batches, state is only required for streaming api
-            if step != 0:
-                model.reset_states()
 
             # tf.profiler.experimental.client.trace('grpc://localhost:6009',
             #                                       checkpoint_dir, 2000)

@@ -81,24 +81,14 @@ class MyModel(Model):
         # Dense 6
         model.add(tfl.TimeDistributed(tfl.Dense(self.n_output)))
 
-        # Transpose to shape [n_steps, batch_size, n_output]
-        model.add(tfl.Lambda(lambda x: tf.transpose(x, perm=[1, 0, 2])))
-
-        # Named output layer
         model.add(tfl.Lambda(lambda x: x, name="output"))
-
         return model
 
     # ==============================================================================================
 
-    def reset_states(self):
-        # self.lstm.reset_states()
-        pass
-
-    # ==============================================================================================
-
     def call(self, x, training=False):
-        """Call with input shape: [batch_size, n_steps, n_input]"""
+        """Call with input shape: [batch_size, steps_a, n_input],
+        outputs tensor of shape: [batch_size, steps_b, n_output]"""
 
         x = self.model(x)
         return x
