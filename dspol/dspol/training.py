@@ -223,6 +223,7 @@ def main():
 
     model = nets.deepspeech1.MyModel()
     # model = nets.deepspeech2.MyModel()
+    model = nets.jasper.MyModel(blocks=5, module_repeat=3, dense_residuals=True)
     model.build(input_shape=(None, None, 26))
     model.summary()
 
