@@ -221,9 +221,10 @@ def main():
     # tf.summary.trace_on(graph=True, profiler=True)
     # tf.summary.trace_on(graph=True, profiler=False)
 
-    model = nets.deepspeech1.MyModel()
+    # model = nets.deepspeech1.MyModel()
     # model = nets.deepspeech2.MyModel()
-    model = nets.jasper.MyModel(blocks=5, module_repeat=3, dense_residuals=True)
+    # model = nets.jasper.MyModel(blocks=5, module_repeat=3, dense_residuals=True)
+    model = nets.quartznet.MyModel(blocks=5, module_repeat=5)
     model.build(input_shape=(None, None, 26))
     model.summary()
 
