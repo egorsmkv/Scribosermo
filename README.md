@@ -113,9 +113,12 @@ my_deepspeech_folder
 Clone DeepSpeech and build container:
 
 ```bash
-git clone https://github.com/mozilla/DeepSpeech.git
+# Until PR #3247 is merged, use my fork which enables improved transfer learning.
+# git clone https://github.com/mozilla/DeepSpeech.git
+git clone https://github.com/DanBmh/DeepSpeech.git
+cd DeepSpeech && git checkout freezed_transfer && cd ..
 
-# Or for for testing with noise
+# Or for testing with noise
 git clone https://github.com/DanBmh/DeepSpeech.git
 cd DeepSpeech && git checkout noiseaugmaster && cd ..
 
