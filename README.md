@@ -113,13 +113,10 @@ my_deepspeech_folder
 Clone DeepSpeech and build container:
 
 ```bash
-# git clone https://github.com/mozilla/DeepSpeech.git
+git clone https://github.com/mozilla/DeepSpeech.git
+
+# Or for for testing with noise
 git clone https://github.com/DanBmh/DeepSpeech.git
-
-# checkout older version because I have the feeling that augmentations did work better
-cd DeepSpeech && git checkout before_new_augs2 && cd ..
-
-# or for for testing with noise
 cd DeepSpeech && git checkout noiseaugmaster && cd ..
 
 cd DeepSpeech && make Dockerfile.train && cd ..
