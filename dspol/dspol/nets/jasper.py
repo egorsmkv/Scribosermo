@@ -2,7 +2,6 @@ import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
 
-
 # ==================================================================================================
 
 
@@ -54,7 +53,7 @@ class PartialBlock(Model):
 
 
 class MyModel(Model):
-    def __init__(self, blocks, module_repeat, dense_residuals):
+    def __init__(self, input_channels, blocks, module_repeat, dense_residuals):
         super(MyModel, self).__init__()
 
         # Params: output_filters, kernel_size, dropout
@@ -71,7 +70,7 @@ class MyModel(Model):
 
         alphabet = " abcdefghijklmnopqrstuvwxyz'"
         self.n_output = len(alphabet) + 1
-        self.n_input = 26
+        self.n_input = input_channels
 
         self.model = self.make_model(
             block_params, block_repeat, module_repeat, dense_residuals

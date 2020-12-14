@@ -2,7 +2,6 @@ import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
 
-
 # ==================================================================================================
 
 
@@ -78,7 +77,7 @@ class MyModel(Model):
     """See Quartznet example config at:
     https://github.com/NVIDIA/OpenSeq2Seq/blob/master/example_configs/speech2text/"""
 
-    def __init__(self, blocks, module_repeat):
+    def __init__(self, input_channels, blocks, module_repeat):
         super(MyModel, self).__init__()
 
         block_params = [
@@ -94,7 +93,7 @@ class MyModel(Model):
 
         alphabet = " abcdefghijklmnopqrstuvwxyz'"
         self.n_output = len(alphabet) + 1
-        self.n_input = 26
+        self.n_input = input_channels
 
         self.model = self.make_model(block_params, block_repeat, module_repeat)
 

@@ -7,10 +7,10 @@ from tensorflow.keras import layers as tfl
 
 
 class MyModel(Model):
-    def __init__(self):
+    def __init__(self, input_channels):
         super(MyModel, self).__init__()
 
-        self.n_input = 26
+        self.n_input = input_channels
         self.n_lstms = 5
         self.n_hidden = 1024
         self.relu_clip = 20

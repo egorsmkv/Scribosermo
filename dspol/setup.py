@@ -14,9 +14,11 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
+        "librosa",
         "numpy",
         "pandas",
         "tensorflow",
+        "tensorflow-io",
         "tqdm",
     ],
     python_requires=">=3.6",

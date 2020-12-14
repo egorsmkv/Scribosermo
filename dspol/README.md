@@ -1,7 +1,7 @@
 Build and run our docker container:
 
 ```bash
-docker build -f deepspeech-polyglot/Containerfile -t dspol deepspeech-polyglot/
+docker build -f deepspeech-polyglot/Containerfile -t dspol ./deepspeech-polyglot/
 
 docker run --privileged --rm --network host -it \
   --gpus all --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 \

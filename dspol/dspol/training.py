@@ -32,6 +32,8 @@ summary_writer: tf.summary.SummaryWriter
 save_manager: tf.train.CheckpointManager
 optimizer: tf.keras.optimizers.Adam
 
+feature_type = "mfcc"
+# feature_type = "lfbank"
 batch_size = 1
 max_epoch = 30
 learning_rate = 0.0001
@@ -213,6 +215,13 @@ def main():
     utils.delete_dir(checkpoint_dir)
     pipeline.delete_cache()
 
+    dataset_train, num_channels = pipeline.create_pipeline(
+        dataset_train_path, batch_size, feature_type, is_training=True
+    )
+    dataset_val, _ = pipeline.create_pipeline(
+        dataset_val_path, batch_size, feature_type, is_training=False
+    )
+
     summary_writer = tf.summary.create_file_writer(checkpoint_dir)
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
     # optimizer = mixed_precision.LossScaleOptimizer(optimizer, loss_scale='dynamic')
@@ -221,11 +230,11 @@ def main():
     # tf.summary.trace_on(graph=True, profiler=True)
     # tf.summary.trace_on(graph=True, profiler=False)
 
-    # model = nets.deepspeech1.MyModel()
-    # model = nets.deepspeech2.MyModel()
-    # model = nets.jasper.MyModel(blocks=5, module_repeat=3, dense_residuals=True)
-    model = nets.quartznet.MyModel(blocks=5, module_repeat=5)
-    model.build(input_shape=(None, None, 26))
+    model = nets.deepspeech1.MyModel(input_channels=num_channels)
+    # model = nets.deepspeech2.MyModel(num_channels)
+    # model = nets.jasper.MyModel(num_channels, blocks=5, module_repeat=3, dense_residuals=True)
+    # model = nets.quartznet.MyModel(num_channels, blocks=5, module_repeat=5)
+    model.build(input_shape=(None, None, num_channels))
     model.summary()
 
     checkpoint = tf.train.Checkpoint(model=model, optimizer=optimizer)
@@ -239,10 +248,4 @@ def main():
         checkpoint.restore(save_manager.latest_checkpoint)
     start_epoch += 1
 
-    dataset_train = pipeline.create_pipeline(
-        dataset_train_path, batch_size, is_training=True
-    )
-    dataset_val = pipeline.create_pipeline(
-        dataset_val_path, batch_size, is_training=False
-    )
     train(dataset_train, dataset_val, start_epoch, max_epoch)
