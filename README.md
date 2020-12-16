@@ -4,7 +4,6 @@ _This project is build upon the paper [German End-to-end Speech Recognition base
 _Original paper code can be found [here](https://github.com/AASHISHAG/deepspeech-german)._
 
 This project uses [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech) to train the speech-to-text network.
-But it also has some experimental support for [Wav2Letter](https://github.com/facebookresearch/wav2letter/).
 
 <div align="center">
     <img src="media/deep_speech_architecture.png" alt="deepspeech graph" width="45%"/>
@@ -444,33 +443,6 @@ python3 /DeepSpeech/DeepSpeech.py --test_files /DeepSpeech/data_prepared/de/voxf
 
 # Or to run a cycled training as described in the paper, run:
 python3 /DeepSpeech/deepspeech-polyglot/training/cycled_training.py /DeepSpeech/checkpoints/de/voxforge/ /DeepSpeech/data_prepared/de/ _azce --voxforge
-```
-
-<br/>
-
-Training with wav2letter:
-
-```bash
-export LANGUAGE="de"
-
-# Build docker container
-git clone https://github.com/facebookresearch/wav2letter.git
-cd wav2letter && git checkout v0.2
-docker build --no-cache -f ./Dockerfile-CUDA -t wav2letter .
-cd ..
-
-# Convert csv files to lst files:
-python3 deepspeech-polyglot/preprocessing/ds_to_w2l.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv /DeepSpeech/data_prepared/${LANGUAGE}/w2l_voxforge/train_azce.lst
-
-# Generate lexicon file:
-python3 deepspeech-polyglot/preprocessing/create_w2l_lexicon.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/dev_azce.csv /DeepSpeech/data_prepared/texts/${LANGUAGE}/lexicon.txt
-
-Run training with single gpu (Uncomment according parts in run_container.sh to run this):
-mpirun -n 1 --allow-run-as-root /root/wav2letter/build/Train continue --flagsfile /root/deepspeech-polyglot/training/train.cfg
-mpirun -n 1 --allow-run-as-root /root/wav2letter/build/Decoder --flagsfile /root/deepspeech-polyglot/training/decode.cfg
-
-Continue training:
-mpirun -n 1 --allow-run-as-root /root/wav2letter/build/Train continue checkpoints/w2l/voxforge_conv_glu/
 ```
 
 Training time for voxforge on 2x Nvidia 1080Ti using batch size of 48 is about 01:45min per epoch.
