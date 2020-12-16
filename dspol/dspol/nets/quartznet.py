@@ -133,26 +133,24 @@ class MyModel(Model):
         x = tfl.BatchNormalization()(x)
         x = tfl.ReLU()(x)
 
-        x = tfl.SeparableConv1D(
+        x = tfl.Conv1D(
             filters=1024,
             kernel_size=1,
             padding="same",
             data_format="channels_last",
-            depthwise_regularizer="l2",
-            pointwise_regularizer="l2",
+            kernel_regularizer="l2",
             use_bias=False,
         )(x)
         x = tfl.BatchNormalization()(x)
         x = tfl.ReLU()(x)
 
-        x = tfl.SeparableConv1D(
+        x = tfl.Conv1D(
             filters=self.n_output,
             kernel_size=1,
             dilation_rate=2,
             padding="same",
             data_format="channels_last",
-            depthwise_regularizer="l2",
-            pointwise_regularizer="l2",
+            kernel_regularizer="l2",
             use_bias=False,
         )(x)
         output_tensor = tf.identity(x, name="output")
@@ -163,8 +161,9 @@ class MyModel(Model):
     # ==============================================================================================
 
     def call(self, x, training=False):
-        """Call with input shape: [batch_size, steps_a, n_input],
-        outputs tensor of shape: [batch_size, steps_b, n_output]"""
+        """Call with input shape: [batch_size, steps_a, n_input]. Note that this is different to
+        nemo's refecence implementation which uses a "channels_first" approach.
+        Outputs a tensor of shape: [batch_size, steps_b, n_output]"""
 
         x = self.model(x)
         return x

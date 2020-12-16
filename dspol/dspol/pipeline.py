@@ -57,6 +57,7 @@ def load_audio(sample, augment: bool = False):
 
     if augment:
         # Run signal augmentations
+        # audio = augmentations.normalize(audio)
         # audio = augmentations.resample(audio, tmp_sample_rate=8000)
         # audio = augmentations.preemphasis(audio, coef=0.97)
         pass
@@ -221,7 +222,7 @@ def create_pipeline(
     )
 
     # ds = ds.cache("/tmp/dspol_cache")
-    ds = ds.repeat(50)
+    # ds = ds.repeat(50)
     ds = ds.prefetch(buffer_size=AUTOTUNE)
     return ds, num_channels
 

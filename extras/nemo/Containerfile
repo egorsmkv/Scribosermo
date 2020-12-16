@@ -1,0 +1,12 @@
+FROM nvcr.io/nvidia/tensorflow:20.11-tf2-py3
+
+WORKDIR /
+RUN pip3 install git+https://github.com/onnx/onnx-tensorflow
+RUN pip3 install git+https://github.com/onnx/tensorflow-onnx
+
+# Requirements for testing with our pipeline
+RUN apt-get update && apt-get install -y libsndfile1
+COPY dspol/ /deepspeech-polyglot/dspol/
+RUN pip3 install -e /deepspeech-polyglot/dspol/
+
+CMD ["/bin/bash"]

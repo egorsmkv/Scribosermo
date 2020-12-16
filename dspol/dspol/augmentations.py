@@ -23,6 +23,17 @@ def resample(signal, tmp_sample_rate):
 # ==================================================================================================
 
 
+def normalize(signal):
+    """Normalize signal to range [-1,1]"""
+
+    gain = 1.0 / (tf.maximum(tf.abs(signal)) + 1e-7)
+    signal = signal * gain
+    return signal
+
+
+# ==================================================================================================
+
+
 def preemphasis(signal, coef=0.97):
     """Emphasizes high-frequency signal components. Doubles pipeline time."""
 
