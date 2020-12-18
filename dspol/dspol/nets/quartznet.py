@@ -159,7 +159,11 @@ class MyModel(Model):
 
     # ==============================================================================================
 
-    def call(self, x, training=False):
+    # This input signature is required that we can export and load the model in ".pb" format
+    # with a variable sequence length, instead of using the one of the first input.
+    # The channel value could be fixed, but I didn't find a way to set it to the channels variable.
+    @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
+    def call(self, x):
         """Call with input shape: [batch_size, steps_a, n_input]. Note that this is different to
         nemo's refecence implementation which uses a "channels_first" approach.
         Outputs a tensor of shape: [batch_size, steps_b, n_output]"""
