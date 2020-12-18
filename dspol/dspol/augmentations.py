@@ -7,16 +7,12 @@ import tensorflow_io as tfio
 
 # ==================================================================================================
 
-audio_sample_rate = 16000
 
-# ==================================================================================================
-
-
-def resample(signal, tmp_sample_rate):
+def resample(signal, sample_rate, tmp_sample_rate):
     """Resample to given sample rate and back again"""
 
-    signal = tfio.audio.resample(signal, audio_sample_rate, tmp_sample_rate)
-    signal = tfio.audio.resample(signal, tmp_sample_rate, audio_sample_rate)
+    signal = tfio.audio.resample(signal, sample_rate, tmp_sample_rate)
+    signal = tfio.audio.resample(signal, tmp_sample_rate, sample_rate)
     return signal
 
 
@@ -26,7 +22,7 @@ def resample(signal, tmp_sample_rate):
 def normalize(signal):
     """Normalize signal to range [-1,1]"""
 
-    gain = 1.0 / (tf.maximum(tf.abs(signal)) + 1e-7)
+    gain = 1.0 / (tf.reduce_max(tf.abs(signal)) + 1e-7)
     signal = signal * gain
     return signal
 

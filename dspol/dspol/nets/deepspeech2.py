@@ -7,17 +7,16 @@ from tensorflow.keras import layers as tfl
 
 
 class MyModel(Model):
-    def __init__(self, input_channels):
+    def __init__(self, c_input, c_output):
         super(MyModel, self).__init__()
 
-        self.n_input = input_channels
+        self.n_input = c_input
+        self.n_output = c_output
+
         self.n_lstms = 5
         self.n_hidden = 1024
         self.relu_clip = 20
         self.dropout_rate = 0.05
-
-        alphabet = " abcdefghijklmnopqrstuvwxyz'"
-        self.n_output = len(alphabet) + 1
 
         self.model = self.make_model()
 

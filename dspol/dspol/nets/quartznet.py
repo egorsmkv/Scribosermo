@@ -14,8 +14,8 @@ class BaseModule(Model):
             kernel_size=kernel_size,
             padding="same",
             data_format="channels_last",
-            depthwise_regularizer="l2",
-            pointwise_regularizer="l2",
+            depthwise_regularizer=None,
+            pointwise_regularizer=None,
             use_bias=False,
         )
 
@@ -53,14 +53,14 @@ class BaseBlock(Model):
             kernel_size=1,
             padding="same",
             data_format="channels_last",
-            kernel_regularizer="l2",
+            kernel_regularizer=None,
             use_bias=False,
         )
         self.bnorm = tfl.BatchNormalization()
 
     # ==============================================================================================
 
-    @tf.function(experimental_relax_shapes=True)
+    @tf.function()
     def call(self, x):
         a = self.partial_block(x)
         b = self.convpt(x)
@@ -77,7 +77,7 @@ class MyModel(Model):
     """See Quartznet example config at:
     https://github.com/NVIDIA/OpenSeq2Seq/blob/master/example_configs/speech2text/"""
 
-    def __init__(self, input_channels, blocks, module_repeat):
+    def __init__(self, c_input, c_output, blocks, module_repeat):
         super(MyModel, self).__init__()
 
         block_params = [
@@ -91,9 +91,8 @@ class MyModel(Model):
         assert block_repeat == int(block_repeat)
         block_repeat = int(block_repeat)
 
-        alphabet = " abcdefghijklmnopqrstuvwxyz'"
-        self.n_output = len(alphabet) + 1
-        self.n_input = input_channels
+        self.n_input = c_input
+        self.n_output = c_output
 
         self.model = self.make_model(block_params, block_repeat, module_repeat)
 
@@ -108,8 +107,8 @@ class MyModel(Model):
             strides=2,
             padding="same",
             data_format="channels_last",
-            depthwise_regularizer="l2",
-            pointwise_regularizer="l2",
+            depthwise_regularizer=None,
+            pointwise_regularizer=None,
             use_bias=False,
         )(input_tensor)
         x = tfl.BatchNormalization()(x)
@@ -126,8 +125,8 @@ class MyModel(Model):
             kernel_size=87,
             padding="same",
             data_format="channels_last",
-            depthwise_regularizer="l2",
-            pointwise_regularizer="l2",
+            depthwise_regularizer=None,
+            pointwise_regularizer=None,
             use_bias=False,
         )(x)
         x = tfl.BatchNormalization()(x)
@@ -138,7 +137,7 @@ class MyModel(Model):
             kernel_size=1,
             padding="same",
             data_format="channels_last",
-            kernel_regularizer="l2",
+            kernel_regularizer=None,
             use_bias=False,
         )(x)
         x = tfl.BatchNormalization()(x)
@@ -150,7 +149,7 @@ class MyModel(Model):
             dilation_rate=2,
             padding="same",
             data_format="channels_last",
-            kernel_regularizer="l2",
+            kernel_regularizer=None,
             use_bias=False,
         )(x)
         output_tensor = tf.identity(x, name="output")

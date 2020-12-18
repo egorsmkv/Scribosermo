@@ -1,9 +1,11 @@
+import json
 import os
 import shutil
 import time
 
 import numpy as np
 import tensorflow as tf
+import tensorflow_addons as tfa
 import tqdm
 from tensorflow.keras.mixed_precision import experimental as mixed_precision
 
@@ -13,39 +15,17 @@ from . import nets, pipeline, utils
 
 # Use growing gpu memory
 gpus = tf.config.experimental.list_physical_devices("GPU")
-if gpus:
-    try:
-        # Currently, memory growth needs to be the same across GPUs
-        for gpu in gpus:
-            tf.config.experimental.set_memory_growth(gpu, True)
-    except RuntimeError as e:
-        # Memory growth must be set before GPUs have been initialized
-        print(e)
-
+for gpu in gpus:
+    tf.config.experimental.set_memory_growth(gpu, True)
 
 # policy = mixed_precision.Policy('mixed_float16')
 # mixed_precision.set_policy(policy)
 
+config = utils.get_config()
+checkpoint_dir = config["checkpoint_dir"]
+cache_dir = config["cache_dir"]
 
-model: tf.keras.Model
-summary_writer: tf.summary.SummaryWriter
-save_manager: tf.train.CheckpointManager
-optimizer: tf.keras.optimizers.Adam
-
-feature_type = "mfcc"
-# feature_type = "lfbank"
-batch_size = 1
-max_epoch = 30
-learning_rate = 0.0001
-# dataset_train_path = "/data_prepared/de/voxforge/train_azce.csv"
-# dataset_train_path = "/data_prepared/de/voxforge/mini_test_azce.csv"
-dataset_train_path = "/data_prepared/de/voxforge/nano_test_azce.csv"
-# dataset_val_path = "/data_prepared/de/voxforge/dev_azce.csv"
-dataset_val_path = "/data_prepared/de/voxforge/nano_val_azce.csv"
-dataset_test_path = "/data_prepared/de/voxforge/test_azce.csv"
-checkpoint_dir = "/checkpoints/tmp/"
-
-alphabet = " abcdefghijklmnopqrstuvwxyz'"
+alphabet = utils.load_alphabet(config)
 idx2char = tf.lookup.StaticHashTable(
     initializer=tf.lookup.KeyValueTensorInitializer(
         keys=tf.constant([i for i, u in enumerate(alphabet)]),
@@ -53,6 +33,11 @@ idx2char = tf.lookup.StaticHashTable(
     ),
     default_value=tf.constant(" "),
 )
+
+model: tf.keras.Model
+summary_writer: tf.summary.SummaryWriter
+save_manager: tf.train.CheckpointManager
+optimizer: tf.keras.optimizers.Adam
 
 
 # ==================================================================================================
@@ -143,6 +128,7 @@ def log_greedy_text(predictions, samples):
 
 def train(dataset_train, dataset_val, start_epoch, stop_epoch):
     step = np.int64(0)
+    log_greedy_steps = config["log_prediction_steps"]
     # tf.profiler.experimental.start('/checkpoints/profiles/')
 
     for epoch in range(start_epoch, stop_epoch):
@@ -168,7 +154,7 @@ def train(dataset_train, dataset_val, start_epoch, stop_epoch):
             #         name="my_func_trace",
             #         step=0)
 
-            if step % 25 == 0:
+            if log_greedy_steps != 0 and step % log_greedy_steps == 0:
                 # print("")
                 # print(samples["features"][0])
                 # print(samples["label"][0])
@@ -176,7 +162,9 @@ def train(dataset_train, dataset_val, start_epoch, stop_epoch):
                 log_greedy_text(predictions, samples)
 
         save_manager.save()
-        eval(dataset_val)
+        # eval(dataset_val)
+        # tf.saved_model.save(model, checkpoint_dir)
+        tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
 
         msg = "Epoch {} took {} hours\n"
         duration = utils.seconds_to_hours(time.time() - start_time)
@@ -192,13 +180,15 @@ def eval(dataset_val):
     print("\nEvaluating ...")
     loss = 0
     step = 0
+    log_greedy_steps = config["log_prediction_steps"]
+
     for samples in dataset_val:
         features = samples["features"]
         predictions = model(features)
         loss += get_loss(predictions, samples).numpy()
         step += 1
 
-        if step % 25 == 0:
+        if log_greedy_steps != 0 and step % log_greedy_steps == 0:
             log_greedy_text(predictions, samples)
 
     loss = loss / step
@@ -211,41 +201,99 @@ def eval(dataset_val):
 def main():
     global model, summary_writer, save_manager, optimizer
 
-    # Delete old data
-    utils.delete_dir(checkpoint_dir)
-    pipeline.delete_cache()
+    # Delete old data and create folders
+    if os.path.exists(checkpoint_dir):
+        utils.delete_dir(checkpoint_dir)
+    if os.path.exists(cache_dir):
+        utils.delete_dir(cache_dir)
+    os.makedirs(checkpoint_dir)
+    os.makedirs(cache_dir)
 
-    dataset_train, num_channels = pipeline.create_pipeline(
-        dataset_train_path, batch_size, feature_type, is_training=True
-    )
-    dataset_val, _ = pipeline.create_pipeline(
-        dataset_val_path, batch_size, feature_type, is_training=False
-    )
+    # Export current config next to the checkpoints
+    path = os.path.join(checkpoint_dir, "config_export.json")
+    with open(path, "w+", encoding="utf-8") as file:
+        json.dump(config, file, indent=2)
 
-    summary_writer = tf.summary.create_file_writer(checkpoint_dir)
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
-    # optimizer = mixed_precision.LossScaleOptimizer(optimizer, loss_scale='dynamic')
+    # Create pipelines
+    cache = config["cache_dir"] + "train" if config["use_pipeline_cache"] else ""
+    dataset_train = pipeline.create_pipeline(
+        csv_path=config["data_paths"]["train"],
+        batch_size=config["batch_sizes"]["train"],
+        config=config,
+        augment=True,
+        cache_path=cache,
+    )
+    cache = config["cache_dir"] + "val" if config["use_pipeline_cache"] else ""
+    dataset_val = pipeline.create_pipeline(
+        csv_path=config["data_paths"]["val"],
+        batch_size=config["batch_sizes"]["val"],
+        config=config,
+        augment=False,
+        cache_path=cache,
+    )
 
     # tf.profiler.experimental.server.start(6009)
     # tf.summary.trace_on(graph=True, profiler=True)
     # tf.summary.trace_on(graph=True, profiler=False)
 
-    model = nets.deepspeech1.MyModel(input_channels=num_channels)
-    # model = nets.deepspeech2.MyModel(num_channels)
-    # model = nets.jasper.MyModel(num_channels, blocks=5, module_repeat=3, dense_residuals=True)
-    # model = nets.quartznet.MyModel(num_channels, blocks=5, module_repeat=5)
-    model.build(input_shape=(None, None, num_channels))
-    model.summary()
+    feature_type = config["audio_features"]["use_type"]
+    c_input = config["audio_features"][feature_type]["num_features"]
+    c_output = len(alphabet) + 1
 
+    # Build the network
+    network_type = config["network"]["name"]
+    if network_type == "deepspeech1":
+        model = nets.deepspeech1.MyModel(c_input, c_output)
+    elif network_type == "deepspeech2":
+        model = nets.deepspeech2.MyModel(c_input, c_output)
+    elif network_type == "jasper":
+        model = nets.jasper.MyModel(
+            c_input,
+            c_output,
+            blocks=config["network"]["blocks"],
+            module_repeat=config["network"]["module_repeat"],
+            dense_residuals=config["network"]["dense_residuals"],
+        )
+    elif network_type == "quartznet":
+        model = nets.quartznet.MyModel(
+            c_input,
+            c_output,
+            blocks=config["network"]["blocks"],
+            module_repeat=config["network"]["module_repeat"],
+        )
+
+    # Print network summary
+    model.build(input_shape=(None, None, c_input))
+    model.summary()
+    # tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
+
+    # Select optimizer
+    optimizer_type = config["optimizer"]["name"]
+    if optimizer_type == "adamw":
+        optimizer = tfa.optimizers.AdamW(
+            learning_rate=config["optimizer"]["learning_rate"],
+            weight_decay=config["optimizer"]["weight_decay"],
+        )
+    elif optimizer_type == "novograd":
+        optimizer = tfa.optimizers.NovoGrad(
+            learning_rate=config["optimizer"]["learning_rate"],
+            weight_decay=config["optimizer"]["weight_decay"],
+        )
+    # optimizer = mixed_precision.LossScaleOptimizer(optimizer, loss_scale='dynamic')
+
+    summary_writer = tf.summary.create_file_writer(checkpoint_dir)
     checkpoint = tf.train.Checkpoint(model=model, optimizer=optimizer)
     save_manager = tf.train.CheckpointManager(
-        checkpoint, directory=checkpoint_dir, max_to_keep=3
+        checkpoint, directory=checkpoint_dir, max_to_keep=1
     )
 
+    # Load old checkpoint and its epoch number if existing
     start_epoch = 0
     if save_manager.latest_checkpoint:
         start_epoch = int(save_manager.latest_checkpoint.split("-")[-1])
         checkpoint.restore(save_manager.latest_checkpoint)
     start_epoch += 1
 
+    # Finally the training can start
+    max_epoch = config["training_epochs"]
     train(dataset_train, dataset_val, start_epoch, max_epoch)

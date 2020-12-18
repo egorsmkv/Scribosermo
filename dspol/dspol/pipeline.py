@@ -10,31 +10,42 @@ import pandas as pd
 import tensorflow as tf
 import tqdm
 
-from . import augmentations
+from . import augmentations, utils
 
 # ==================================================================================================
 
-alphabet = " abcdefghijklmnopqrstuvwxyz'"
-char2idx = tf.lookup.StaticHashTable(
-    initializer=tf.lookup.KeyValueTensorInitializer(
-        keys=tf.constant([u for i, u in enumerate(alphabet)]),
-        values=tf.constant([i for i, u in enumerate(alphabet)]),
-    ),
-    default_value=tf.constant(0),
-)
-
-audio_sample_rate = 16000
 AUTOTUNE = tf.data.experimental.AUTOTUNE
+char2idx: tf.lookup.StaticHashTable
+audio_sample_rate: int
+audio_window_samples: int
+audio_step_samples: int
+num_features: int
 
-num_mfcc_features = 26
-feature_win_len = 32
-feature_win_step = 20
-audio_window_samples = audio_sample_rate * (feature_win_len / 1000)
-audio_step_samples = audio_sample_rate * (feature_win_step / 1000)
+# ==================================================================================================
 
-window_stride = 0.001
-window_size = 0.002
-num_lfbank_features = 64
+
+def initialize(config):
+    global char2idx, audio_sample_rate, audio_window_samples, audio_step_samples, num_features
+
+    alphabet = utils.load_alphabet(config)
+    char2idx = tf.lookup.StaticHashTable(
+        initializer=tf.lookup.KeyValueTensorInitializer(
+            keys=tf.constant([u for i, u in enumerate(alphabet)]),
+            values=tf.constant([i for i, u in enumerate(alphabet)]),
+        ),
+        default_value=tf.constant(0),
+    )
+
+    config = utils.get_config()
+    audio_sample_rate = int(config["audio_sample_rate"])
+    feature_type = config["audio_features"]["use_type"]
+
+    num_features = config["audio_features"][feature_type]["num_features"]
+    window_len = config["audio_features"][feature_type]["window_len"]
+    window_step = config["audio_features"][feature_type]["window_step"]
+    audio_window_samples = audio_sample_rate * window_len
+    audio_step_samples = audio_sample_rate * window_step
+
 
 # ==================================================================================================
 
@@ -58,7 +69,7 @@ def load_audio(sample, augment: bool = False):
     if augment:
         # Run signal augmentations
         # audio = augmentations.normalize(audio)
-        # audio = augmentations.resample(audio, tmp_sample_rate=8000)
+        # audio = augmentations.resample(audio, audio_sample_rate, tmp_sample_rate=8000)
         # audio = augmentations.preemphasis(audio, coef=0.97)
         pass
 
@@ -98,7 +109,7 @@ def audio_to_mfcc(sample, augment: bool = False):
         sample_rate=audio_sample_rate,
         upper_frequency_limit=audio_sample_rate / 2,
         lower_frequency_limit=20,
-        dct_coefficient_count=num_mfcc_features,
+        dct_coefficient_count=num_features,
     )
 
     # Drop batch axis
@@ -119,7 +130,7 @@ def audio_to_lfbank(sample, augment: bool = False):
     """See: https://www.tensorflow.org/api_docs/python/tf/signal/mfccs_from_log_mel_spectrograms"""
 
     lmw_matrix = tf.signal.linear_to_mel_weight_matrix(
-        num_mel_bins=num_lfbank_features,
+        num_mel_bins=num_features,
         num_spectrogram_bins=tf.shape(sample["spectrogram"])[-1],
         sample_rate=audio_sample_rate,
         lower_edge_hertz=20,
@@ -175,9 +186,17 @@ def post_process(sample):
 
 
 def create_pipeline(
-    csv_path: str, batch_size: int, feature_type: str, is_training: bool = False
+    csv_path: str,
+    batch_size: int,
+    config: dict,
+    augment: bool = False,
+    cache_path: str = "",
 ):
     """Create data-iterator from csv file"""
+
+    # Initialize pipeline values, using config from method call, that we can easily reuse the config
+    # from exported checkpoints
+    initialize(config)
 
     # Keep the german 0 as "null" string
     df = pd.read_csv(csv_path, sep=",", keep_default_na=False)
@@ -186,18 +205,17 @@ def create_pipeline(
     df = df[["wav_filename", "transcript"]]
     ds = tf.data.Dataset.from_tensor_slices(dict(df))
 
-    la_func = lambda x: load_audio(x, is_training)
+    la_func = lambda x: load_audio(x, augment)
     ds = ds.map(map_func=la_func, num_parallel_calls=AUTOTUNE)
-    a2s_func = lambda x: audio_to_spect(x, is_training)
+    a2s_func = lambda x: audio_to_spect(x, augment)
     ds = ds.map(map_func=a2s_func, num_parallel_calls=AUTOTUNE)
 
+    feature_type = config["audio_features"]["use_type"]
     if feature_type == "mfcc":
-        num_channels = num_mfcc_features
-        a2m_func = lambda x: audio_to_mfcc(x, is_training)
+        a2m_func = lambda x: audio_to_mfcc(x, augment)
         ds = ds.map(map_func=a2m_func, num_parallel_calls=AUTOTUNE)
     elif feature_type == "lfbank":
-        num_channels = num_lfbank_features
-        a2b_func = lambda x: audio_to_lfbank(x, is_training)
+        a2b_func = lambda x: audio_to_lfbank(x, augment)
         ds = ds.map(map_func=a2b_func, num_parallel_calls=AUTOTUNE)
     else:
         raise ValueError
@@ -205,33 +223,29 @@ def create_pipeline(
     ds = ds.map(text_to_ids, num_parallel_calls=AUTOTUNE)
     ds = ds.map(post_process, num_parallel_calls=AUTOTUNE)
 
-    # ds = ds.batch(1)
-    ds = ds.padded_batch(
-        batch_size=batch_size,
-        drop_remainder=True,
-        padded_shapes=(
-            {
-                "features": [None, num_channels],
-                "feature_length": [],
-                "label": [None],
-                "label_length": [],
-                "transcript": [],
-                "wav_filename": [],
-            }
-        ),
-    )
+    if batch_size == 1:
+        # No need for padding here
+        # This also makes debugging easier if the key dropping is skipped
+        ds = ds.batch(1)
+    else:
+        ds = ds.padded_batch(
+            batch_size=batch_size,
+            drop_remainder=True,
+            padded_shapes=(
+                {
+                    "features": [None, num_features],
+                    "feature_length": [],
+                    "label": [None],
+                    "label_length": [],
+                    "transcript": [],
+                    "wav_filename": [],
+                }
+            ),
+        )
 
-    # ds = ds.cache("/tmp/dspol_cache")
+    if cache_path != "":
+        ds = ds.cache(cache_path)
+
     # ds = ds.repeat(50)
     ds = ds.prefetch(buffer_size=AUTOTUNE)
-    return ds, num_channels
-
-
-# ==================================================================================================
-
-
-def delete_cache():
-    """Delete cache files using multiple processes"""
-
-    p = multiprocessing.Pool()
-    p.map(os.remove, glob.glob("/tmp/dspol_cache*"))
+    return ds

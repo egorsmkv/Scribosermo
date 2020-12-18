@@ -1,0 +1,71 @@
+# Define the network for training.
+# Only "name" is a required argument, the others depend on the network you want to use.
+# Checkout the network's source code to see which parameters are required to initialize it.
+network:
+  name: "quartznet"
+  blocks: 5
+  module_repeat: 5
+
+# All "{LANGUAGE}" occurances in this file will be replaced with this value automatically.
+language: "de"
+
+# Columns "filepath", "duration" and "text" are required, additional columns will be ignored.
+data_paths:
+  train: "/data_prepared/{LANGUAGE}/voxforge/train_azce.csv"
+#  train: "/data_prepared/{LANGUAGE}/voxforge/nano_test_azce.csv"
+#  train: "/data_prepared/{LANGUAGE}/voxforge/mini_test_azce.csv"
+  val: "/data_prepared/{LANGUAGE}/voxforge/dev_azce.csv"
+#  val: "/data_prepared/{LANGUAGE}/voxforge/nano_val_azce.csv"
+  test: "/data_prepared/{LANGUAGE}/voxforge/test_azce.csv"
+
+alphabet_path: "/deepspeech-polyglot/data/alphabet_{LANGUAGE}.json"
+audio_sample_rate: 16000
+
+# Depends on your gpu memory. If using multiple gpus, the value will be automatically multiplyed.
+# In most cases a higher value is better, but if it's too high, you will get an Out-Of-Memory error.
+batch_sizes:
+  train: 8
+  val: 8
+  test: 8
+
+training_epochs: 30
+checkpoint_dir: "/checkpoints/{LANGUAGE}/tmp/"
+
+use_pipeline_cache: true
+cache_dir: "/tmp/dspol_cache/"
+
+# Print a single greedy prediction while training, disable by setting value to zero.
+log_prediction_steps: 25
+
+# Like with the network, checkout the training source code to see which parameters are required.
+optimizer:
+  name: "novograd"
+  learning_rate: 0.0001
+  weight_decay: 0.001
+
+# Changing things here will break compabitility with the default production bindings.
+audio_features:
+  use_type: "mfcc"
+  mfcc:
+    num_features: 26
+    window_len: 0.032
+    window_step: 0.020
+  lfbank:
+    num_features: 64
+    window_len: 0.020
+    window_step: 0.010
+
+augmentations:
+  normalize:
+    use: false
+  resample:
+    # Resamples to given sample rate and back again.
+    use: false
+    temp_sample_rate: 8000
+  speed_change:
+    # Applys random speed changes, using clipped normal distribution.
+    use: false
+    mean: 1.0
+    stddev: 0.25
+    cut_min: 0.5
+    cut_max: 2.0
