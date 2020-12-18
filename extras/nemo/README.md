@@ -7,14 +7,14 @@
   ```bash
   docker run --gpus all -it --rm -p 8888:8888 -p 6006:6006 \
     --ulimit memlock=-1 --ulimit stack=67108864  --shm-size=8g \
-    --volume `pwd`/deepspeech-polyglot/extras/nemo/models/:/models/ \
+    --volume `pwd`/deepspeech-polyglot/extras/nemo/:/dsp_nemo/ \
     --device=/dev/snd nvcr.io/nvidia/nemo:v1.0.0b2
   
   # We need to clone the repo because it's not included in the container
   cd / && git clone --depth 1 https://github.com/NVIDIA/NeMo.git
     
   python3 /NeMo/scripts/convasr_to_single_onnx.py \
-    --nemo_file /models/QuartzNet15x5Base-En.nemo --onnx_file /models/QuartzNet15x5Base-En.onnx
+    --nemo_file /dsp_nemo/models/QuartzNet15x5Base-En.nemo --onnx_file /dsp_nemo/models/QuartzNet15x5Base-En.onnx
   ```
   
 * Go to https://netron.app/ and look at the graph structure.

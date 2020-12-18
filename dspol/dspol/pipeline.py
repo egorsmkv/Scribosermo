@@ -36,7 +36,6 @@ def initialize(config):
         default_value=tf.constant(0),
     )
 
-    config = utils.get_config()
     audio_sample_rate = int(config["audio_sample_rate"])
     feature_type = config["audio_features"]["use_type"]
 

@@ -1,10 +1,10 @@
 import math
 
 import librosa
-import tensorflow as tf
-import onnx
-from onnx_tf.backend import prepare
 import numpy as np
+import onnx
+import tensorflow as tf
+from onnx_tf.backend import prepare
 
 from dspol import pipeline
 
@@ -49,7 +49,9 @@ def make_prediction(onnxtf_model, features):
 
     logit_lengths = tf.constant(tf.shape(prediction)[0], shape=(1,))
     decoded = tf.nn.ctc_greedy_decoder(prediction, logit_lengths, merge_repeated=True)
-    print(decoded)
+    # decoded = tf.nn.ctc_beam_search_decoder(
+    #     prediction, logit_lengths, beam_width=100, top_paths=3
+    # )
 
     values = tf.cast(decoded[0][0].values, dtype=tf.int32)
     values = idx2char.lookup(values).numpy()
@@ -63,7 +65,20 @@ def make_prediction(onnxtf_model, features):
 def test_csv_input(onnx_path: str, csv_path: str):
     onnx_model = onnx.load(onnx_path)
     onnxtf_model = prepare(onnx_model)
-    tds, _ = pipeline.create_pipeline(csv_path, 1, "lfbank", is_training=False)
+
+    # TODO: Test per feature normalization
+    # https://github.com/NVIDIA/NeMo/blob/main/nemo/collections/asr/parts/features.py#L192
+    # Also don't forget to activate preemphasis and signal normalization
+
+    config = {
+        "alphabet_path": "/deepspeech-polyglot/data/alphabet_de.json",
+        "audio_sample_rate": 16000,
+        "audio_features": {
+            "use_type": "lfbank",
+            "lfbank": {"num_features": 64, "window_len": 0.02, "window_step": 0.01},
+        },
+    }
+    tds = pipeline.create_pipeline(csv_path, 1, config, augment=True)
 
     for samples in tds:
         features = samples["features"]

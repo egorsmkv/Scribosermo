@@ -20,5 +20,5 @@ Run training or tests:
 python3 /deepspeech-polyglot/dspol/run_train.py
 
 # Besides the normal network test, there are also some debugging tests you can uncomment
-python3 /deepspeech-polyglot/dspol/run_tests.yp
+python3 /deepspeech-polyglot/dspol/run_tests.py
 ```
