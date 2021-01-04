@@ -1,5 +1,9 @@
 # NeMo Model Conversion
 
+The official ASR tutorial (containing also instructions for transfer-learning) can be found under this
+[link](https://colab.research.google.com/github/NVIDIA/NeMo/blob/master/tutorials/asr/01_ASR_with_NeMo.ipynb). \
+The goal here is to use the pretrained NeMo models from Nvidia with our tensorflow implementation.
+
 * Get nemo docker container from [here](https://ngc.nvidia.com/catalog/containers/nvidia:nemo).
 * Get model [here](https://ngc.nvidia.com/catalog/models/nvidia:nemospeechmodels/files) and save it in `models` folder.
 
@@ -8,7 +12,7 @@
   docker run --gpus all -it --rm -p 8888:8888 -p 6006:6006 \
     --ulimit memlock=-1 --ulimit stack=67108864  --shm-size=8g \
     --volume `pwd`/deepspeech-polyglot/extras/nemo/:/dsp_nemo/ \
-    --device=/dev/snd nvcr.io/nvidia/nemo:v1.0.0b2
+    --device=/dev/snd nvcr.io/nvidia/nemo:1.0.0b3
   
   # We need to clone the repo because it's not included in the container
   cd / && git clone --depth 1 https://github.com/NVIDIA/NeMo.git
@@ -39,11 +43,7 @@
   onnx-tf convert -i /nemo/models/QuartzNet5x5LS-En.onnx -o /nemo/models/tfpb/
   onnx-tf convert -i /nemo/models/QuartzNet15x5Base-En.onnx -o /nemo/models/tfpb/
   onnx-tf convert -i /checkpoints/model.onnx -o /checkpoints/tfpb/
-  ```
   
-The goal was to use the pretrained NeMo models from Nvidia with the tensorflow implementation here.
-By running `python3 /nemo/testing_onnx.py` in the container, you can do some inference tests, 
-but I wasn't able to replicate the input pipeline, so the outputs won't make sense.
-
-The official ASR tutorial (containing also instructions for transfer-leraning) can be found under this
-[link](https://colab.research.google.com/github/NVIDIA/NeMo/blob/master/tutorials/asr/01_ASR_with_NeMo.ipynb).
+  # Run some inference tests to check the .onnx model and data pipeline
+  python3 /nemo/testing_onnx.py
+  ```

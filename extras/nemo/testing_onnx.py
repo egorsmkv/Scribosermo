@@ -66,9 +66,8 @@ def test_csv_input(onnx_path: str, csv_path: str):
     onnx_model = onnx.load(onnx_path)
     onnxtf_model = prepare(onnx_model)
 
-    # TODO: Test per feature normalization
-    # https://github.com/NVIDIA/NeMo/blob/main/nemo/collections/asr/parts/features.py#L192
-    # Also don't forget to activate preemphasis and signal normalization
+    # Don't forget to activate the augmentations for signal normalization, preemphasis, dither and
+    # feature normalization in the pipeline
 
     config = {
         "alphabet_path": "/deepspeech-polyglot/data/alphabet_de.json",

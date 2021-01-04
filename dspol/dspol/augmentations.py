@@ -1,7 +1,3 @@
-import random
-
-import librosa
-import numpy as np
 import tensorflow as tf
 import tensorflow_io as tfio
 
@@ -30,16 +26,20 @@ def normalize(signal):
 # ==================================================================================================
 
 
+def dither(signal, factor):
+    """Amount of additional white-noise dithering to prevent quantization artefacts"""
+
+    signal += factor * tf.random.normal(shape=tf.shape(signal))
+    return signal
+
+
+# ==================================================================================================
+
+
 def preemphasis(signal, coef=0.97):
-    """Emphasizes high-frequency signal components. Doubles pipeline time."""
+    """Emphasizes high-frequency signal components"""
 
-    def norm(sig):
-        sig = sig.numpy().flatten()
-        sig = librosa.effects.preemphasis(sig, coef=coef)
-        sig = np.expand_dims(sig, axis=1)
-        return sig
-
-    signal = tf.py_function(func=norm, inp=[signal], Tout=tf.float32)
+    signal = signal[1:] - coef * signal[:-1]
     return signal
 
 
@@ -50,6 +50,22 @@ def freq_time_mask(spectrogram, param=10):
     # Not working yet
     # spectrogram = tfio.experimental.audio.freq_mask(spectrogram, param=param)
     # spectrogram = tfio.experimental.audio.time_mask(spectrogram, param=param)
+    # tfa.image.random_cutout()
+    return spectrogram
+
+
+# ==================================================================================================
+
+
+def per_feature_norm(features):
+    """Normalize features per channel/frequency"""
+    f_mean = tf.math.reduce_mean(features, axis=0)
+    f_std = tf.math.reduce_std(features, axis=0)
+
+    f_mean = tf.expand_dims(f_mean, axis=0)
+    f_std = tf.expand_dims(f_std, axis=0)
+
+    spectrogram = (features - f_mean) / (f_std + 1e-7)
     return spectrogram
 
 
@@ -60,7 +76,7 @@ def random_speed(
     spectrogram, mean: float, stddev: float, cut_min: float, cut_max: float
 ):
     """Apply random speed changes, using clipped normal distribution.
-    Transforming the spectogram is much faster than transforming the audio signal."""
+    Transforming the spectrogram is much faster than transforming the audio signal."""
 
     # Get a random speed and clip it, that we don't reach edge cases where the speed is negative
     change = tf.random.normal(shape=[], mean=mean, stddev=stddev)
