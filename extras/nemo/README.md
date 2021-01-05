@@ -24,26 +24,27 @@ The goal here is to use the pretrained NeMo models from Nvidia with our tensorfl
 * Go to https://netron.app/ and look at the graph structure.
   This is also a nice way to compare two graph implementations with each other.
 
-* Build conversion container:
+* Build and start conversion container:
   ```bash
   docker build -f ./deepspeech-polyglot/extras/nemo/Containerfile -t onnx-tf ./deepspeech-polyglot/
-  ```
   
-* Convert between `.pb` and `.onnx`:
-  ```bash
   docker run --rm --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --gpus all \
     --volume `pwd`/deepspeech-polyglot/:/deepspeech-polyglot/ \
     --volume `pwd`/deepspeech-polyglot/extras/nemo/:/nemo/ \
     --volume `pwd`/checkpoints/:/checkpoints/ -it onnx-tf
+  ```
   
-  # From .pb to .onnx
+* Transfer the pretrained weights, or run some tests to check the .onnx model and data pipeline:
+  ```bash
+  # Uncomment the required calls at the bottom
+  python3 /nemo/testing_models.py
+  ```
+  
+* Convert between `.pb` and `.onnx`:
+  ```bash
+  # From .pb to .onnx (can be used for better visualisation in above web-tool)
   python3 -m tf2onnx.convert --opset 12 --saved-model /checkpoints/tmp/ --output /checkpoints/model.onnx
 
-  # From .onnx to .pb
+  # From .onnx to .pb (loading it into our tensorflow model didn't work)
   onnx-tf convert -i /nemo/models/QuartzNet5x5LS-En.onnx -o /nemo/models/tfpb/
-  onnx-tf convert -i /nemo/models/QuartzNet15x5Base-En.onnx -o /nemo/models/tfpb/
-  onnx-tf convert -i /checkpoints/model.onnx -o /checkpoints/tfpb/
-  
-  # Run some inference tests to check the .onnx model and data pipeline
-  python3 /nemo/testing_onnx.py
   ```

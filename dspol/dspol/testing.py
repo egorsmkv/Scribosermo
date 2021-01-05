@@ -1,7 +1,5 @@
-import json
 import os
 
-import numpy as np
 import tensorflow as tf
 
 from . import pipeline, training, utils

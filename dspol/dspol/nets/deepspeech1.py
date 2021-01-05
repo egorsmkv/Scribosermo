@@ -85,6 +85,11 @@ class MyModel(Model):
 
     # ==============================================================================================
 
+    def summary(self, line_length=100, **kwargs):
+        self.model.summary(line_length=line_length, **kwargs)
+
+    # ==============================================================================================
+
     def call(self, x, training=False):
         """Call with input shape: [batch_size, steps_a, n_input],
         outputs tensor of shape: [batch_size, steps_b, n_output]"""

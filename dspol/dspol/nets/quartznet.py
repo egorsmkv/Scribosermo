@@ -21,7 +21,7 @@ class BaseModule(Model):
 
         self.model = tf.keras.Sequential()
         self.model.add(self.sconv1d)
-        self.model.add(tfl.BatchNormalization())
+        self.model.add(tfl.BatchNormalization(momentum=0.9))
 
         if has_relu:
             # Last base module in a block has the relu after the residual connection
@@ -56,7 +56,7 @@ class BaseBlock(Model):
             kernel_regularizer=None,
             use_bias=False,
         )
-        self.bnorm = tfl.BatchNormalization()
+        self.bnorm = tfl.BatchNormalization(momentum=0.9)
 
     # ==============================================================================================
 
@@ -111,7 +111,7 @@ class MyModel(Model):
             pointwise_regularizer=None,
             use_bias=False,
         )(input_tensor)
-        x = tfl.BatchNormalization()(x)
+        x = tfl.BatchNormalization(momentum=0.9)(x)
         x = tfl.ReLU()(x)
         x = tfl.Dropout(0.1)(x)
 
@@ -129,7 +129,7 @@ class MyModel(Model):
             pointwise_regularizer=None,
             use_bias=False,
         )(x)
-        x = tfl.BatchNormalization()(x)
+        x = tfl.BatchNormalization(momentum=0.9)(x)
         x = tfl.ReLU()(x)
 
         x = tfl.Conv1D(
@@ -140,7 +140,7 @@ class MyModel(Model):
             kernel_regularizer=None,
             use_bias=False,
         )(x)
-        x = tfl.BatchNormalization()(x)
+        x = tfl.BatchNormalization(momentum=0.9)(x)
         x = tfl.ReLU()(x)
 
         x = tfl.Conv1D(
@@ -150,12 +150,17 @@ class MyModel(Model):
             padding="same",
             data_format="channels_last",
             kernel_regularizer=None,
-            use_bias=False,
+            use_bias=True,
         )(x)
         output_tensor = tf.identity(x, name="output")
 
         model = Model(input_tensor, output_tensor, name="Quartznet")
         return model
+
+    # ==============================================================================================
+
+    def summary(self, line_length=100, **kwargs):
+        self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
 
@@ -165,7 +170,7 @@ class MyModel(Model):
     @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
     def call(self, x):
         """Call with input shape: [batch_size, steps_a, n_input]. Note that this is different to
-        nemo's refecence implementation which uses a "channels_first" approach.
+        nemo's reference implementation which uses a "channels_first" approach.
         Outputs a tensor of shape: [batch_size, steps_b, n_output]"""
 
         x = self.model(x)
