@@ -14,7 +14,7 @@ def test_pipeline():
     # Run pipeline for one epoch to check how long preprocessing takes
     print("\nGoing through dataset to check preprocessing duration...")
     tds = pipeline.create_pipeline(sample_csv_path, bench_batch_size, config, augment)
-    for samples in tqdm.tqdm(tds):
+    for _ in tqdm.tqdm(tds):
         pass
 
     # Print the first two samples of the dataset

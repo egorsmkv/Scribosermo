@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/tensorflow:20.11-tf2-py3
+FROM nvcr.io/nvidia/tensorflow:20.12-tf2-py3
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV LANG C.UTF-8
@@ -33,8 +33,9 @@ RUN python3 -m pip install --upgrade pip
 # Pre-install some libraries for faster installation time of dspol package
 RUN pip3 install --no-cache-dir pandas
 RUN pip3 install --no-cache-dir librosa
-RUN pip3 install --no-cache-dir tensorflow
-RUN pip3 install --no-cache-dir tensorflow-io
+RUN pip3 install --no-cache-dir "tensorflow<2.4,>=2.3"
+RUN pip3 install --no-cache-dir "tensorflow-addons<0.12"
+RUN pip3 install --no-cache-dir "tensorflow-io<0.17"
 
 COPY dspol/ /deepspeech-polyglot/dspol/
 RUN pip3 install -e /deepspeech-polyglot/dspol/
