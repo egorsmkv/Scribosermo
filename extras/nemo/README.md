@@ -39,11 +39,13 @@ The goal here is to use the pretrained NeMo models from Nvidia with our tensorfl
   # Uncomment the required calls at the bottom
   python3 /nemo/testing_models.py
   ```
-  
+
+* Go to the exported checkpoint, edit the `config_export.json` and then do a full test run.
+
 * Convert between `.pb` and `.onnx`:
   ```bash
   # From .pb to .onnx (can be used for better visualisation in above web-tool)
-  python3 -m tf2onnx.convert --opset 12 --saved-model /checkpoints/tmp/ --output /checkpoints/model.onnx
+  python3 -m tf2onnx.convert --opset 12 --saved-model /checkpoints/tmp/ --output /nemo/models/tfmodel.onnx
 
   # From .onnx to .pb (loading it into our tensorflow model didn't work)
   onnx-tf convert -i /nemo/models/QuartzNet5x5LS-En.onnx -o /nemo/models/tfpb/

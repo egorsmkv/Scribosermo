@@ -1,3 +1,5 @@
+import math
+
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
@@ -9,10 +11,13 @@ class BaseModule(Model):
     def __init__(self, filters, kernel_size, has_relu=True):
         super(BaseModule, self).__init__()
 
+        pad = int(math.floor(kernel_size / 2))
+        self.pad1d = tf.keras.layers.ZeroPadding1D(padding=(pad, pad))
+
         self.sconv1d = tfl.SeparableConv1D(
             filters=filters,
             kernel_size=kernel_size,
-            padding="same",
+            padding="valid",
             data_format="channels_last",
             depthwise_regularizer=None,
             pointwise_regularizer=None,
@@ -20,6 +25,7 @@ class BaseModule(Model):
         )
 
         self.model = tf.keras.Sequential()
+        self.model.add(self.pad1d)
         self.model.add(self.sconv1d)
         self.model.add(tfl.BatchNormalization(momentum=0.9))
 
@@ -51,7 +57,7 @@ class BaseBlock(Model):
         self.convpt = tfl.Conv1D(
             filters=filters,
             kernel_size=1,
-            padding="same",
+            padding="valid",
             data_format="channels_last",
             kernel_regularizer=None,
             use_bias=False,
@@ -101,16 +107,24 @@ class MyModel(Model):
     def make_model(self, block_params, block_repeat, module_repeat):
         input_tensor = tfl.Input(shape=[None, self.n_input], name="input")
 
+        # Used for easier debugging changes
+        x = tf.identity(input_tensor)
+
+        # Use manual zero padding instead of "same" padding in the convolution,
+        # because else there is an data/weight offset by 1, resulting in wrong outputs
+        x = tf.keras.layers.ZeroPadding1D(padding=(16, 16))(x)
+
         x = tfl.SeparableConv1D(
             filters=256,
             kernel_size=33,
             strides=2,
-            padding="same",
+            padding="valid",
             data_format="channels_last",
             depthwise_regularizer=None,
             pointwise_regularizer=None,
             use_bias=False,
-        )(input_tensor)
+        )(x)
+
         x = tfl.BatchNormalization(momentum=0.9)(x)
         x = tfl.ReLU()(x)
         x = tfl.Dropout(0.1)(x)
@@ -120,10 +134,12 @@ class MyModel(Model):
                 filters, kernel_size = block_params[i]
                 x = BaseBlock(filters, kernel_size, module_repeat)(x)
 
+        x = tf.keras.layers.ZeroPadding1D(padding=(86, 86))(x)
         x = tfl.SeparableConv1D(
             filters=512,
             kernel_size=87,
-            padding="same",
+            dilation_rate=2,
+            padding="valid",
             data_format="channels_last",
             depthwise_regularizer=None,
             pointwise_regularizer=None,
@@ -135,7 +151,7 @@ class MyModel(Model):
         x = tfl.Conv1D(
             filters=1024,
             kernel_size=1,
-            padding="same",
+            padding="valid",
             data_format="channels_last",
             kernel_regularizer=None,
             use_bias=False,
@@ -146,12 +162,12 @@ class MyModel(Model):
         x = tfl.Conv1D(
             filters=self.n_output,
             kernel_size=1,
-            dilation_rate=2,
-            padding="same",
+            padding="valid",
             data_format="channels_last",
             kernel_regularizer=None,
             use_bias=True,
         )(x)
+        x = tf.nn.softmax(x)
         output_tensor = tf.identity(x, name="output")
 
         model = Model(input_tensor, output_tensor, name="Quartznet")
