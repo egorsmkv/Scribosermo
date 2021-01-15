@@ -115,7 +115,7 @@ def log_greedy_text(predictions, samples):
     label = samples["label"][0]
     label = idx2char.lookup(label).numpy()
     label = b"".join(label).strip()
-    print("Label: {}".format(label))
+    print("Label     : {}".format(label))
 
     values = tf.cast(decoded[0][0].values, dtype=tf.int32)
     values = idx2char.lookup(values).numpy()

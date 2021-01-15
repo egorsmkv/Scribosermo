@@ -1,6 +1,8 @@
 import os
+from typing import List
 
 import tensorflow as tf
+import tqdm
 from ds_ctcdecoder import ctc_beam_search_decoder, Scorer, Alphabet
 
 from . import pipeline, training, utils
@@ -22,7 +24,7 @@ ds_alphabet = Alphabet("/deepspeech-polyglot/data/alphabet_en.txt")
 ds_scorer = Scorer(
     alpha=0.931289039105002,
     beta=1.1834137581510284,
-    scorer_path="/data_prepared/lm/ds_en.scorer",
+    scorer_path="/data_prepared/texts/en/ds_en.scorer",
     alphabet=ds_alphabet,
 )
 
@@ -54,15 +56,38 @@ def levenshtein(a, b):
 # ==================================================================================================
 
 
+def calc_stats(results: List[dict]) -> List[dict]:
+    """Calculate CER and WER of both prediction types"""
+
+    for result in results:
+        label = result["label"]
+        greedy_text = result["greedy_text"]
+        lm_text = result["lm_text"]
+
+        gd_cer = levenshtein(label, greedy_text) / len(label)
+        gd_wer = levenshtein(label.split(), greedy_text.split()) / len(label.split())
+        result["greedy_cer"] = gd_cer
+        result["greedy_wer"] = gd_wer
+
+        lm_cer = levenshtein(label, lm_text) / len(label)
+        lm_wer = levenshtein(label.split(), lm_text.split()) / len(label.split())
+        result["lm_cer"] = lm_cer
+        result["lm_wer"] = lm_wer
+
+    return results
+
+
+# ==================================================================================================
+
+
 def get_texts(predictions, samples):
 
     twfs = []
     for i, pred in enumerate(predictions):
 
         # Calculate text using language model
-        lpred = tf.nn.softmax(pred).numpy().tolist()
         ldecoded = ctc_beam_search_decoder(
-            lpred,
+            pred.tolist(),
             ds_alphabet,
             beam_size=1024,
             cutoff_prob=1.0,
@@ -88,12 +113,6 @@ def get_texts(predictions, samples):
         label = training.idx2char.lookup(label).numpy()
         label = b"".join(label).strip().decode("utf-8")
 
-        # Calculate CER and WER of both predictions
-        gd_cer = levenshtein(label, greedy_text) / len(label)
-        gd_wer = levenshtein(label.split(), greedy_text.split()) / len(label.split())
-        lm_cer = levenshtein(label, lm_text) / len(label)
-        lm_wer = levenshtein(label.split(), lm_text.split()) / len(label.split())
-
         # Calculate loss
         samp = {
             "label": [samples["label"][i]],
@@ -107,15 +126,44 @@ def get_texts(predictions, samples):
             "label": label,
             "loss": loss,
             "greedy_text": greedy_text,
-            "greedy_cer": gd_cer,
-            "greedy_wer": gd_wer,
             "lm_text": lm_text,
-            "lm_cer": lm_cer,
-            "lm_wer": lm_wer,
         }
         twfs.append(twf)
 
     return twfs
+
+
+# ==================================================================================================
+
+
+def print_results(results: List[dict]):
+    gd_cer = 0
+    gd_wer = 0
+    lm_cer = 0
+    lm_wer = 0
+    loss = 0
+
+    for result in results:
+        gd_cer += result["greedy_cer"]
+        gd_wer += result["greedy_wer"]
+        lm_cer += result["lm_cer"]
+        lm_wer += result["lm_wer"]
+        loss += result["loss"]
+
+    len_results = len(results)
+    gd_cer = gd_cer / len_results
+    gd_wer = gd_wer / len_results
+    lm_cer = lm_cer / len_results
+    lm_wer = lm_wer / len_results
+    loss = loss / len_results
+
+    print("Test summary:")
+    print("  Loss: {}".format(loss))
+    print("  CER greedy: {}".format(gd_cer))
+    print("  CER with lm: {}".format(lm_cer))
+    print("  WER greedy: {}".format(gd_wer))
+    print("  WER with lm: {}".format(lm_wer))
+    # print(results)
 
 
 # ==================================================================================================
@@ -126,7 +174,8 @@ def run_test(dataset_test):
     step = 0
     log_greedy_steps = config["log_prediction_steps"]
 
-    for samples in dataset_test:
+    test_results = []
+    for samples in tqdm.tqdm(dataset_test):
         features = samples["features"]
         predictions = model.predict(features)
         step += 1
@@ -134,8 +183,11 @@ def run_test(dataset_test):
         if log_greedy_steps != 0 and step % log_greedy_steps == 0:
             training.log_greedy_text(predictions, samples)
 
-        greedy_texts = get_texts(predictions, samples)
-        print(greedy_texts)
+        results = get_texts(predictions, samples)
+        test_results.extend(results)
+
+    test_results = calc_stats(test_results)
+    print_results(test_results)
 
 
 # ==================================================================================================
