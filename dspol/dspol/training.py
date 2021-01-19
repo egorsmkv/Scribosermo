@@ -115,12 +115,12 @@ def log_greedy_text(predictions, samples):
     label = samples["label"][0]
     label = idx2char.lookup(label).numpy()
     label = b"".join(label).strip()
-    print("Label     : {}".format(label))
+    print("=Label======: {}".format(label))
 
     values = tf.cast(decoded[0][0].values, dtype=tf.int32)
     values = idx2char.lookup(values).numpy()
     values = b"".join(values)
-    print("Prediction: {}".format(values))
+    print("=Prediction=: {}".format(values))
 
 
 # ==================================================================================================
@@ -278,6 +278,8 @@ def main():
         optimizer = tfa.optimizers.NovoGrad(
             learning_rate=config["optimizer"]["learning_rate"],
             weight_decay=config["optimizer"]["weight_decay"],
+            beta_1=config["optimizer"]["beta_1"],
+            beta_2=config["optimizer"]["beta_2"],
         )
     # optimizer = mixed_precision.LossScaleOptimizer(optimizer, loss_scale='dynamic')
 

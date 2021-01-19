@@ -39,7 +39,8 @@ def dither(signal, factor):
 def preemphasis(signal, coef=0.97):
     """Emphasizes high-frequency signal components"""
 
-    signal = signal[1:] - coef * signal[:-1]
+    psig = signal[1:] - coef * signal[:-1]
+    signal = tf.concat([[signal[0]], psig], axis=0)
     return signal
 
 
@@ -61,9 +62,6 @@ def per_feature_norm(features):
     """Normalize features per channel/frequency"""
     f_mean = tf.math.reduce_mean(features, axis=0)
     f_std = tf.math.reduce_std(features, axis=0)
-
-    f_mean = tf.expand_dims(f_mean, axis=0)
-    f_std = tf.expand_dims(f_std, axis=0)
 
     spectrogram = (features - f_mean) / (f_std + 1e-7)
     return spectrogram

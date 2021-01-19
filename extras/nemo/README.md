@@ -4,21 +4,24 @@ The official ASR tutorial (containing also instructions for transfer-learning) c
 [link](https://colab.research.google.com/github/NVIDIA/NeMo/blob/master/tutorials/asr/01_ASR_with_NeMo.ipynb). \
 The goal here is to use the pretrained NeMo models from Nvidia with our tensorflow implementation.
 
-* Get nemo docker container from [here](https://ngc.nvidia.com/catalog/containers/nvidia:nemo).
 * Get model [here](https://ngc.nvidia.com/catalog/models/nvidia:nemospeechmodels/files) and save it in `models` folder.
 
 * Convert `.nemo` to `.onnx`:
   ```bash
+  docker build -f ./deepspeech-polyglot/extras/nemo/Containerfile_Nemo -t dsp_nemo ./deepspeech-polyglot/
+  
   docker run --gpus all -it --rm -p 8888:8888 -p 6006:6006 \
     --ulimit memlock=-1 --ulimit stack=67108864  --shm-size=8g \
     --volume `pwd`/deepspeech-polyglot/extras/nemo/:/dsp_nemo/ \
-    --device=/dev/snd nvcr.io/nvidia/nemo:1.0.0b3
+    --volume `pwd`/data_prepared/:/data_prepared/ \
+    --device=/dev/snd dsp_nemo
   
-  # We need to clone the repo because it's not included in the container
-  cd / && git clone --depth 1 https://github.com/NVIDIA/NeMo.git
-    
+  # Convert pretrained model
   python3 /NeMo/scripts/convasr_to_single_onnx.py \
     --nemo_file /dsp_nemo/models/QuartzNet15x5Base-En.nemo --onnx_file /dsp_nemo/models/QuartzNet15x5Base-En.onnx
+  
+  # Test model and some debugging for our pipeline
+  python3 /dsp_nemo/testing_nemo.py
   ```
   
 * Go to https://netron.app/ and look at the graph structure.
@@ -26,7 +29,7 @@ The goal here is to use the pretrained NeMo models from Nvidia with our tensorfl
 
 * Build and start conversion container:
   ```bash
-  docker build -f ./deepspeech-polyglot/extras/nemo/Containerfile -t onnx-tf ./deepspeech-polyglot/
+  docker build -f ./deepspeech-polyglot/extras/nemo/Containerfile_Onnx -t onnx-tf ./deepspeech-polyglot/
   
   docker run --rm --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --gpus all \
     --volume `pwd`/deepspeech-polyglot/:/deepspeech-polyglot/ \

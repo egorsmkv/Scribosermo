@@ -167,7 +167,7 @@ class MyModel(Model):
             kernel_regularizer=None,
             use_bias=True,
         )(x)
-        x = tf.nn.softmax(x)
+        x = tf.nn.log_softmax(x)
         output_tensor = tf.identity(x, name="output")
 
         model = Model(input_tensor, output_tensor, name="Quartznet")

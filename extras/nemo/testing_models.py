@@ -2,14 +2,16 @@ import itertools
 import json
 import os
 
+import librosa
 import numpy as np
 import onnx
+import scipy.io.wavfile as wave
 import tensorflow as tf
+from onnx import TensorProto, helper
 from onnx_tf.backend import prepare
-from onnx import helper, TensorProto
 from tensorflow.keras import Model
 
-from dspol import pipeline, nets, utils
+from dspol import nets, pipeline, utils
 
 # ==================================================================================================
 
@@ -208,7 +210,7 @@ def debug_models(onnx_path: str, csv_path: str):
     """Compare outputs layer by layer. Partly taken from:
     https://github.com/onnx/onnx-tensorflow/blob/master/example/test_model_large_stepping.py"""
 
-    log_layer = 4
+    log_layer = 6
     # Get onnx layer names from netron website
     layer_map = [
         ("194", "separable_conv1d"),
@@ -216,6 +218,8 @@ def debug_models(onnx_path: str, csv_path: str):
         ("219", "base_block"),
         ("311", "base_block_4"),
         ("313", "separable_conv1d_26"),
+        ("DC3", "conv1d_6"),
+        ("logprobs", "tf_op_layer_output"),
     ]
 
     onnx_model = onnx.load(onnx_path)
@@ -253,7 +257,10 @@ def debug_models(onnx_path: str, csv_path: str):
         print(pfeat.shape)
 
         intermediate_output = itfmodel.predict(features)
-        intermediate_output = tf.transpose(intermediate_output, [0, 2, 1])
+        # Nemo's implementation uses a channel first approach, only the last layer has the channels
+        # in the last dimension, check this when debugging intermediate layers
+        intermediate_output = tf.identity(intermediate_output)
+        # intermediate_output = tf.transpose(intermediate_output, [0, 2, 1])
         print(intermediate_output)
         print(intermediate_output.shape)
 
@@ -270,12 +277,78 @@ def debug_models(onnx_path: str, csv_path: str):
 
 # ==================================================================================================
 
+
+def lrs_features(audio_path):
+    """Taken from:
+    https://github.com/NVIDIA/OpenSeq2Seq/blob/master/open_seq2seq/data/speech2text/speech_utils.py"""
+
+    def normalize_signal(signal):
+        gain = 1.0 / (np.max(np.abs(signal)) + 1e-5)
+        return signal * gain
+
+    def preemphasis(signal, coeff=0.97):
+        return np.append(signal[0], signal[1:] - coeff * signal[:-1])
+
+    _, signal = wave.read(audio_path)
+    signal = normalize_signal(signal.astype(np.float32))
+    signal = preemphasis(signal, coeff=0.97)
+
+    # print(signal)
+    # print(signal.shape)
+
+    stfts = librosa.core.stft(
+        signal,
+        n_fft=512,
+        hop_length=160,
+        win_length=320,
+        center=True,
+        window=np.hanning,
+    )
+    # print(stfts.T)
+    # print(stfts.T.shape)
+
+    spectrogram = np.abs(stfts) ** 2.0
+    # print(spectrogram.T)
+    # print(spectrogram.T.shape)
+
+    # Build and apply Mel filter
+    mel_basis = librosa.filters.mel(16000, 512, n_mels=64, fmin=0, fmax=int(16000 / 2))
+    features = np.log(np.dot(mel_basis, spectrogram) + 1e-20).T
+
+    mean = np.mean(features, axis=0)
+    std_dev = np.std(features, axis=0)
+    features = (features - mean) / std_dev
+
+    return features
+
+
+# ==================================================================================================
+
+
+def debug_input(csv_path):
+    tds = pipeline.create_pipeline(csv_path, 1, pl_config, augment=True)
+    np.set_printoptions(edgeitems=10)
+
+    for samples in tds:
+        print(samples)
+
+        afp = samples["filepath"].numpy()[0]
+        lfeat = lrs_features(afp)
+        print(lfeat)
+        print(lfeat.shape)
+
+        break
+
+
+# ==================================================================================================
+
 # test_random_input("/checkpoints/model.onnx")
 # test_random_input("/nemo/models/QuartzNet5x5LS-En.onnx")
 # print_onnx_infos("/nemo/models/QuartzNet5x5LS-En.onnx")
 # print_onnx_infos("/checkpoints/model.onnx")
 # test_csv_input("/nemo/models/QuartzNet5x5LS-En.onnx", test_csv)
 # debug_models("/nemo/models/QuartzNet5x5LS-En.onnx", test_csv)
+# debug_input(test_csv)
 
 # Also update quartznet block number above if you change the model
 build_test_tfmodel(

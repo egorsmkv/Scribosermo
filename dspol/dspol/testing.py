@@ -85,9 +85,11 @@ def get_texts(predictions, samples):
     twfs = []
     for i, pred in enumerate(predictions):
 
-        # Calculate text using language model
+        # Calculate text using language model. Use extra softmax to convert values from log_softmax
+        # range to normal softmax range to prevent "Segmentation fault (core dumped)" error
+        spred = tf.nn.softmax(pred)
         ldecoded = ctc_beam_search_decoder(
-            pred.tolist(),
+            spred.numpy().tolist(),
             ds_alphabet,
             beam_size=1024,
             cutoff_prob=1.0,
@@ -122,7 +124,7 @@ def get_texts(predictions, samples):
         loss = training.get_loss(bpred, samp).numpy()
 
         twf = {
-            "filepath": samples["wav_filename"][i].numpy(),
+            "filepath": samples["filepath"][i].numpy(),
             "label": label,
             "loss": loss,
             "greedy_text": greedy_text,

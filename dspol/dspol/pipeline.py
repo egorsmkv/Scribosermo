@@ -50,7 +50,7 @@ def initialize(config):
 
 
 def text_to_ids(sample):
-    text = tf.strings.lower(sample["transcript"])
+    text = tf.strings.lower(sample["text"])
     text_as_chars = tf.strings.bytes_split(text)
     text_as_ints = char2idx.lookup(text_as_chars)
     sample["label"] = text_as_ints
@@ -62,7 +62,7 @@ def text_to_ids(sample):
 
 
 def load_audio(sample, augment: bool = False):
-    audio_binary = tf.io.read_file(sample["wav_filename"])
+    audio_binary = tf.io.read_file(sample["filepath"])
     audio, _ = tf.audio.decode_wav(audio_binary)
 
     if augment:
@@ -88,6 +88,22 @@ def audio_to_spect(sample, augment: bool = False):
         stride=audio_step_samples,
         magnitude_squared=True,
     )
+
+    # pcm = tf.squeeze(sample["raw_audio"], axis=-1)
+    # n_fft = 2 ** math.ceil(math.log2(audio_window_samples))
+    # # pad_size = int(n_fft // 2)
+    # # pcm = tf.pad(pcm, [[pad_size, pad_size]], "REFLECT")
+    # # sample["pcm"] = pcm
+    # stfts = tf.signal.stft(
+    #     pcm,
+    #     frame_length=int(audio_window_samples),
+    #     frame_step=int(audio_step_samples),
+    #     fft_length=n_fft,
+    #     pad_end=False,
+    # )
+    # spectrogram = tf.abs(stfts)
+    # spectrogram = tf.math.pow(spectrogram, 2)
+    # spectrogram = tf.expand_dims(spectrogram, axis=0)
 
     if augment:
         # Run spectrogram augmentations
@@ -134,6 +150,7 @@ def audio_to_lfbank(sample, augment: bool = False):
         num_spectrogram_bins=tf.shape(sample["spectrogram"])[-1],
         sample_rate=audio_sample_rate,
         lower_edge_hertz=20,
+        # lower_edge_hertz=0,
         upper_edge_hertz=audio_sample_rate / 2,
     )
 
@@ -175,8 +192,8 @@ def post_process(sample):
             "feature_length",
             "label",
             "label_length",
-            "transcript",
-            "wav_filename",
+            "text",
+            "filepath",
         ]
     }
 
@@ -200,10 +217,11 @@ def create_pipeline(
     initialize(config)
 
     # Keep the german 0 as "null" string
-    df = pd.read_csv(csv_path, sep=",", keep_default_na=False)
-    df = df.sort_values("wav_filesize")
+    df = pd.read_csv(csv_path, encoding="utf-8", sep="\t", keep_default_na=False)
+    df = df[["filepath", "duration", "text"]]
 
-    df = df[["wav_filename", "transcript"]]
+    df = df.sort_values("duration")
+    df = df[["filepath", "text"]]
     ds = tf.data.Dataset.from_tensor_slices(dict(df))
 
     la_func = lambda x: load_audio(x, augment)
@@ -238,8 +256,8 @@ def create_pipeline(
                     "feature_length": [],
                     "label": [None],
                     "label_length": [],
-                    "transcript": [],
-                    "wav_filename": [],
+                    "text": [],
+                    "filepath": [],
                 }
             ),
         )
