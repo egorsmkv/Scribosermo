@@ -4,20 +4,11 @@ import os
 import sys
 import time
 
-import librosa
 import numpy as np
 import pandas as pd
 from pandarallel import pandarallel
 
 import text_cleaning
-
-# ==================================================================================================
-
-
-def get_duration(filename):
-    """ Get duration of the wav file """
-    length = librosa.get_duration(filename=filename)
-    return length
 
 
 # ==================================================================================================
@@ -37,10 +28,7 @@ def seconds_to_hours(secs):
 def add_statistics_columns(data):
     """ Create some temporary columns """
 
-    data["duration"] = data.parallel_apply(
-        lambda x: get_duration(x.wav_filename), axis=1
-    )
-    data["text_length"] = data.parallel_apply(lambda x: len(x.transcript), axis=1)
+    data["text_length"] = data.parallel_apply(lambda x: len(x.text), axis=1)
     data["avg_time_per_char"] = data["duration"] / data["text_length"]
 
     return data
@@ -79,10 +67,15 @@ def clean(data):
     data = data[data["duration"] > 0.5]
     print("Excluded", length_old - len(data), "files with too short duration")
 
-    # Keep only files less than 45 seconds
+    # Keep only files less than 30 seconds
     length_old = len(data)
-    data = data[data["duration"] < 45]
+    data = data[data["duration"] < 30]
     print("Excluded", length_old - len(data), "files with too long duration")
+
+    # Keep only files with transcriptions shorter than 512 chars
+    length_old = len(data)
+    data = data[data["text_length"] < 512]
+    print("Excluded", length_old - len(data), "files with too long transcriptions")
 
     # Drop files which need more than 3 seconds per char
     length_old = len(data)
@@ -139,14 +132,20 @@ def main():
     start_time = time.time()
 
     # Keep the german 0 as "null" string
-    data = pd.read_csv(args.input_csv_path, keep_default_na=False)
+    data = pd.read_csv(args.input_csv_path, sep="\t", keep_default_na=False)
 
     # Drop sentences with empty transcription
     length_old = len(data)
-    data["text_length"] = data.parallel_apply(lambda x: len(x.transcript), axis=1)
+    data["text_length"] = data.parallel_apply(lambda x: len(x.text), axis=1)
     data = data[data["text_length"] > 0]
     data = data.drop(columns=["text_length"])
     print("\nExcluded", length_old - len(data), "files with empty transcriptions")
+
+    # Make audiopaths absolute
+    csv_dir = os.path.dirname(args.input_csv_path)
+    data["filepath"] = data["filepath"].parallel_apply(
+        lambda x: os.path.join(csv_dir, x)
+    )
 
     if not args.nostats:
         # Add statistics columns, save start size and duration and print data statistics
@@ -157,7 +156,7 @@ def main():
 
     if args.exclude:
         length_old = len(data)
-        data = data[~data["wav_filename"].isin(excluded)]
+        data = data[~data["filepath"].isin(excluded)]
         msg = "Excluded {} files which were marked for exclusion"
         print(msg.format(length_old - len(data)))
 
@@ -165,12 +164,12 @@ def main():
         data = data.reindex(np.random.permutation(data.index))
 
     if args.sort:
-        data = data.sort_values("wav_filesize")
+        data = data.sort_values("duration")
         data = data.reset_index(drop=True)
 
     if args.replace:
-        data["transcript"] = data["transcript"].str.lower()
-        data["transcript"] = data["transcript"].parallel_apply(
+        data["text"] = data["text"].str.lower()
+        data["text"] = data["text"].parallel_apply(
             lambda x: text_cleaning.clean_sentence(x)[0]
         )
 
@@ -184,7 +183,7 @@ def main():
         size_diff = size_start - size_end
         time_diff = duration_start - time_end
         print_statistics(data)
-        data = data.drop(columns=["duration", "text_length", "avg_time_per_char"])
+        data = data.drop(columns=["text_length", "avg_time_per_char"])
 
         # Print summary
         msg = "Excluded in total {} of {} files, those are {:.1f}% of all files"
@@ -201,7 +200,7 @@ def main():
         msg = "Your dataset now has {} files and a duration of {} hours\n"
         print(msg.format(size_end, seconds_to_hours(time_end)))
 
-    data.to_csv(args.output_csv_path, index=False, encoding="utf-8")
+    data.to_csv(args.output_csv_path, index=False, sep="\t", encoding="utf-8")
     end_time = time.time()
     msg = "Preparation took {} hours\n"
     print(msg.format(seconds_to_hours(end_time - start_time)))

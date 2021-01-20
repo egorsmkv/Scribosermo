@@ -19,6 +19,8 @@ data_paths:
   test: "/data_prepared/{LANGUAGE}/voxforge/test_azce.csv"
 
 alphabet_path: "/deepspeech-polyglot/data/alphabet_{LANGUAGE}.json"
+scorer_path: "/data_prepared/texts/{LANGUAGE}/kenlm_{LANGUAGE}.scorer"
+scorer_alphabet: "/deepspeech-polyglot/data/alphabet_{LANGUAGE}.txt"
 audio_sample_rate: 16000
 
 # Depends on your gpu memory. If using multiple gpus, the value will be automatically multiplied.
@@ -29,9 +31,17 @@ batch_sizes:
   test: 1
 
 training_epochs: 30
+
+# If there are old checkpoints in the directory, the training will be continued from there
+empty_ckpt_dir: true
 checkpoint_dir: "/checkpoints/{LANGUAGE}/tmp/"
 
+# If using this, make sure your config matches the one of the pretrained checkpoint
+continue_pretrained: false
+pretrained_checkpoint_dir: "/checkpoints/en/qnet5/"
+
 use_pipeline_cache: true
+empty_cache_dir: true
 cache_dir: "/tmp/dspol_cache/"
 
 # Print a single greedy prediction while training, disable by setting value to zero.
@@ -47,7 +57,7 @@ optimizer:
 
 # Changing things here will break compatibility with the default production bindings.
 audio_features:
-  use_type: "mfcc"
+  use_type: "lfbank"
   mfcc:
     num_features: 26
     window_len: 0.032
@@ -59,7 +69,7 @@ audio_features:
 
 augmentations:
   normalize:
-    use: false
+    use: true
   resample:
     # Resamples to given sample rate and back again.
     use: false

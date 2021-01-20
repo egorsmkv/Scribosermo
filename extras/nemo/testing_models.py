@@ -352,5 +352,5 @@ def debug_input(csv_path):
 
 # Also update quartznet block number above if you change the model
 build_test_tfmodel(
-    "/nemo/models/QuartzNet5x5LS-En.onnx", test_csv, "/checkpoints/qnet5/"
+    "/nemo/models/QuartzNet5x5LS-En.onnx", test_csv, "/checkpoints/en/qnet5/"
 )

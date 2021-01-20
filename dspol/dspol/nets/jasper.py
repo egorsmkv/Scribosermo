@@ -70,6 +70,7 @@ class MyModel(Model):
 
         self.n_input = c_input
         self.n_output = c_output
+        self.feature_time_reduction_factor = 2
 
         self.model = self.make_model(
             block_params, block_repeat, module_repeat, dense_residuals
@@ -126,6 +127,14 @@ class MyModel(Model):
 
         model = Model(input_tensor, output_tensor, name="Jasper")
         return model
+
+    # ==============================================================================================
+
+    def get_time_reduction_factor(self):
+        """Some models reduce the time dimension of the features, for example with striding.
+        When the inputs are padded for better batching, it's complicated to get the original length
+        from the outputs. So we use this fixed factor."""
+        return self.feature_time_reduction_factor
 
     # ==============================================================================================
 

@@ -13,6 +13,9 @@ from . import nets, pipeline, utils
 
 # ==================================================================================================
 
+# tf.config.run_functions_eagerly(True)
+# tf.config.optimizer.set_jit(True)
+
 # Use growing gpu memory
 gpus = tf.config.experimental.list_physical_devices("GPU")
 for gpu in gpus:
@@ -64,14 +67,11 @@ def loss_function(predictions, logit_lengths, samples):
 
 # ==================================================================================================
 
-
+# @tf.function
 def get_loss(predictions, samples):
     # Calculate logit length here, that we can decorate the loss calculation
     # with a tf-function call for much faster calculations
-    logit_lengths = tf.constant(
-        tf.shape(predictions)[1], shape=tf.shape(predictions)[0]
-    )
-    # logit_lengths = samples["feature_length"]
+    logit_lengths = samples["feature_length"] / model.get_time_reduction_factor()
     loss = loss_function(predictions, logit_lengths, samples)
     # loss = optimizer.get_scaled_loss(loss)
     return loss
@@ -92,7 +92,7 @@ def train_step(samples, step):
         tf.summary.scalar("loss", loss)
 
     trainable_variables = model.trainable_variables
-    gradients = tape.gradient(loss, model.trainable_variables)
+    gradients = tape.gradient(loss, trainable_variables)
     # gradients = optimizer.get_unscaled_gradients(scaled_gradients)
     gradients, global_norm = tf.clip_by_global_norm(gradients, 1.0)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
@@ -127,7 +127,7 @@ def log_greedy_text(predictions, samples):
 
 
 def train(dataset_train, dataset_val, start_epoch, stop_epoch):
-    step = np.int64(0)
+    step = tf.constant(0, dtype=tf.int64)
     log_greedy_steps = config["log_prediction_steps"]
     # tf.profiler.experimental.start('/checkpoints/profiles/')
 
@@ -201,18 +201,24 @@ def eval(dataset_val):
 def main():
     global model, summary_writer, save_manager, optimizer
 
-    # Delete old data and create folders
-    if os.path.exists(checkpoint_dir):
-        utils.delete_dir(checkpoint_dir)
-    if os.path.exists(cache_dir):
-        utils.delete_dir(cache_dir)
-    os.makedirs(checkpoint_dir)
-    os.makedirs(cache_dir)
+    if config["empty_cache_dir"]:
+        # Delete and recreate cache dir
+        if os.path.exists(cache_dir):
+            utils.delete_dir(cache_dir)
+    os.makedirs(cache_dir, exist_ok=True)
 
-    # Export current config next to the checkpoints
-    path = os.path.join(checkpoint_dir, "config_export.json")
-    with open(path, "w+", encoding="utf-8") as file:
-        json.dump(config, file, indent=2)
+    if config["empty_ckpt_dir"]:
+        # Delete and recreate checkpoint dir
+        if os.path.exists(checkpoint_dir):
+            utils.delete_dir(checkpoint_dir)
+
+    if config["continue_pretrained"]:
+        # Copy the pretrained checkpoint
+        shutil.copytree(config["pretrained_checkpoint_dir"], config["checkpoint_dir"])
+        print("Copied pretrained checkpoint")
+    else:
+        # Create and empty directory
+        os.makedirs(checkpoint_dir, exist_ok=True)
 
     # Create pipelines
     cache = config["cache_dir"] + "train" if config["use_pipeline_cache"] else ""
@@ -240,8 +246,16 @@ def main():
     c_input = config["audio_features"][feature_type]["num_features"]
     c_output = len(alphabet) + 1
 
+    # Get the model type either from the config or the existing checkpoint
+    if config["continue_pretrained"] or not config["empty_ckpt_dir"]:
+        path = os.path.join(checkpoint_dir, "config_export.json")
+        exported_config = utils.load_json_file(path)
+        network_type = exported_config["network"]["name"]
+    else:
+        network_type = config["network"]["name"]
+
     # Build the network
-    network_type = config["network"]["name"]
+    print("Creating new {} model ...".format(network_type))
     if network_type == "deepspeech1":
         model = nets.deepspeech1.MyModel(c_input, c_output)
     elif network_type == "deepspeech2":
@@ -262,10 +276,22 @@ def main():
             module_repeat=config["network"]["module_repeat"],
         )
 
+    # Copy weights. Compared to loading the model directly, this has the benefit that parts of the
+    # model code can be changed as long the layers are kept.
+    if config["continue_pretrained"] or not config["empty_ckpt_dir"]:
+        print("Copying model weights from checkpoint ...")
+        exported_model = tf.keras.models.load_model(checkpoint_dir)
+        model.set_weights(exported_model.get_weights())
+
     # Print network summary
     model.build(input_shape=(None, None, c_input))
     model.summary()
     # tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
+
+    # Export current config next to the checkpoints
+    path = os.path.join(checkpoint_dir, "config_export.json")
+    with open(path, "w+", encoding="utf-8") as file:
+        json.dump(config, file, indent=2)
 
     # Select optimizer
     optimizer_type = config["optimizer"]["name"]
@@ -278,8 +304,8 @@ def main():
         optimizer = tfa.optimizers.NovoGrad(
             learning_rate=config["optimizer"]["learning_rate"],
             weight_decay=config["optimizer"]["weight_decay"],
-            beta_1=config["optimizer"]["beta_1"],
-            beta_2=config["optimizer"]["beta_2"],
+            beta_1=config["optimizer"]["beta1"],
+            beta_2=config["optimizer"]["beta2"],
         )
     # optimizer = mixed_precision.LossScaleOptimizer(optimizer, loss_scale='dynamic')
 

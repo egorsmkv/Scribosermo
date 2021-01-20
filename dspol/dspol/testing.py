@@ -9,8 +9,6 @@ from . import pipeline, training, utils
 
 # ==================================================================================================
 
-# tf.config.optimizer.set_jit(True)
-
 # Allow growing gpu memory
 gpus = tf.config.experimental.list_physical_devices("GPU")
 for gpu in gpus:
@@ -20,11 +18,11 @@ config = utils.get_config()
 checkpoint_dir = config["checkpoint_dir"]
 model: tf.keras.Model
 
-ds_alphabet = Alphabet("/deepspeech-polyglot/data/alphabet_en.txt")
+ds_alphabet = Alphabet(config["scorer_alphabet"])
 ds_scorer = Scorer(
     alpha=0.931289039105002,
     beta=1.1834137581510284,
-    scorer_path="/data_prepared/texts/en/ds_en.scorer",
+    scorer_path=config["scorer_path"],
     alphabet=ds_alphabet,
 )
 
@@ -116,12 +114,14 @@ def get_texts(predictions, samples):
         label = b"".join(label).strip().decode("utf-8")
 
         # Calculate loss
-        samp = {
-            "label": [samples["label"][i]],
-            "label_length": [samples["label_length"][i]],
-        }
-        bpred = tf.expand_dims(pred, axis=0)
-        loss = training.get_loss(bpred, samp).numpy()
+        # samp = {
+        #     "label": [samples["label"][i]],
+        #     "label_length": [samples["label_length"][i]],
+        #     "feature_length": [samples["feature_length"][i]],
+        # }
+        # bpred = tf.expand_dims(pred, axis=0)
+        # loss = training.get_loss(bpred, samp).numpy()
+        loss = 0
 
         twf = {
             "filepath": samples["filepath"][i].numpy(),
@@ -218,4 +218,5 @@ def main():
     model.compile()
     model.summary()
 
+    # training.model = model
     run_test(dataset_test)

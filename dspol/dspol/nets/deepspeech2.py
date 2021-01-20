@@ -17,6 +17,7 @@ class MyModel(Model):
         self.n_hidden = 1024
         self.relu_clip = 20
         self.dropout_rate = 0.05
+        self.feature_time_reduction_factor = 2
 
         self.model = self.make_model()
 
@@ -67,6 +68,14 @@ class MyModel(Model):
 
         model.add(tfl.Lambda(lambda x: x, name="output"))
         return model
+
+    # ==============================================================================================
+
+    def get_time_reduction_factor(self):
+        """Some models reduce the time dimension of the features, for example with striding.
+        When the inputs are padded for better batching, it's complicated to get the original length
+        from the outputs. So we use this fixed factor."""
+        return self.feature_time_reduction_factor
 
     # ==============================================================================================
 

@@ -16,6 +16,8 @@ setuptools.setup(
     install_requires=[
         "librosa",
         "numpy",
+        "num2words",
+        "pandarallel",
         "pandas",
         "pyyaml",
         "tensorflow<2.4,>=2.3",

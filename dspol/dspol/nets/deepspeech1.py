@@ -85,6 +85,12 @@ class MyModel(Model):
 
     # ==============================================================================================
 
+    def get_time_reduction_factor(self):
+        """Keep for compatibility with other models"""
+        return 1
+
+    # ==============================================================================================
+
     def summary(self, line_length=100, **kwargs):
         self.model.summary(line_length=line_length, **kwargs)
 
