@@ -4,7 +4,6 @@ import os
 import sys
 import time
 
-import numpy as np
 import pandas as pd
 from pandarallel import pandarallel
 
@@ -107,11 +106,10 @@ def clean(data):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Clean and shuffle datasets")
+    parser = argparse.ArgumentParser(description="Clean datasets")
     parser.add_argument("input_csv_path", type=str)
     parser.add_argument("output_csv_path", type=str)
-    parser.add_argument("--shuffle", action="store_true")
-    parser.add_argument("--sort", action="store_true", help="Sort dataset by filesize")
+    parser.add_argument("--sort", action="store_true", help="Sort dataset by duration")
     parser.add_argument("--replace", action="store_true")
     parser.add_argument("--clean", action="store_true")
     parser.add_argument("--exclude", action="store_true")
@@ -125,7 +123,7 @@ def main():
     with open(file_path + "../data/excluded_files.json") as json_file:
         excluded = json.load(json_file)
 
-    if not (args.shuffle or args.replace or args.clean or args.exclude):
+    if not (args.sort or args.replace or args.clean or args.exclude):
         print("No operation given")
         sys.exit()
 
@@ -159,9 +157,6 @@ def main():
         data = data[~data["filepath"].isin(excluded)]
         msg = "Excluded {} files which were marked for exclusion"
         print(msg.format(length_old - len(data)))
-
-    if args.shuffle:
-        data = data.reindex(np.random.permutation(data.index))
 
     if args.sort:
         data = data.sort_values("duration")

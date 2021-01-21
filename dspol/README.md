@@ -26,11 +26,13 @@ python3 /deepspeech-polyglot/dspol/run_tests.py
 
 Other commands:
 ```bash
-# Combine specific csv files:
-python3 /deepspeech-polyglot/preprocessing/combine_datasets.py --file_output "/data_prepared/en/librispeech/train-all.csv" \
-  --files "/data_prepared/en/librispeech/train-clean-100.csv /data_prepared/en/librispeech/train-clean-360.csv /data_prepared/en/librispeech/train-other-500.csv"
+export LANGUAGE="de"
 
 # To shuffle and replace non alphabet characters and clean the files run (repeat for all 3 csv files):
 python3 /deepspeech-polyglot/preprocessing/dataset_operations.py "/data_prepared/en/librispeech/train-all.csv" \
-  "/data_prepared/en/librispeech/train-all_azce.csv" --replace --shuffle --clean --exclude
+  "/data_prepared/en/librispeech/train-all_azce.csv" --replace --clean --exclude
+
+# Combine specific csv files:
+python3 /deepspeech-polyglot/preprocessing/combine_datasets.py --file_output "/data_prepared/en/librispeech/train-all.csv" \
+  --files "/data_prepared/en/librispeech/train-clean-100.csv /data_prepared/en/librispeech/train-clean-360.csv /data_prepared/en/librispeech/train-other-500.csv"
 ```

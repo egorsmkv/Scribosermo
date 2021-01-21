@@ -21,9 +21,8 @@ def main():
         os.makedirs(dir_path, exist_ok=True)
 
     files = args.files.split(" ")
-    combined_csv = pd.concat(
-        [pd.read_csv(f, sep="\t", keep_default_na=False) for f in files]
-    )
+    csvs = [pd.read_csv(f, sep="\t", keep_default_na=False) for f in files]
+    combined_csv = pd.concat(csvs, axis=0, join="inner")
     combined_csv.to_csv(args.file_output, index=False, sep="\t", encoding="utf-8")
 
 
