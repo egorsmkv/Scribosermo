@@ -1,8 +1,3 @@
-"""
-For setup follow:
-https://cloud.google.com/text-to-speech/docs/reference/libraries#client-libraries-resources-python
-"""
-
 import os
 import random
 import sys
@@ -14,7 +9,7 @@ from google.cloud import texttospeech
 # ==================================================================================================
 
 # Export application credentials
-gac_path = "/DeepSpeech/deepspeech-polyglot/data/google_application_credentials.json"
+gac_path = "/deepspeech-polyglot/extras/wavenet/google_application_credentials.json"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = gac_path
 
 speakers = [
@@ -27,8 +22,8 @@ speakers = [
 
 client: texttospeech.TextToSpeechClient
 
-text_data_path = "/DeepSpeech/data_original/German_sentences_8mil_filtered_maryfied.txt"
-data_directory = "/DeepSpeech/data_original/google_wavenet/"
+text_data_path = "/data_original/texts/de/German_sentences_8mil_filtered_maryfied.txt"
+data_directory = "/data_original/google_wavenet/"
 audio_path = data_directory + "audio/"
 csv_path = data_directory + "all.csv"
 
