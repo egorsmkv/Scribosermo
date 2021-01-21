@@ -12,10 +12,7 @@ language: "de"
 # Columns "filepath", "duration" and "text" are required, additional columns will be ignored.
 data_paths:
   train: "/data_prepared/{LANGUAGE}/voxforge/train_azce.csv"
-#  train: "/data_prepared/{LANGUAGE}/voxforge/nano_test_azce.csv"
-#  train: "/data_prepared/{LANGUAGE}/voxforge/mini_test_azce.csv"
-  val: "/data_prepared/{LANGUAGE}/voxforge/dev_azce.csv"
-#  val: "/data_prepared/{LANGUAGE}/voxforge/nano_val_azce.csv"
+  eval: "/data_prepared/{LANGUAGE}/voxforge/dev_azce.csv"
   test: "/data_prepared/{LANGUAGE}/voxforge/test_azce.csv"
 
 alphabet_path: "/deepspeech-polyglot/data/alphabet_{LANGUAGE}.json"
@@ -27,8 +24,12 @@ audio_sample_rate: 16000
 # In most cases a higher value is better, but if it's too high, you will get an Out-Of-Memory error.
 batch_sizes:
   train: 8
-  val: 8
+  eval: 8
   test: 1
+
+# Sort the datasets. You can use a descending sort to estimate the maximal batch size you can use.
+sort_datasets: true
+sort_ds_ascending: true
 
 training_epochs: 30
 
@@ -46,6 +47,10 @@ cache_dir: "/tmp/dspol_cache/"
 
 # Print a single greedy prediction while training, disable by setting value to zero.
 log_prediction_steps: 25
+
+# Print files with worst predictions. Sort either by "loss" or "greedy_cer". Usable for debugging.
+log_worst_test_losses: 3
+sort_wtl_key: "greedy_cer"
 
 # Like with the network, checkout the training source code to see which parameters are required.
 optimizer:

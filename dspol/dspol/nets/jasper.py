@@ -130,6 +130,8 @@ class MyModel(Model):
 
     # ==============================================================================================
 
+    # Input signature is required to export this method into ".pb" format and use it while testing
+    @tf.function(input_signature=[])
     def get_time_reduction_factor(self):
         """Some models reduce the time dimension of the features, for example with striding.
         When the inputs are padded for better batching, it's complicated to get the original length

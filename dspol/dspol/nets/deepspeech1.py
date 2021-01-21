@@ -85,6 +85,8 @@ class MyModel(Model):
 
     # ==============================================================================================
 
+    # Input signature is required to export this method into ".pb" format and use it while testing
+    @tf.function(input_signature=[])
     def get_time_reduction_factor(self):
         """Keep for compatibility with other models"""
         return 1

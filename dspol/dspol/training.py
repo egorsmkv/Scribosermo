@@ -3,10 +3,8 @@ import os
 import shutil
 import time
 
-import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
-import tqdm
 from tensorflow.keras.mixed_precision import experimental as mixed_precision
 
 from . import nets, pipeline, utils
@@ -41,15 +39,19 @@ model: tf.keras.Model
 summary_writer: tf.summary.SummaryWriter
 save_manager: tf.train.CheckpointManager
 optimizer: tf.keras.optimizers.Adam
-
+strategy: tf.distribute.Strategy
 
 # ==================================================================================================
 
 
 @tf.function(experimental_relax_shapes=True)
-def loss_function(predictions, logit_lengths, samples):
-    labels = samples["label"]
+def get_loss(predictions, samples):
+    """Calculate CTC loss"""
+
     label_lengths = samples["label_length"]
+    labels = samples["label"]
+    logit_lengths = samples["feature_length"] / model.get_time_reduction_factor()
+    logit_lengths = tf.cast(tf.math.ceil(logit_lengths), tf.int32)
 
     # Blank index of "-1" returned better results compared to labels starting from 1, reason unclear
     loss = tf.nn.ctc_loss(
@@ -60,36 +62,22 @@ def loss_function(predictions, logit_lengths, samples):
         blank_index=-1,
         logits_time_major=False,
     )
-
-    loss = tf.reduce_mean(loss)
     return loss
 
 
 # ==================================================================================================
 
-# @tf.function
-def get_loss(predictions, samples):
-    # Calculate logit length here, that we can decorate the loss calculation
-    # with a tf-function call for much faster calculations
-    logit_lengths = samples["feature_length"] / model.get_time_reduction_factor()
-    loss = loss_function(predictions, logit_lengths, samples)
-    # loss = optimizer.get_scaled_loss(loss)
-    return loss
 
+@tf.function(experimental_relax_shapes=True)
+def train_step(samples):
+    """Run a single forward and backward step and return the loss"""
 
-# ==================================================================================================
-
-# @tf.function
-def train_step(samples, step):
     features = samples["features"]
 
     with tf.GradientTape() as tape:
         predictions = model(features)
         loss = get_loss(predictions, samples)
-
-    with summary_writer.as_default():
-        tf.summary.experimental.set_step(step)
-        tf.summary.scalar("loss", loss)
+        loss = tf.reduce_mean(loss)
 
     trainable_variables = model.trainable_variables
     gradients = tape.gradient(loss, trainable_variables)
@@ -97,19 +85,64 @@ def train_step(samples, step):
     gradients, global_norm = tf.clip_by_global_norm(gradients, 1.0)
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
-    return loss, predictions
+    return loss
 
 
 # ==================================================================================================
 
 
-def log_greedy_text(predictions, samples):
+@tf.function(experimental_relax_shapes=True)
+def eval_step(samples):
+    """Run a single forward and return the loss"""
 
-    # Drop all except first sample, and switch batch_size and time_steps
-    predictions = tf.expand_dims(predictions[0], axis=0)
-    predictions = tf.transpose(predictions, perm=[1, 0, 2])
+    features = samples["features"]
+    predictions = model(features, training=False)
+    loss = get_loss(predictions, samples)
+    loss = tf.reduce_mean(loss)
 
-    logit_lengths = tf.constant(tf.shape(predictions)[0], shape=(1,))
+    return loss
+
+
+# ==================================================================================================
+
+
+@tf.function(experimental_relax_shapes=True)
+def distributed_train_step(dist_inputs):
+    """Helper function for distributed training"""
+
+    per_replica_losses = strategy.run(train_step, args=(dist_inputs,))
+    loss = strategy.reduce(tf.distribute.ReduceOp.SUM, per_replica_losses, axis=None)
+    return loss
+
+
+# ==================================================================================================
+
+
+@tf.function(experimental_relax_shapes=True)
+def distributed_eval_step(dist_inputs):
+    """Helper function for distributed evaluation"""
+
+    per_replica_losses = strategy.run(eval_step, args=(dist_inputs,))
+    loss = strategy.reduce(tf.distribute.ReduceOp.SUM, per_replica_losses, axis=None)
+    return loss
+
+
+# ==================================================================================================
+
+
+def log_greedy_text(samples):
+    """Run a prediction and log the predicted text"""
+
+    features = tf.expand_dims(samples["features"][0], axis=0)
+    logit_lengths = tf.expand_dims(samples["feature_length"][0], axis=0)
+    logit_lengths = logit_lengths / model.get_time_reduction_factor()
+    logit_lengths = tf.cast(tf.math.ceil(logit_lengths), tf.int32)
+
+    with tf.device("/CPU:0"):
+        prediction = model.predict(features)
+
+    # Switch batch_size and time_steps before decoding
+    predictions = tf.transpose(prediction, perm=[1, 0, 2])
     decoded = tf.nn.ctc_greedy_decoder(predictions, logit_lengths, merge_repeated=True)
 
     label = samples["label"][0]
@@ -126,13 +159,30 @@ def log_greedy_text(predictions, samples):
 # ==================================================================================================
 
 
-def train(dataset_train, dataset_val, start_epoch, stop_epoch):
+def distributed_log_greedy(dist_inputs):
+    """Helper function for distributed prediction logs. Because the dataset is distributed, we have
+    to extract the data values of the first device before running a non distributed prediction"""
+
+    samples = strategy.experimental_local_results(dist_inputs)[0]
+    conv_samps = {
+        "features": samples["features"].values[0],
+        "feature_length": samples["feature_length"].values[0],
+        "label": samples["label"].values[0],
+    }
+    log_greedy_text(conv_samps)
+
+
+# ==================================================================================================
+
+
+def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
     step = tf.constant(0, dtype=tf.int64)
     log_greedy_steps = config["log_prediction_steps"]
     # tf.profiler.experimental.start('/checkpoints/profiles/')
 
     for epoch in range(start_epoch, stop_epoch):
         start_time = time.time()
+        print("\nStarting new training epoch ...")
 
         for samples in dataset_train:
 
@@ -145,8 +195,13 @@ def train(dataset_train, dataset_val, start_epoch, stop_epoch):
             #     # Not recommended, but couldn't get next dataset element here
             #     loss, predictions = train_step(samples, step)
 
-            loss, predictions = train_step(samples, step)
+            loss = distributed_train_step(samples)
             step += 1
+
+            with summary_writer.as_default():
+                tf.summary.experimental.set_step(step)
+                tf.summary.scalar("loss", loss)
+
             print("Step: {} - Epoch: {} - Loss: {}".format(step, epoch, loss.numpy()))
 
             # with summary_writer.as_default():
@@ -155,15 +210,10 @@ def train(dataset_train, dataset_val, start_epoch, stop_epoch):
             #         step=0)
 
             if log_greedy_steps != 0 and step % log_greedy_steps == 0:
-                # print("")
-                # print(samples["features"][0])
-                # print(samples["label"][0])
-                # print(predictions)
-                log_greedy_text(predictions, samples)
+                distributed_log_greedy(samples)
 
         save_manager.save()
-        # eval(dataset_val)
-        # tf.saved_model.save(model, checkpoint_dir)
+        eval(dataset_eval)
         tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
 
         msg = "Epoch {} took {} hours\n"
@@ -176,20 +226,18 @@ def train(dataset_train, dataset_val, start_epoch, stop_epoch):
 # ==================================================================================================
 
 
-def eval(dataset_val):
+def eval(dataset_eval):
     print("\nEvaluating ...")
     loss = 0
     step = 0
     log_greedy_steps = config["log_prediction_steps"]
 
-    for samples in dataset_val:
-        features = samples["features"]
-        predictions = model(features)
-        loss += get_loss(predictions, samples).numpy()
+    for samples in dataset_eval:
+        loss += distributed_eval_step(samples).numpy()
         step += 1
 
         if log_greedy_steps != 0 and step % log_greedy_steps == 0:
-            log_greedy_text(predictions, samples)
+            distributed_log_greedy(samples)
 
     loss = loss / step
     print("Validation loss: {}".format(loss))
@@ -199,7 +247,7 @@ def eval(dataset_val):
 
 
 def main():
-    global model, summary_writer, save_manager, optimizer
+    global model, summary_writer, save_manager, optimizer, strategy
 
     if config["empty_cache_dir"]:
         # Delete and recreate cache dir
@@ -220,23 +268,34 @@ def main():
         # Create and empty directory
         os.makedirs(checkpoint_dir, exist_ok=True)
 
+    # Enable testing with multiple gpus
+    strategy = tf.distribute.MirroredStrategy()
+    global_train_batch_size = (
+        config["batch_sizes"]["train"] * strategy.num_replicas_in_sync
+    )
+    global_eval_batch_size = (
+        config["batch_sizes"]["eval"] * strategy.num_replicas_in_sync
+    )
+
     # Create pipelines
     cache = config["cache_dir"] + "train" if config["use_pipeline_cache"] else ""
     dataset_train = pipeline.create_pipeline(
         csv_path=config["data_paths"]["train"],
-        batch_size=config["batch_sizes"]["train"],
+        batch_size=global_train_batch_size,
         config=config,
         augment=True,
         cache_path=cache,
     )
-    cache = config["cache_dir"] + "val" if config["use_pipeline_cache"] else ""
-    dataset_val = pipeline.create_pipeline(
-        csv_path=config["data_paths"]["val"],
-        batch_size=config["batch_sizes"]["val"],
+    cache = config["cache_dir"] + "eval" if config["use_pipeline_cache"] else ""
+    dataset_eval = pipeline.create_pipeline(
+        csv_path=config["data_paths"]["eval"],
+        batch_size=global_eval_batch_size,
         config=config,
         augment=False,
         cache_path=cache,
     )
+    dataset_train = strategy.experimental_distribute_dataset(dataset_train)
+    dataset_eval = strategy.experimental_distribute_dataset(dataset_eval)
 
     # tf.profiler.experimental.server.start(6009)
     # tf.summary.trace_on(graph=True, profiler=True)
@@ -256,25 +315,26 @@ def main():
 
     # Build the network
     print("Creating new {} model ...".format(network_type))
-    if network_type == "deepspeech1":
-        model = nets.deepspeech1.MyModel(c_input, c_output)
-    elif network_type == "deepspeech2":
-        model = nets.deepspeech2.MyModel(c_input, c_output)
-    elif network_type == "jasper":
-        model = nets.jasper.MyModel(
-            c_input,
-            c_output,
-            blocks=config["network"]["blocks"],
-            module_repeat=config["network"]["module_repeat"],
-            dense_residuals=config["network"]["dense_residuals"],
-        )
-    elif network_type == "quartznet":
-        model = nets.quartznet.MyModel(
-            c_input,
-            c_output,
-            blocks=config["network"]["blocks"],
-            module_repeat=config["network"]["module_repeat"],
-        )
+    with strategy.scope():
+        if network_type == "deepspeech1":
+            model = nets.deepspeech1.MyModel(c_input, c_output)
+        elif network_type == "deepspeech2":
+            model = nets.deepspeech2.MyModel(c_input, c_output)
+        elif network_type == "jasper":
+            model = nets.jasper.MyModel(
+                c_input,
+                c_output,
+                blocks=config["network"]["blocks"],
+                module_repeat=config["network"]["module_repeat"],
+                dense_residuals=config["network"]["dense_residuals"],
+            )
+        elif network_type == "quartznet":
+            model = nets.quartznet.MyModel(
+                c_input,
+                c_output,
+                blocks=config["network"]["blocks"],
+                module_repeat=config["network"]["module_repeat"],
+            )
 
     # Copy weights. Compared to loading the model directly, this has the benefit that parts of the
     # model code can be changed as long the layers are kept.
@@ -294,20 +354,21 @@ def main():
         json.dump(config, file, indent=2)
 
     # Select optimizer
-    optimizer_type = config["optimizer"]["name"]
-    if optimizer_type == "adamw":
-        optimizer = tfa.optimizers.AdamW(
-            learning_rate=config["optimizer"]["learning_rate"],
-            weight_decay=config["optimizer"]["weight_decay"],
-        )
-    elif optimizer_type == "novograd":
-        optimizer = tfa.optimizers.NovoGrad(
-            learning_rate=config["optimizer"]["learning_rate"],
-            weight_decay=config["optimizer"]["weight_decay"],
-            beta_1=config["optimizer"]["beta1"],
-            beta_2=config["optimizer"]["beta2"],
-        )
-    # optimizer = mixed_precision.LossScaleOptimizer(optimizer, loss_scale='dynamic')
+    with strategy.scope():
+        optimizer_type = config["optimizer"]["name"]
+        if optimizer_type == "adamw":
+            optimizer = tfa.optimizers.AdamW(
+                learning_rate=config["optimizer"]["learning_rate"],
+                weight_decay=config["optimizer"]["weight_decay"],
+            )
+        elif optimizer_type == "novograd":
+            optimizer = tfa.optimizers.NovoGrad(
+                learning_rate=config["optimizer"]["learning_rate"],
+                weight_decay=config["optimizer"]["weight_decay"],
+                beta_1=config["optimizer"]["beta1"],
+                beta_2=config["optimizer"]["beta2"],
+            )
+        # optimizer = mixed_precision.LossScaleOptimizer(optimizer, loss_scale='dynamic')
 
     summary_writer = tf.summary.create_file_writer(checkpoint_dir)
     checkpoint = tf.train.Checkpoint(model=model, optimizer=optimizer)
@@ -324,4 +385,4 @@ def main():
 
     # Finally the training can start
     max_epoch = config["training_epochs"]
-    train(dataset_train, dataset_val, start_epoch, max_epoch)
+    train(dataset_train, dataset_eval, start_epoch, max_epoch)

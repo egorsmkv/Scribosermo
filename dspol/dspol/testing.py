@@ -31,7 +31,7 @@ ds_scorer = Scorer(
 
 def levenshtein(a, b):
     """Calculates the Levenshtein distance between a and b.
-    Copied from: hetland.org/coding/python/levenshtein.py"""
+    Copied from: http://hetland.org/coding/python/levenshtein.py"""
     n, m = len(a), len(b)
     if n > m:
         # Make sure n <= m, to use O(min(n,m)) space
@@ -114,14 +114,13 @@ def get_texts(predictions, samples):
         label = b"".join(label).strip().decode("utf-8")
 
         # Calculate loss
-        # samp = {
-        #     "label": [samples["label"][i]],
-        #     "label_length": [samples["label_length"][i]],
-        #     "feature_length": [samples["feature_length"][i]],
-        # }
-        # bpred = tf.expand_dims(pred, axis=0)
-        # loss = training.get_loss(bpred, samp).numpy()
-        loss = 0
+        samp = {
+            "label": [samples["label"][i]],
+            "label_length": [samples["label_length"][i]],
+            "feature_length": [samples["feature_length"][i]],
+        }
+        bpred = tf.expand_dims(pred, axis=0)
+        loss = training.get_loss(bpred, samp)[0].numpy()
 
         twf = {
             "filepath": samples["filepath"][i].numpy(),
@@ -139,12 +138,27 @@ def get_texts(predictions, samples):
 
 
 def print_results(results: List[dict]):
-    gd_cer = 0
-    gd_wer = 0
-    lm_cer = 0
-    lm_wer = 0
-    loss = 0
+    """Prints test summary and worst predictions"""
 
+    if config["log_worst_test_losses"] > 0:
+        print("\nPredictions with highest {}:".format(config["sort_wtl_key"]))
+        results = sorted(results, key=lambda r: r[config["sort_wtl_key"]], reverse=True)
+        wres = results[: config["log_worst_test_losses"]]
+
+        keep_keys = ["filepath", "label", "greedy_text", "greedy_cer", "loss"]
+        for wr in wres:
+            print("-----")
+            pr = {k: v for k, v in wr.items() if k in keep_keys}
+            for k in pr:
+                if k in ["label", "greedy_text"]:
+                    print("-  {}: '{}'".format(k, pr[k]))
+                else:
+                    print("-  {}: {}".format(k, pr[k]))
+        print("-----")
+
+    gd_cer, gd_wer = 0, 0
+    lm_cer, lm_wer = 0, 0
+    loss = 0
     for result in results:
         gd_cer += result["greedy_cer"]
         gd_wer += result["greedy_wer"]
@@ -159,13 +173,13 @@ def print_results(results: List[dict]):
     lm_wer = lm_wer / len_results
     loss = loss / len_results
 
-    print("Test summary:")
+    print("\nTest summary:")
     print("  Loss: {}".format(loss))
     print("  CER greedy: {}".format(gd_cer))
     print("  CER with lm: {}".format(lm_cer))
     print("  WER greedy: {}".format(gd_wer))
     print("  WER with lm: {}".format(lm_wer))
-    # print(results)
+    print("")
 
 
 # ==================================================================================================
@@ -183,7 +197,7 @@ def run_test(dataset_test):
         step += 1
 
         if log_greedy_steps != 0 and step % log_greedy_steps == 0:
-            training.log_greedy_text(predictions, samples)
+            training.log_greedy_text(samples)
 
         results = get_texts(predictions, samples)
         test_results.extend(results)
@@ -198,25 +212,32 @@ def run_test(dataset_test):
 def main():
     global model
 
+    # Enable testing with multiple gpus
+    mirrored_strategy = tf.distribute.MirroredStrategy()
+    global_batch_size = (
+        config["batch_sizes"]["test"] * mirrored_strategy.num_replicas_in_sync
+    )
+
     # Use exported config to set up the pipeline
     path = os.path.join(checkpoint_dir, "config_export.json")
     exported_config = utils.load_json_file(path)
 
     dataset_test = pipeline.create_pipeline(
         csv_path=config["data_paths"]["test"],
-        batch_size=config["batch_sizes"]["test"],
+        batch_size=global_batch_size,
         config=exported_config,
         augment=True,
         cache_path="",
     )
 
     # Build model and print network summary
-    model = tf.keras.models.load_model(checkpoint_dir)
-    feature_type = exported_config["audio_features"]["use_type"]
-    c_input = exported_config["audio_features"][feature_type]["num_features"]
-    model.build(input_shape=(None, None, c_input))
-    model.compile()
-    model.summary()
+    with mirrored_strategy.scope():
+        model = tf.keras.models.load_model(checkpoint_dir)
+        feature_type = exported_config["audio_features"]["use_type"]
+        c_input = exported_config["audio_features"][feature_type]["num_features"]
+        model.build(input_shape=(None, None, c_input))
+        model.compile()
+        model.summary()
 
-    # training.model = model
+    training.model = model
     run_test(dataset_test)

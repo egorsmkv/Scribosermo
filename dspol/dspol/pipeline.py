@@ -211,7 +211,9 @@ def create_pipeline(
     df = pd.read_csv(csv_path, encoding="utf-8", sep="\t", keep_default_na=False)
     df = df[["filepath", "duration", "text"]]
 
-    df = df.sort_values("duration")
+    if config["sort_datasets"]:
+        df = df.sort_values("duration", ascending=config["sort_ds_ascending"])
+
     df = df[["filepath", "text"]]
     ds = tf.data.Dataset.from_tensor_slices(dict(df))
 
