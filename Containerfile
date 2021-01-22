@@ -44,9 +44,12 @@ RUN pip3 install --no-cache-dir "tensorflow-io<0.17"
 
 RUN apt-get update && apt-get install -y ffmpeg
 RUN git clone --depth 1 https://gitlab.com/Jaco-Assistant/corcua.git
-RUN pip3 install -e corcua/
+RUN pip3 install --no-cache-dir -e corcua/
+
+COPY requirements_test.txt /deepspeech-polyglot/requirements_test.txt
+RUN pip3 install --no-cache-dir -r /deepspeech-polyglot/requirements_test.txt
 
 COPY dspol/ /deepspeech-polyglot/dspol/
-RUN pip3 install -e /deepspeech-polyglot/dspol/
+RUN pip3 install --no-cache-dir -e /deepspeech-polyglot/dspol/
 
 CMD ["/bin/bash"]

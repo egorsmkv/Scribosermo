@@ -49,10 +49,10 @@ class BaseBlock(Model):
 
         self.partial_block = tf.keras.Sequential()
         for i in range(repeat - 1):
-            l = BaseModule(filters=filters, kernel_size=kernel_size)
-            self.partial_block.add(l)
-        l = BaseModule(filters=filters, kernel_size=kernel_size, has_relu=False)
-        self.partial_block.add(l)
+            layer = BaseModule(filters=filters, kernel_size=kernel_size)
+            self.partial_block.add(layer)
+        layer = BaseModule(filters=filters, kernel_size=kernel_size, has_relu=False)
+        self.partial_block.add(layer)
 
         self.convpt = tfl.Conv1D(
             filters=filters,

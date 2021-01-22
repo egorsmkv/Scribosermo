@@ -9,7 +9,6 @@ from pandarallel import pandarallel
 
 import text_cleaning
 
-
 # ==================================================================================================
 
 

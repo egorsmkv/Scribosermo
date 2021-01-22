@@ -17,9 +17,9 @@ def test_clean_sentence():
     os.environ["LANGUAGE"] = "de"
     text_cleaning.load_language()
 
-    sentences = "Hi, wie geht's dir?"
-    correct_sentence = "hi wie gehts dir"
-    correct_deleted = ["'"]
+    sentences = "Hi #, wie geht's dir?"
+    correct_sentence = "hi wie geht's dir"
+    correct_deleted = ["#"]
     cleaned_sentence, deleted_chars = text_cleaning.clean_sentence(sentences)
 
     assert cleaned_sentence == correct_sentence
@@ -41,7 +41,7 @@ def test_clean_sentence_list_de():
         "Für Vanilleeis? Da kauf ich lieber 1,5m² Grundstück in München",
     ]
     correct_sentences = [
-        "hi wie gehts dir",
+        "hi wie geht's dir",
         "moechtest du drei kilogramm vanilleeis",
         "ich habe leider nur zwei euro",
         "der preiss mag dafuer zwoelftausenddreihundert komma fuenf euro",

@@ -12,11 +12,11 @@ BATCH_SIZE=12
 USE_AUGMENTATION=1
 
 if [ "${DELETE_OLD_CHECKPOINTS}" = "1" ] || [ "${START_FROM_ENGLISH_CHECKPOINT}" = "1" ]; then
-    rm -rf ${CHECKPOINT_DIR}
+    rm -rf "${CHECKPOINT_DIR}"
 fi;
 
 if [ "${START_FROM_ENGLISH_CHECKPOINT}" = "1" ]; then
-    cp -r "/checkpoints/deepspeech-0.6.0-checkpoint/" ${CHECKPOINT_DIR}
+    cp -r "/checkpoints/deepspeech-0.6.0-checkpoint/" "${CHECKPOINT_DIR}"
 fi;
 
 if [ "${USE_AUGMENTATION}" = "1" ]; then
@@ -64,7 +64,7 @@ DSARGS="--train_files ${TRAIN_FILE} \
 
 echo ""
 echo ""
-echo "Running training with arguments:" ${DSARGS}
+echo "Running training with arguments: ${DSARGS}"
 echo ""
 echo ""
-python3 -u DeepSpeech.py ${DSARGS}
+/bin/bash -c "python3 -u /DeepSpeech/DeepSpeech.py ${DSARGS}"

@@ -6,6 +6,7 @@ Instructions to collect sample sentences and build an additional language model 
 
 Download sentence collection datasets from [tuda](http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/)
 and [europarl+news](https://www.statmt.org/wmt13/translation-task.html):
+
 ```bash
 export LANGUAGE="de"
 mkdir data_original/texts/ && mkdir data_original/texts/${LANGUAGE}/
@@ -31,18 +32,20 @@ rm news-2012.tgz && rm -r training-monolingual/
 
 In addition to above sentence collections, we can extract more sentences from our own datasets: \
 (Only use the training partitions for that)
+
 ```bash
 # Run in container
 export LANGUAGE="de"
 
 python3 /deepspeech-polyglot/langmodel/extract_transcripts.py \
   --input_csv /data_prepared/${LANGUAGE}/librispeech/train-all.csv \
-  --output_txt /data_original/texts/${LANGUAGE}/librispeech.txt 
+  --output_txt /data_original/texts/${LANGUAGE}/librispeech.txt
 ```
 
 <br/>
 
 Prepare the sentences.
+
 ```bash
 # Run in container
 export LANGUAGE="de"
@@ -56,6 +59,7 @@ python3 /deepspeech-polyglot/langmodel/prepare_vocab.py \
 
 Create the language model: \
 (If you want to keep the intermediate `.arpa` files, you can add the `--keep_arpa`)
+
 ```bash
 # Run in container
 export LANGUAGE="de"
@@ -69,6 +73,7 @@ python3 /deepspeech-polyglot/langmodel/generate_lm.py \
 ```
 
 Combine files to the scorer:
+
 ```bash
 # Run in container
 export LANGUAGE="de"

@@ -3,7 +3,7 @@ from typing import List
 
 import tensorflow as tf
 import tqdm
-from ds_ctcdecoder import ctc_beam_search_decoder, Scorer, Alphabet
+from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
 
 from . import pipeline, training, utils
 

@@ -7,7 +7,7 @@ image: python:3
 # only cache local items.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  SRC_DIRS: "preprocessing tests training"
+  SRC_DIRS: "dspol langmodel preprocessing tests"
 
 # Pip's cache doesn't store the python packages
 # https://pip.pypa.io/en/stable/reference/pip_install/#caching
@@ -44,9 +44,9 @@ linting:
     - isort --recursive --check-only --diff .
     - black --check --exclude venv .
     - npx prettylint "**/*.{json,md,yml}"
-    - pylint --disable=import-error ${SRC_DIRS}
+    - pylint --disable=import-error --disable=parse-error ${SRC_DIRS}
     - flake8 ${SRC_DIRS}
-    - shellcheck **/*.sh
+    - find . -type f \( -name '*.sh' -o -name '*.bash' \) ! -path './venv/*' | xargs shellcheck
 
 test:
   script:

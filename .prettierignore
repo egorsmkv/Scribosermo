@@ -5,7 +5,9 @@
 **.log
 **.tmp
 models/*
-data/google_application_credentials.json
+extras/wavenet/google_application_credentials.json
+extras/nemo/data/test.json
+extras/nemo/models/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

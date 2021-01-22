@@ -2,8 +2,6 @@ import argparse
 import os
 import sys
 
-import tqdm
-
 # The if block is required for isort
 if True:  # pylint: disable=using-constant-test
     file_path = os.path.dirname(os.path.realpath(__file__)) + "/"

@@ -1,21 +1,21 @@
 # Some experiments
 
 I did run some experiments using [Wav2Letter](https://github.com/facebookresearch/wav2letter/),
-but results weren't promising enough to continue further. 
+but results weren't promising enough to continue further.
 The code is not maintained anymore, so use it at your own risk.
 
 <br/>
 
-* Build the container:
+- Build the container:
 
-    ```bash
-    git clone https://github.com/facebookresearch/wav2letter.git
-    cd wav2letter && git checkout v0.2
-    docker build --no-cache -f ./Dockerfile-CUDA -t wav2letter .
-    cd ..
-    ```
+  ```bash
+  git clone https://github.com/facebookresearch/wav2letter.git
+  cd wav2letter && git checkout v0.2
+  docker build --no-cache -f ./Dockerfile-CUDA -t wav2letter .
+  cd ..
+  ```
 
-* Create training resources (Run in polyglot's container):
+- Create training resources (Run in polyglot's container):
 
 ```bash
 export LANGUAGE="de"
@@ -27,7 +27,7 @@ python3 deepspeech-polyglot/extras/wav2letter/ds_to_w2l.py /DeepSpeech/data_prep
 python3 deepspeech-polyglot/extras/wav2letter/create_lexicon.py /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/train_azce.csv /DeepSpeech/data_prepared/${LANGUAGE}/voxforge/dev_azce.csv /DeepSpeech/data_prepared/texts/${LANGUAGE}/lexicon.txt
 ```
 
-* Run training:
+- Run training:
 
 ```bash
 docker run \

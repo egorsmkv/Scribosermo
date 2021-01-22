@@ -28,6 +28,7 @@ watch -n 1 nvidia-smi
 ```
 
 Other commands:
+
 ```bash
 export LANGUAGE="de"
 
@@ -38,4 +39,7 @@ python3 /deepspeech-polyglot/preprocessing/dataset_operations.py "/data_prepared
 # Combine specific csv files:
 python3 /deepspeech-polyglot/preprocessing/combine_datasets.py --file_output "/data_prepared/en/librispeech/train-all.csv" \
   --files "/data_prepared/en/librispeech/train-clean-100.csv /data_prepared/en/librispeech/train-clean-360.csv /data_prepared/en/librispeech/train-other-500.csv"
+
+# Run unit tests
+cd /deepspeech-polyglot/ && pytest --cov=preprocessing
 ```

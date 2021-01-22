@@ -37,10 +37,12 @@ class PartialBlock(Model):
         # Build block until residual connection
         self.model = tf.keras.Sequential()
         for i in range(repeat - 1):
-            l = BaseModule(filters=filters, kernel_size=kernel_size, dropout=dropout)
-            self.model.add(l)
-        l = BaseModule(filters, kernel_size, dropout, is_last_module=True)
-        self.model.add(l)
+            layer = BaseModule(
+                filters=filters, kernel_size=kernel_size, dropout=dropout
+            )
+            self.model.add(layer)
+        layer = BaseModule(filters, kernel_size, dropout, is_last_module=True)
+        self.model.add(layer)
 
     # ==============================================================================================
 

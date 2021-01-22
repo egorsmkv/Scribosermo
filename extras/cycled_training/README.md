@@ -7,7 +7,7 @@ It was presented by the paper
 
 ### Experiment results
 
-The experiments were run with DeepSpeech v0.6 and an old version of this project (check out the 
+The experiments were run with DeepSpeech v0.6 and an old version of this project (check out the
 git history if you're interested in the complete setup used for the tests). \
 In difference to the paper it only had a very small effect on the accuracy,
 but a high impact on training duration. Therefore, it wasn't used further.
