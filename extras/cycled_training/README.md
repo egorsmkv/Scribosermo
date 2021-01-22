@@ -25,7 +25,8 @@ Important note for the comparison: In the paper the data was randomly split. Bec
 the same transcriptions can occur in train and test set, only recorded with different microphones.
 This results in a much lower WER compared to using the predefined splits of Tuda.
 
-| Dataset | Additional Infos                                              | Result        |
-| ------- | ------------------------------------------------------------- | ------------- |
-| Tuda-De | DS-German paper                                               | WER: 0.268    |
-| Tuda    | random dataset split, checkpoint from Voxforge with WER 0.344 | WER: 0.090285 |
+| Dataset | Additional Infos                                                | Result        |
+| ------- | --------------------------------------------------------------- | ------------- |
+| Tuda-De | DS-German paper                                                 | WER: 0.268    |
+| Tuda    | random dataset split, checkpoint from Voxforge with WER 0.344   | WER: 0.090285 |
+| Tuda    | test of pretrained checkpoint from DS-German with correct split | WER: 0.785655 |

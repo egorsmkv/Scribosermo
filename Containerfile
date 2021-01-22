@@ -28,12 +28,16 @@ RUN cd /DeepSpeech/native_client/ && \
 #  --artifact convert_graphdef_memmapped_format  --target /DeepSpeech/
 
 # Get prebuilt scorer generator script
-RUN cd /DeepSpeech/data/lm/ && \
-  wget https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/native_client.amd64.cpu.linux.tar.xz && \
-  tar xvf native_client.*.tar.xz
+RUN cd /DeepSpeech/data/lm/ \
+  && curl -LO https://github.com/mozilla/DeepSpeech/releases/latest/download/native_client.amd64.cpu.linux.tar.xz \
+  && tar xvf native_client.*.tar.xz
 
 # Solve broken pip "ImportError: No module named pip._internal.cli.main"
 RUN python3 -m pip install --upgrade pip
+
+# Dependencies for noise normalization
+RUN apt-get update && apt-get install -y ffmpeg
+RUN pip install --no-cache-dir --upgrade pydub
 
 # Pre-install some libraries for faster installation time of dspol package
 RUN pip3 install --no-cache-dir pandas
@@ -42,13 +46,18 @@ RUN pip3 install --no-cache-dir "tensorflow<2.4,>=2.3"
 RUN pip3 install --no-cache-dir "tensorflow-addons<0.12"
 RUN pip3 install --no-cache-dir "tensorflow-io<0.17"
 
-RUN apt-get update && apt-get install -y ffmpeg
+# Install audiomate
+RUN pip3 install --upgrade git+https://github.com/danbmh/audiomate.git@new_features
+
+# Install corcua
 RUN git clone --depth 1 https://gitlab.com/Jaco-Assistant/corcua.git
 RUN pip3 install --no-cache-dir -e corcua/
 
+# Testing requirements
 COPY requirements_test.txt /deepspeech-polyglot/requirements_test.txt
 RUN pip3 install --no-cache-dir -r /deepspeech-polyglot/requirements_test.txt
 
+# Training package
 COPY dspol/ /deepspeech-polyglot/dspol/
 RUN pip3 install --no-cache-dir -e /deepspeech-polyglot/dspol/
 
