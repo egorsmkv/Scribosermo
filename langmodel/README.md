@@ -36,13 +36,21 @@ In addition to above sentence collections, we can extract more sentences from ou
 export LANGUAGE="de"
 
 python3 /deepspeech-polyglot/langmodel/extract_transcripts.py \
-  --input_csv /data_prepared/${LANGUAGE}/librispeech/train.csv \
+  --input_csv /data_prepared/${LANGUAGE}/librispeech/train-all.csv \
   --output_txt /data_original/texts/${LANGUAGE}/librispeech.txt 
 ```
 
 <br/>
 
 Prepare the sentences.
+```bash
+# Run in container
+export LANGUAGE="de"
+
+python3 /deepspeech-polyglot/langmodel/prepare_vocab.py \
+  --input_dir /data_original/texts/${LANGUAGE}/ \
+  --output_dir /data_prepared/texts/${LANGUAGE}/
+```
 
 <br/>
 
@@ -64,11 +72,6 @@ Combine files to the scorer:
 ```bash
 # Run in container
 export LANGUAGE="de"
-
-# Get prebuilt generator script
-cd /DeepSpeech/data/lm/
-wget https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/native_client.amd64.cpu.linux.tar.xz
-tar xvf native_client.*.tar.xz
 
 # Optimized scorer alpha and beta values:
 # English (taken from DeepSpeech repo): --default_alpha 0.931289039105002 --default_beta 1.1834137581510284

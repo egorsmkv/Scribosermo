@@ -64,13 +64,25 @@ def load_langdicts() -> dict:
 # ==================================================================================================
 
 
+def load_alphabet(lang: str) -> list:
+    """Load alphabet from file"""
+
+    path = file_path + "../data/alphabet_{}.json".format(lang)
+    with open(path, "r", encoding="utf-8") as file:
+        content = json.load(file)
+    return content
+
+
+# ==================================================================================================
+
+
 def load_replacers(lang):
     global decimal_pattern, ordinal_pattern, allowed_chars, umlaut_replacers, special_replacers, char_replacers
 
     decimal_pattern = re.compile(langdicts["number_pattern"][lang]["decimal"])
     ordinal_pattern = re.compile(langdicts["number_pattern"][lang]["ordinal"])
 
-    allowed_chars = langdicts["allowed_chars"][lang]
+    allowed_chars = load_alphabet(lang)
     umlaut_replacers = langdicts["umlaut_replacers"][lang]
     special_replacers = langdicts["special_replacers"][lang]
 
@@ -238,7 +250,7 @@ def clean_sentence_list(sentences):
     for bc in bad_characters:
         all_bad_characters.extend(bc)
 
-    msg = "\nCharacters which were deleted without replacement: {}"
+    msg = "Characters which were deleted without replacement: {}\n"
     print(msg.format(collections.Counter(all_bad_characters)))
 
     return list(cleaned_sentences)

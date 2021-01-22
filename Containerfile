@@ -27,6 +27,11 @@ RUN cd /DeepSpeech/native_client/ && \
 #RUN python3 /DeepSpeech/util/taskcluster.py --source tensorflow --branch r1.15 \
 #  --artifact convert_graphdef_memmapped_format  --target /DeepSpeech/
 
+# Get prebuilt scorer generator script
+RUN cd /DeepSpeech/data/lm/ && \
+  wget https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/native_client.amd64.cpu.linux.tar.xz && \
+  tar xvf native_client.*.tar.xz
+
 # Solve broken pip "ImportError: No module named pip._internal.cli.main"
 RUN python3 -m pip install --upgrade pip
 

@@ -1,12 +1,4 @@
 {
-  "allowed_chars": {
-    "de": "abcdefghijklmnopqrstuvwxyz ",
-    "en": "abcdefghijklmnopqrstuvwxyz' ",
-    "es": "abcdefghijklmnopqrstuvwxyz áéíóúýñü",
-    "fr": "abcdefghijklmnopqrstuvwxyz' àâæçèéêëîïôœùûüÿ",
-    "it": "abcdefghijklmnopqrstuvwxyz' ",
-    "pl": "abcdefghijklmnopqrstuvwxyz ćńóśźżąęł"
-  },
   "number_pattern": {
     "de": {
       "decimal": "(?:[\\s][+-])?[0-9]+(?:(?:[.][0-9]{3}(?:(?=[^0-9])))+)?(?:[,][0-9]+)?",

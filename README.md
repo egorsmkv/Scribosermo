@@ -6,7 +6,7 @@ _Original paper code can be found [here](https://github.com/AASHISHAG/deepspeech
 This project uses [Mozilla DeepSpeech](https://github.com/mozilla/DeepSpeech) to train the speech-to-text network.
 
 <div align="center">
-    <img src="media/deep_speech_architecture.png" alt="deepspeech graph" width="45%"/>
+    <img src="media/deepspeech1_architecture.png" alt="deepspeech graph" width="45%"/>
 </div>
 
 <br/>

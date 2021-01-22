@@ -17,24 +17,26 @@ def convert_and_filter_topk(input_dir: str, output_dir: str, top_k: int):
     data_lower = os.path.join(output_dir, "lower.txt.gz")
 
     txt_files = os.listdir(input_dir)
-    txt_files = [f for f in txt_files if f.endswith(".txt")]
+    txt_files = [
+        f for f in txt_files if f.endswith(".txt") and not f.startswith("vocab-")
+    ]
     txt_files = [os.path.join(input_dir, f) for f in txt_files]
+    print("\nFound {} text files".format(len(txt_files)))
 
     # Conversion and counting
-    print("\nConverting to lowercase and counting word occurrences ...")
+    print("Converting to lowercase and counting word occurrences ...")
     with io.TextIOWrapper(
         io.BufferedWriter(gzip.open(data_lower, "w+")), encoding="utf-8"
     ) as file_out:
 
         for tfile in txt_files:
-            file_in = open(tfile, "r", encoding="utf-8")
+            with open(tfile, "r", encoding="utf-8") as source_file:
+                lines = source_file.readlines()
 
-            for line in tqdm.tqdm(file_in):
+            for line in tqdm.tqdm(lines):
                 line_lower = line.lower()
                 counter.update(line_lower.split())
                 file_out.write(line_lower)
-
-            file_in.close()
 
     # Save top-k words
     print("\nSaving top {} words ...".format(top_k))
@@ -132,7 +134,7 @@ def build_lm(args, data_lower, vocab_str):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate lm.binary and top-k vocab for DeepSpeech."
+        description="Generate lm.binary and top-k vocab for DeepSpeech scorer."
     )
     parser.add_argument(
         "--input_dir",
