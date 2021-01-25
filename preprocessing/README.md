@@ -1,5 +1,8 @@
 # Preparing voice data
 
+Downloading and preprocessing the datasets. \
+(Only some parts were already updated to the new dataset structure)
+
 ## Datasets
 
 #### German (de)
@@ -98,8 +101,8 @@ python3 /deepspeech-polyglot/corpora/get_datasets.py "/data_original/de/" [Inser
 
 ```
 
-Download css10 german/spanish/french dataset (Requires kaggle account, see links above) \
-Extract and move it to datasets directory (data_original/\${LANGUAGE}/css_ten/) \
+Download css10 German/Spanish/French dataset (Requires kaggle account, see links above) \
+Extract and move it to datasets directory `/data_original/${LANGUAGE}/css_ten/` \
 It seems the files are saved all twice, so remove the duplicate folders
 
 <br/>

@@ -37,6 +37,7 @@ pl_config = {
         "use_type": "lfbank",
         "lfbank": {"num_features": 64, "window_len": 0.02, "window_step": 0.01},
     },
+    "sort_datasets": False,
 }
 
 # ==================================================================================================
@@ -58,9 +59,6 @@ def test_random_input(onnx_path: str):
 def print_prediction(prediction):
     logit_lengths = tf.constant(tf.shape(prediction)[0], shape=(1,))
     decoded = tf.nn.ctc_greedy_decoder(prediction, logit_lengths, merge_repeated=True)
-    # decoded = tf.nn.ctc_beam_search_decoder(
-    #     prediction, logit_lengths, beam_width=100, top_paths=3
-    # )
 
     values = tf.cast(decoded[0][0].values, dtype=tf.int32)
     values = idx2char.lookup(values).numpy()

@@ -174,11 +174,11 @@ def print_results(results: List[dict]):
     loss = loss / len_results
 
     print("\nTest summary:")
-    print("  Loss: {}".format(loss))
-    print("  CER greedy: {}".format(gd_cer))
-    print("  CER with lm: {}".format(lm_cer))
-    print("  WER greedy: {}".format(gd_wer))
-    print("  WER with lm: {}".format(lm_wer))
+    print("  Loss: {:.4f}".format(loss))
+    print("  CER greedy: {:.4f}".format(gd_cer))
+    print("  CER with lm: {:.4f}".format(lm_cer))
+    print("  WER greedy: {:.4f}".format(gd_wer))
+    print("  WER with lm: {:.4f}".format(lm_wer))
     print("")
 
 

@@ -72,9 +72,9 @@ Follow [readme](dspol/README.md) in `dspol` directory for training your network.
 
 <br/>
 
-## Datasets
+## Datasets and Networks
 
-You can find the full list of currently supported datasets [here](preprocessing/README.md#Datasets).
+You can find more details about the currently used datasets [here](preprocessing/README.md#Datasets).
 
 |              |      |     |     |     |     |     |       |
 | ------------ | ---- | --- | --- | --- | --- | --- | ----- |
@@ -84,13 +84,37 @@ You can find the full list of currently supported datasets [here](preprocessing/
 
 <br>
 
-## Pretrained Language Models and Checkpoints
+Implemented networks:
+[DeepSpeech1](https://arxiv.org/pdf/1412.5567.pdf),
+[DeepSpeech2](https://arxiv.org/pdf/1512.02595.pdf),
+[Jasper](https://arxiv.org/pdf/1904.03288.pdf),
+[Quartznet](https://arxiv.org/pdf/1910.10261.pdf)
+
+Notes on the networks:
+
+- Not every network is fully tested, but each could be trained with one single audio file.
+- Some networks might differ from their paper implementations.
+
+Supported networks with their trainable parameter count (using English alphabet):
+
+|         |             |             |        |              |               |
+| ------- | ----------- | ----------- | ------ | ------------ | ------------- |
+| Network | DeepSpeech1 | DeepSpeech2 | Jasper | Quartznet5x5 | Quartznet15x5 |
+| Params  | 48.7M       | 120M        | 323M   | 6.7M         | 18.9M         |
+
+<br>
+
+## Pretrained Checkpoints and Language Models
 
 By default, the checkpoints are provided under the same licence as this repository, but a lot of
-datasets have extra conditions (for example non-commercial use only) which also have to be applied. \
+datasets have extra conditions (for example non-commercial use only) which also have to be applied.
 Please check this yourself for the models you want to use.
 
-Coming soon:)
+**English**:
+
+- Quartznet5x5 (WER: 4.5%): [Link](https://www.mediafire.com/file/tooxkchx6mmp13k/qnet5.zip/file)
+- Quartznet15x5 (WER: 3.7%): [Link](https://www.mediafire.com/file/8izmtnpjlwdcfye/qnet15.zip/file)
+- Scorer: [Link](https://github.com/mozilla/DeepSpeech/releases/tag/v0.9.3) (to DeepSpeech)
 
 <br/>
 
@@ -99,6 +123,7 @@ Coming soon:)
 You can contribute to this project in multiple ways:
 
 - Help to solve the open issues
+- Implement new networks or augmentation options
 - Train new models or improve the existing \
   (Requires a gpu and a lot of time, or multiple gpus and some time)
 - Experiment with the language models
@@ -113,9 +138,21 @@ You can contribute to this project in multiple ways:
 
 ## Results
 
-Coming soon:)
+| Language | Network       | Additional Infos                                                                                                | Results                                                                                                        |
+| -------- | ------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| EN       | Quartznet5x5  | Results from Nvidia-Nemo, using LS-dev-clean as test dataset                                                    | WER greedy: 0.0537                                                                                             |
+| EN       | Quartznet5x5  | Converted model from Nvidia-Nemo, using LS-dev-clean as test dataset                                            | Loss: 9.7666 <br> CER greedy: 0.0268 <br> CER with lm: 0.0202 <br> WER greedy: 0.0809 <br> WER with lm: 0.0506 |
+| EN       | Quartznet5x5  | Pretrained model from Nvidia-Nemo, one extra epoch on LibriSpeech to reduce the different spectrogram problem   | Loss: 7.3253 <br> CER greedy: 0.0202 <br> CER with lm: 0.0163 <br> WER greedy: 0.0654 <br> WER with lm: 0.0446 |
+| EN       | Quartznet5x5  | above, using LS-dev-clean as test dataset (for better comparison with results from Nemo)                        | Loss: 6.9973 <br> CER greedy: 0.0203 <br> CER with lm: 0.0159 <br> WER greedy: 0.0648 <br> WER with lm: 0.0419 |
+|          |               |                                                                                                                 |                                                                                                                |
+| EN       | Quartznet15x5 | Results from Nvidia-Nemo, using LS-dev-clean as test dataset                                                    | WER greedy: 0.0379                                                                                             |
+| EN       | Quartznet15x5 | Converted model from Nvidia-Nemo, using LS-dev-clean as test dataset                                            | Loss: 5.8044 <br> CER greedy: 0.0160 <br> CER with lm: 0.0130 <br> WER greedy: 0.0515 <br> WER with lm: 0.0355 |
+| EN       | Quartznet15x5 | Pretrained model from Nvidia-Nemo, four extra epochs on LibriSpeech to reduce the different spectrogram problem | Loss: 5.3177 <br> CER greedy: 0.0143 <br> CER with lm: 0.0128 <br> WER greedy: 0.0467 <br> WER with lm: 0.0374 |
+| EN       | Quartznet15x5 | above, using LS-dev-clean as test dataset (for better comparison with results from Nemo)                        | Loss: 5.0822 <br> CER greedy: 0.0134 <br> CER with lm: 0.0110 <br> WER greedy: 0.0439 <br> WER with lm: 0.0319 |
 
-### Old experiments
+<br/>
+
+## Old experiments
 
 The following experiments were run with an old version of this repository,
 using the DeepSpeech-1 network from [Mozilla-DeepSpeech](https://github.com/mozilla/DeepSpeech). \

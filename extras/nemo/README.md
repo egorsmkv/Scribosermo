@@ -39,7 +39,8 @@ The goal here is to use the pretrained NeMo models from Nvidia with our tensorfl
     --volume `pwd`/checkpoints/:/checkpoints/ -it onnx-tf
   ```
 
-- Transfer the pretrained weights, or run some tests to check the .onnx model and data pipeline:
+- Transfer the pretrained weights, or run some tests to check the .onnx model and data pipeline: \
+  (Note that currently the calculated spectrogram differs between the pipeline here and the one from nemo)
 
   ```bash
   # Uncomment the required calls at the bottom
