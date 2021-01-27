@@ -9,11 +9,6 @@ from . import pipeline, training, utils
 
 # ==================================================================================================
 
-# Allow growing gpu memory
-gpus = tf.config.experimental.list_physical_devices("GPU")
-for gpu in gpus:
-    tf.config.experimental.set_memory_growth(gpu, True)
-
 config = utils.get_config()
 checkpoint_dir = config["checkpoint_dir"]
 model: tf.keras.Model
@@ -212,6 +207,11 @@ def run_test(dataset_test):
 def main():
     global model
 
+    # Allow growing gpu memory
+    gpus = tf.config.experimental.list_physical_devices("GPU")
+    for gpu in gpus:
+        tf.config.experimental.set_memory_growth(gpu, True)
+
     # Enable testing with multiple gpus
     mirrored_strategy = tf.distribute.MirroredStrategy()
     global_batch_size = (
@@ -240,4 +240,5 @@ def main():
         model.summary()
 
     training.model = model
+    training.create_idx2char()
     run_test(dataset_test)

@@ -14,32 +14,30 @@ from . import nets, pipeline, utils
 # tf.config.run_functions_eagerly(True)
 # tf.config.optimizer.set_jit(True)
 
-# Use growing gpu memory
-gpus = tf.config.experimental.list_physical_devices("GPU")
-for gpu in gpus:
-    tf.config.experimental.set_memory_growth(gpu, True)
-
-# policy = mixed_precision.Policy('mixed_float16')
-# mixed_precision.set_policy(policy)
-
 config = utils.get_config()
 checkpoint_dir = config["checkpoint_dir"]
 cache_dir = config["cache_dir"]
 
 alphabet = utils.load_alphabet(config)
-idx2char = tf.lookup.StaticHashTable(
-    initializer=tf.lookup.KeyValueTensorInitializer(
-        keys=tf.constant([i for i, u in enumerate(alphabet)]),
-        values=tf.constant([u for i, u in enumerate(alphabet)]),
-    ),
-    default_value=tf.constant(" "),
-)
+idx2char: tf.lookup.StaticHashTable
 
 model: tf.keras.Model
 summary_writer: tf.summary.SummaryWriter
 save_manager: tf.train.CheckpointManager
 optimizer: tf.keras.optimizers.Adam
 strategy: tf.distribute.Strategy
+
+# ==================================================================================================
+
+def create_idx2char():
+    global idx2char
+    idx2char = tf.lookup.StaticHashTable(
+        initializer=tf.lookup.KeyValueTensorInitializer(
+            keys=tf.constant([i for i, u in enumerate(alphabet)]),
+            values=tf.constant([u for i, u in enumerate(alphabet)]),
+        ),
+        default_value=tf.constant(" "),
+    )
 
 # ==================================================================================================
 
@@ -248,6 +246,17 @@ def eval(dataset_eval):
 
 def main():
     global model, summary_writer, save_manager, optimizer, strategy
+
+    # Use growing gpu memory
+    gpus = tf.config.experimental.list_physical_devices("GPU")
+    for gpu in gpus:
+        tf.config.experimental.set_memory_growth(gpu, True)
+
+    # policy = mixed_precision.Policy('mixed_float16')
+    # mixed_precision.set_policy(policy)
+
+    # Build this after setting the gpu config, else it will raise an initialization error
+    create_idx2char()
 
     if config["empty_cache_dir"]:
         # Delete and recreate cache dir

@@ -58,7 +58,7 @@ def load_audio(sample, augment: bool = False):
 
     if augment:
         # Run signal augmentations
-        audio = augmentations.normalize(audio)
+        # audio = augmentations.normalize(audio)
         # audio = augmentations.resample(audio, audio_sample_rate, tmp_sample_rate=8000)
         audio = augmentations.dither(audio, factor=0.00001)
         audio = augmentations.preemphasis(audio, coef=0.97)

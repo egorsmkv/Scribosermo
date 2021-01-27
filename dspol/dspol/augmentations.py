@@ -63,8 +63,8 @@ def per_feature_norm(features):
     f_mean = tf.math.reduce_mean(features, axis=0)
     f_std = tf.math.reduce_std(features, axis=0)
 
-    spectrogram = (features - f_mean) / (f_std + 1e-7)
-    return spectrogram
+    features = (features - f_mean) / (f_std + 1e-7)
+    return features
 
 
 # ==================================================================================================
