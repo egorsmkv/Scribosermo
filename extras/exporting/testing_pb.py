@@ -1,6 +1,6 @@
-import tensorflow as tf
 import librosa
 import numpy as np
+import tensorflow as tf
 
 # ==================================================================================================
 
@@ -33,12 +33,12 @@ def print_prediction(prediction):
 
 
 def main():
+    audio, _ = librosa.load(test_wav, sr=16000)
+    audio = np.expand_dims(audio, axis=0)
+
     model = tf.keras.models.load_model(checkpoint_dir)
     model.summary()
     print("Metadata: {}\n".format(model.get_metadata()))
-
-    audio, _ = librosa.load(test_wav, sr=16000)
-    audio = np.expand_dims(audio, axis=0)
 
     prediction = model.predict(audio)
     print_prediction(prediction)

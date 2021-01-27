@@ -19,13 +19,12 @@ _DeepSpeech-Polyglot is a framework to train Speech-to-Text networks in differen
 
 ## Usage
 
-Note: This repository is about training STT-networks only, you can't really _"use"_ it,
-except by creating a test dataset with one single entry and running a test with it.
+Note: This repository is about training STT-networks only, you can't really _"use"_ it to transcribe files.
 
 Requirements are:
 
 - Computer with a modern gpu and working nvidia+docker setup
-- Basic knowledge in deep-learning
+- Basic knowledge in python and deep-learning
 - A lot of training data in your required language \
   (preferable >100h for fine-tuning and >1000h for new languages)
 
@@ -68,7 +67,8 @@ Follow [readme](langmodel/README.md) in `langmodel` directory for generating the
 
 #### Training
 
-Follow [readme](dspol/README.md) in `dspol` directory for training your network.
+Follow [readme](dspol/README.md) in `dspol` directory for training your network. \
+For easier inference follow the exporting [readme](extras/exporting/README.md) in `extras/exporting` directory.
 
 <br/>
 

@@ -29,6 +29,7 @@ strategy: tf.distribute.Strategy
 
 # ==================================================================================================
 
+
 def create_idx2char():
     global idx2char
     idx2char = tf.lookup.StaticHashTable(
@@ -38,6 +39,7 @@ def create_idx2char():
         ),
         default_value=tf.constant(" "),
     )
+
 
 # ==================================================================================================
 

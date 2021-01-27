@@ -165,9 +165,10 @@ class MyModel(Model):
 
         self.model = self.make_model()
 
-    # ==================================================================================================
+    # ==============================================================================================
 
-    def preemphasis(self, signal, coef=0.97):
+    @staticmethod
+    def preemphasis(signal, coef=0.97):
         """Emphasizes high-frequency signal components"""
 
         psig = signal[1:] - coef * signal[:-1]
@@ -176,8 +177,20 @@ class MyModel(Model):
 
     # ==============================================================================================
 
+    @staticmethod
+    def per_feature_norm(features):
+        """Normalize features per channel/frequency"""
+        f_mean = tf.math.reduce_mean(features, axis=0)
+        f_std = tf.math.reduce_std(features, axis=0)
+
+        features = (features - f_mean) / (f_std + 1e-7)
+        return features
+
+    # ==============================================================================================
+
     def make_model(self):
         input_tensor = tfl.Input(shape=[None], name="input_samples")
+        # input_tensor = tfl.Input(shape=[73152], name="input_samples")
 
         # Used for easier debugging changes
         x = tf.identity(input_tensor)
@@ -195,6 +208,17 @@ class MyModel(Model):
             stride=self.metadata["audio_step_samples"],
             magnitude_squared=True,
         )
+        # import math
+        # import tflite_tools
+        # pcm = tf.squeeze(audio, axis=-1)
+        # n_fft = 2 ** math.ceil(math.log2(self.metadata["audio_window_samples"]))
+        # spectrogram = tflite_tools._stft_magnitude_tflite(
+        #     signals=pcm,
+        #     frame_length=int(self.metadata["audio_window_samples"]),
+        #     frame_step=int(self.metadata["audio_step_samples"]),
+        #     fft_length=n_fft,
+        # )
+        # spectrogram = tf.expand_dims(spectrogram, axis=0)
 
         # LogFilterbanks
         mel_spectrograms = tf.tensordot(spectrogram, self.lmw_matrix, 1)
@@ -205,8 +229,11 @@ class MyModel(Model):
         features = features[0]
 
         # Feature augmentation
-        features = features - self.feat_norm_fixed_mean
-        features = features / self.feat_norm_fixed_std
+        if self.metadata["use_fixed_norm"]:
+            features = features - self.feat_norm_fixed_mean
+            features = features / self.feat_norm_fixed_std
+        else:
+            features = self.per_feature_norm(features)
 
         # Add a name to be able to split the prediction into sub-graphs
         x = tf.identity(features, name="features")
@@ -251,6 +278,7 @@ class MyModel(Model):
     # This input signature is required that we can export and load the model in ".pb" format
     # with a variable sequence length, instead of using the one of the first input.
     @tf.function(input_signature=[tf.TensorSpec([None, None], tf.float32)])
+    # @tf.function(input_signature=[tf.TensorSpec([None, 73152], tf.float32)])
     def call(self, x):
         """Call with input shape: [1, len_signal], output shape: [len_steps, 1, n_alphabet]"""
 
