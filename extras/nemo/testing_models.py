@@ -28,8 +28,6 @@ idx2char = tf.lookup.StaticHashTable(
     default_value=tf.constant(" "),
 )
 
-# Don't forget to activate the augmentations for signal normalization, preemphasis, dither and
-# feature normalization in the pipeline
 pl_config = {
     "alphabet_path": "/deepspeech-polyglot/data/alphabet_de.json",
     "audio_sample_rate": 16000,
@@ -38,6 +36,14 @@ pl_config = {
         "lfbank": {"num_features": 64, "window_len": 0.02, "window_step": 0.01},
     },
     "sort_datasets": False,
+    "augmentations": {
+        "signal": {
+            "normalize_volume": {"use_train": True, "use_test": True},
+            "dither": {"use_train": True, "use_test": True, "factor": 1e-05},
+            "preemphasis": {"use_train": True, "use_test": True, "coefficient": 0.97},
+        },
+        "features": {"normalize_features": {"use_train": True, "use_test": True}},
+    },
 }
 
 # ==================================================================================================
@@ -88,7 +94,7 @@ def test_csv_input(onnx_path: str, csv_path: str):
     onnx_model = onnx.load(onnx_path)
     onnxtf_model = prepare(onnx_model)
 
-    tds = pipeline.create_pipeline(csv_path, 1, pl_config, augment=True)
+    tds = pipeline.create_pipeline(csv_path, 1, pl_config, train_mode=True)
     for samples in tds:
         features = samples["features"]
         print(features)
@@ -171,7 +177,7 @@ def transfer_onnx_weights(onnx_path: str):
 def build_test_tfmodel(onnx_path: str, csv_path: str, checkpoint_dir: str):
 
     model = transfer_onnx_weights(onnx_path)
-    tds = pipeline.create_pipeline(csv_path, 1, pl_config, augment=True)
+    tds = pipeline.create_pipeline(csv_path, 1, pl_config, train_mode=True)
 
     for samples in tds:
         features = samples["features"]
@@ -244,7 +250,7 @@ def debug_models(onnx_path: str, csv_path: str):
     itfmodel.build(input_shape=(None, None, 64))
     itfmodel.summary()
 
-    tds = pipeline.create_pipeline(csv_path, 1, pl_config, augment=True)
+    tds = pipeline.create_pipeline(csv_path, 1, pl_config, train_mode=True)
     for samples in tds:
         features = samples["features"]
         # features = np.zeros(shape=(1, 456, 64), dtype=np.float32)
@@ -324,7 +330,7 @@ def lrs_features(audio_path):
 
 
 def debug_input(csv_path):
-    tds = pipeline.create_pipeline(csv_path, 1, pl_config, augment=True)
+    tds = pipeline.create_pipeline(csv_path, 1, pl_config, train_mode=True)
     np.set_printoptions(edgeitems=10)
 
     for samples in tds:

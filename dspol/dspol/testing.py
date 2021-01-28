@@ -226,7 +226,7 @@ def main():
         csv_path=config["data_paths"]["test"],
         batch_size=global_batch_size,
         config=exported_config,
-        augment=True,
+        train_mode=False,
         cache_path="",
     )
 

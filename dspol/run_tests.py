@@ -5,20 +5,21 @@ from dspol import pipeline, testing, utils
 # ==================================================================================================
 
 
-def test_pipeline():
-    sample_csv_path = "/data_prepared/de/voxforge/test_azce.csv"
-    augment = True
+def test_pipeline(sample_csv_path):
+    train_mode = True
     bench_batch_size = 16
     config = utils.get_config()
 
     # Run pipeline for one epoch to check how long preprocessing takes
     print("\nGoing through dataset to check preprocessing duration...")
-    tds = pipeline.create_pipeline(sample_csv_path, bench_batch_size, config, augment)
+    tds = pipeline.create_pipeline(
+        sample_csv_path, bench_batch_size, config, train_mode
+    )
     for _ in tqdm.tqdm(tds):
         pass
 
-    # Print the first two samples of the dataset
-    tds = pipeline.create_pipeline(sample_csv_path, 2, config, augment)
+    # Print the first sample of the dataset
+    tds = pipeline.create_pipeline(sample_csv_path, 1, config, train_mode)
     for samples in tds:
         print(samples)
         break
@@ -40,5 +41,5 @@ if __name__ == "__main__":
     testing.main()
 
     # print_config()
-    # test_pipeline()
+    # test_pipeline("/data_prepared/en/librispeech/test-clean_azce.csv")
     print("FINISHED")

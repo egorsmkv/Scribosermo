@@ -348,7 +348,7 @@ def main():
         csv_path=config["data_paths"]["train"],
         batch_size=global_train_batch_size,
         config=config,
-        augment=True,
+        train_mode=True,
         cache_path=cache,
     )
     cache = config["cache_dir"] + "eval" if config["use_pipeline_cache"] else ""
@@ -356,7 +356,7 @@ def main():
         csv_path=config["data_paths"]["eval"],
         batch_size=global_eval_batch_size,
         config=config,
-        augment=False,
+        train_mode=False,
         cache_path=cache,
     )
     dataset_train = strategy.experimental_distribute_dataset(dataset_train)

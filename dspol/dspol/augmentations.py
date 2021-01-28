@@ -1,4 +1,5 @@
 import tensorflow as tf
+import tensorflow_addons as tfa
 import tensorflow_io as tfio
 
 # ==================================================================================================
@@ -15,8 +16,8 @@ def resample(signal, sample_rate, tmp_sample_rate):
 # ==================================================================================================
 
 
-def normalize(signal):
-    """Normalize signal to range [-1,1]"""
+def normalize_volume(signal):
+    """Normalize volume to range [-1,1]"""
 
     gain = 1.0 / (tf.reduce_max(tf.abs(signal)) + 1e-7)
     signal = signal * gain
@@ -47,11 +48,86 @@ def preemphasis(signal, coef=0.97):
 # ==================================================================================================
 
 
-def freq_time_mask(spectrogram, param=10):
-    # Not working yet
-    # spectrogram = tfio.experimental.audio.freq_mask(spectrogram, param=param)
-    # spectrogram = tfio.experimental.audio.time_mask(spectrogram, param=param)
-    # tfa.image.random_cutout()
+def freq_mask(spectrogram, n=2, max_size=27):
+    """See SpecAugment paper - Frequency Masking. Input shape: [1, steps_time, num_bins]"""
+
+    for _ in range(n):
+        size = tf.random.uniform(shape=[], maxval=max_size, dtype=tf.int32)
+        max_freq = tf.shape(spectrogram)[-1]
+        start_mask = tf.random.uniform(shape=[], maxval=max_freq - size, dtype=tf.int32)
+        end_mask = start_mask + size
+
+        indices = tf.reshape(tf.range(max_freq), (1, 1, -1))
+        condition = tf.math.logical_and(
+            tf.math.greater_equal(indices, start_mask), tf.math.less(indices, end_mask)
+        )
+        spectrogram = tf.where(condition, tf.cast(0, spectrogram.dtype), spectrogram)
+
+    return spectrogram
+
+
+# ==================================================================================================
+
+
+def time_mask(spectrogram, n=2, max_size=100):
+    """See SpecAugment paper - Time Masking. Input shape: [1, steps_time, num_bins]"""
+
+    for _ in range(n):
+        size = tf.random.uniform(shape=[], maxval=max_size, dtype=tf.int32)
+        max_freq = tf.shape(spectrogram)[-2]
+        start_mask = tf.random.uniform(shape=[], maxval=max_freq - size, dtype=tf.int32)
+        end_mask = start_mask + size
+
+        indices = tf.reshape(tf.range(max_freq), (1, -1, 1))
+        condition = tf.math.logical_and(
+            tf.math.greater_equal(indices, start_mask), tf.math.less(indices, end_mask)
+        )
+        spectrogram = tf.where(condition, tf.cast(0, spectrogram.dtype), spectrogram)
+
+    return spectrogram
+
+
+# ==================================================================================================
+
+
+def spec_cutout(spectrogram, n=5, max_freq_size=27, max_time_size=100):
+    """Cut out random patches of the spectrogram"""
+
+    # Temporarily add extra channels dimension and change W and H
+    spectrogram = tf.expand_dims(spectrogram, axis=-1)
+    spectrogram = tf.transpose(spectrogram, perm=[0, 2, 1, 3])
+
+    width = tf.random.uniform(shape=[], maxval=max_time_size, dtype=tf.int32)
+    height = tf.random.uniform(shape=[], maxval=max_freq_size, dtype=tf.int32)
+
+    # Make the random size divisible by 2
+    width = tf.cast(width / 2, dtype=tf.int32) * 2
+    height = tf.cast(height / 2, dtype=tf.int32) * 2
+
+    for _ in range(n):
+        spectrogram = tfa.image.random_cutout(
+            spectrogram,
+            mask_size=[height, width],
+            constant_values=0,
+        )
+
+    spectrogram = tf.transpose(spectrogram, perm=[0, 2, 1, 3])
+    spectrogram = tf.squeeze(spectrogram, axis=-1)
+    return spectrogram
+
+
+# ==================================================================================================
+
+
+def spec_dropout(spectrogram, max_percentage=0.1):
+    """Drops random values of the spectrogram"""
+
+    percentage = tf.random.uniform(shape=[], maxval=max_percentage, dtype=tf.float32)
+    distrib = tf.random.uniform(
+        tf.shape(spectrogram), minval=0.0, maxval=1.0, dtype=tf.float32
+    )
+    mask = 1 - tf.math.floor(distrib + percentage)
+    spectrogram = spectrogram * mask
     return spectrogram
 
 
