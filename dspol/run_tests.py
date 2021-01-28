@@ -41,3 +41,4 @@ if __name__ == "__main__":
 
     # print_config()
     # test_pipeline()
+    print("FINISHED")

@@ -5,3 +5,4 @@ from dspol import training
 if __name__ == "__main__":
     print("\n======================================================================\n")
     training.main()
+    print("FINISHED")

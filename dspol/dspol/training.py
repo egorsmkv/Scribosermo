@@ -5,9 +5,11 @@ import time
 
 import tensorflow as tf
 import tensorflow_addons as tfa
-from tensorflow.keras.mixed_precision import experimental as mixed_precision
 
 from . import nets, pipeline, utils
+
+# from tensorflow.keras.mixed_precision import experimental as mixed_precision
+
 
 # ==================================================================================================
 
@@ -111,7 +113,7 @@ def distributed_train_step(dist_inputs):
     """Helper function for distributed training"""
 
     per_replica_losses = strategy.run(train_step, args=(dist_inputs,))
-    loss = strategy.reduce(tf.distribute.ReduceOp.SUM, per_replica_losses, axis=None)
+    loss = strategy.reduce(tf.distribute.ReduceOp.MEAN, per_replica_losses, axis=None)
     return loss
 
 
@@ -123,7 +125,7 @@ def distributed_eval_step(dist_inputs):
     """Helper function for distributed evaluation"""
 
     per_replica_losses = strategy.run(eval_step, args=(dist_inputs,))
-    loss = strategy.reduce(tf.distribute.ReduceOp.SUM, per_replica_losses, axis=None)
+    loss = strategy.reduce(tf.distribute.ReduceOp.MEAN, per_replica_losses, axis=None)
     return loss
 
 
@@ -176,8 +178,13 @@ def distributed_log_greedy(dist_inputs):
 
 
 def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
-    step = tf.constant(0, dtype=tf.int64)
+    step = 0
+    best_eval_loss = float("inf")
+    epochs_without_improvement = 0
     log_greedy_steps = config["log_prediction_steps"]
+    last_save_time = time.time()
+    training_start_time = time.time()
+    training_epochs = 0
     # tf.profiler.experimental.start('/checkpoints/profiles/')
 
     for epoch in range(start_epoch, stop_epoch):
@@ -212,13 +219,59 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
             if log_greedy_steps != 0 and step % log_greedy_steps == 0:
                 distributed_log_greedy(samples)
 
-        save_manager.save()
-        eval(dataset_eval)
-        tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
+            if (time.time() - last_save_time) / 60 > config["autosave_every_min"]:
+                save_manager.save()
 
+        # Evaluate
+        eval_loss = eval(dataset_eval)
+
+        # Save new best model
+        if eval_loss < best_eval_loss:
+            best_eval_loss = eval_loss
+            tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
+            print("Saved new best validating model")
+
+        training_epochs += 1
         msg = "Epoch {} took {} hours\n"
         duration = utils.seconds_to_hours(time.time() - start_time)
         print(msg.format(epoch, duration))
+
+        # Count epochs without improvement for early stopping and reducing learning rate on plateaus
+        if eval_loss > best_eval_loss - config["esrp_min_delta"]:
+            epochs_without_improvement += 1
+        else:
+            epochs_without_improvement = 0
+
+        # Early stopping
+        if (
+            config["use_early_stopping"]
+            and epochs_without_improvement == config["early_stopping_epochs"]
+        ):
+            msg = "Early stop triggered as the loss did not improve the last {} epochs"
+            print(msg.format(epochs_without_improvement))
+            break
+
+        # Reduce learning rate on plateau. If the learning rate was reduced and there is still
+        # no improvement, wait reduce_lr_plateau_epochs before the learning rate is reduced again
+        if (
+            config["use_lrp_reduction"]
+            and epochs_without_improvement > 0
+            and epochs_without_improvement % config["reduce_lr_plateau_epochs"] == 0
+        ):
+            # Reduce learning rate
+            new_lr = optimizer.learning_rate * config["lr_plateau_reduction"]
+            optimizer.learning_rate = new_lr
+            msg = "Encountered a plateau, reducing learning rate to {}"
+            print(msg.format(optimizer.learning_rate))
+
+            # Reload checkpoint that we use the best_dev weights again
+            print("Reloading model with best weights ...")
+            best_model = tf.keras.models.load_model(checkpoint_dir)
+            model.set_weights(best_model.get_weights())
+
+    msg = "\nCompleted training after {} epochs with best evaluation loss of {:.4f} after {} hours"
+    duration = utils.seconds_to_hours(time.time() - training_start_time)
+    print(msg.format(training_epochs, best_eval_loss, duration))
 
     # tf.profiler.experimental.stop()
 
@@ -241,6 +294,7 @@ def eval(dataset_eval):
 
     loss = loss / step
     print("Validation loss: {}".format(loss))
+    return loss
 
 
 # ==================================================================================================
@@ -391,7 +445,7 @@ def main():
     start_epoch = 0
     if save_manager.latest_checkpoint:
         start_epoch = int(save_manager.latest_checkpoint.split("-")[-1])
-        checkpoint.restore(save_manager.latest_checkpoint)
+        # checkpoint.restore(save_manager.latest_checkpoint)
     start_epoch += 1
 
     # Finally the training can start

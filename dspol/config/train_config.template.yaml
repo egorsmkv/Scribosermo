@@ -33,11 +33,26 @@ sort_ds_ascending: true
 
 training_epochs: 30
 
+# Early stop training if there was no improvement over the last epochs.
+use_early_stopping: true
+early_stopping_epochs: 7
+
+# Reduce learning rate by given factor if there was no improvement over the last epochs.
+use_lrp_reduction: true
+reduce_lr_plateau_epochs: 3
+lr_plateau_reduction: 0.1
+
+# Minimum reduction of loss to count as improvement.
+# Used for early stopping and reducing learning rate on plateaus.
+esrp_min_delta: 0.1
+
 # If there are old checkpoints in the directory, the training will be continued from there
 empty_ckpt_dir: true
 checkpoint_dir: "/checkpoints/{LANGUAGE}/tmp/"
+autosave_every_min: 30
 
-# If using this, make sure your config matches the one of the pretrained checkpoint
+# Copy another checkpoint and continue from there.
+# If using this, make sure your config matches the one of the pretrained checkpoint.
 continue_pretrained: false
 pretrained_checkpoint_dir: "/checkpoints/en/qnet5/"
 
