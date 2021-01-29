@@ -1,13 +1,13 @@
 ## Training
 
-This file contains instructions how to run the training on a Nvida-DGX with SLURM.
+This file contains instructions how to run the training on a Nvidia-DGX with SLURM.
 
 <br/>
 
 Start a training:
 
 ```bash
-sbatch run_training.sh
+sbatch deepspeech-polyglot/extras/slurm/run_training.sh
 ```
 
 View training output
@@ -24,7 +24,31 @@ scancel JOBID
 
 <br/>
 
-Test gpu availabiltiy (edit run_training.sh and execute follow):
+#### Use docker/podman images:
+
+- Install singularity on your local pc: [Instructions](https://sylabs.io/guides/3.5/user-guide/quick_start.html#quick-installation-steps)
+
+- Convert your images to compressed singularity images:
+
+  ```bash
+  # docker
+  ./deepspeech-polyglot/extras/slurm/convert_to_sifgz.sh d dspol
+  # podman
+  ./deepspeech-polyglot/extras/slurm/convert_to_sifgz.sh p dspol
+  ```
+
+- Upload and decompress the singularity image
+
+  ```bash
+  scp dspol.sif.gz user@ip:/cfs/share/cache/db_xds/images/
+  gzip -d dspol.sif.gz
+  ```
+
+<br/>
+
+## Debugging
+
+Test gpu availability (edit run_training.sh and execute the following command):
 
 ```bash
 python3 -c "import tensorflow as tf; sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))"
@@ -33,36 +57,8 @@ python3 -c "import tensorflow as tf; sess = tf.Session(config=tf.ConfigProto(log
 Convert image.sif to sandbox folder (if local /tmp directory is to small). In commands simply exchange image.sif with sandbox directory:
 
 ```bash
-singularity build --sandbox dsgs_sandbox/ deepspeech_polyglot.sif
+singularity build --sandbox dsgs_sandbox/ dspol.sif
 ```
-
-<br/>
-
-#### Use docker/podman images:
-
-- Install singularity on your local pc: [Instructions](https://sylabs.io/guides/3.5/user-guide/quick_start.html#quick-installation-steps)
-
-- Build images:
-
-  - In DeepSpeech's Dockerfile.train switch `FROM tensorflow/tensorflow:1.15.2-gpu-py3` to `FROM nvcr.io/nvidia/tensorflow:20.03-tf1-py3`
-    (This is required because cudnn doesn't work in slurm with the other base image)
-  - Build `mozilla_deepspeech` and `deepspeech_polyglot`
-
-- Convert your images to compressed singularity images:
-
-  ```bash
-  # docker
-  ./deepspeech-polyglot/slurm/convert_to_sifgz.sh d deepspeech_polyglot
-  # podman
-  ./deepspeech-polyglot/slurm/convert_to_sifgz.sh p deepspeech_polyglot
-  ```
-
-- Upload and decompress the singularity image
-
-  ```bash
-  scp deepspeech_polyglot.sif.gz user@ip:/cfs/share/cache/db_xds/images/
-  gzip -d deepspeech_polyglot.sif.gz
-  ```
 
 <br/>
 
@@ -76,7 +72,6 @@ my_deepspeech_folder (named db_xds here)
     checkpoints
     data_original
     data_prepared
-    DeepSpeech
     deepspeech-polyglot    <- This repositiory
 
     programs <- New folder for dependencies installations
@@ -142,12 +137,11 @@ Test singularity:
 ```bash
 singularity exec \
   --nv \
-  --bind checkpoints/:/DeepSpeech/checkpoints/ \
-  --bind data_original/:/DeepSpeech/data_original/ \
-  --bind data_prepared/:/DeepSpeech/data_prepared/ \
-  --bind deepspeech-polyglot/:/DeepSpeech/deepspeech-polyglot/ \
-  deepspeech_polyglot.sif \
-  /bin/bash /DeepSpeech/deepspeech-polyglot/training/train.sh
+  --bind checkpoints/:/checkpoints/ \
+  --bind data_original/:/data_original/ \
+  --bind data_prepared/:/data_prepared/ \
+  --bind deepspeech-polyglot/:/deepspeech-polyglot/ \
+  dspol.sif
 ```
 
 <br/>

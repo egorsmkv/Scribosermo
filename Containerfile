@@ -46,8 +46,11 @@ RUN pip3 install --no-cache-dir "tensorflow<2.4,>=2.3"
 RUN pip3 install --no-cache-dir "tensorflow-addons<0.12"
 RUN pip3 install --no-cache-dir "tensorflow-io<0.17"
 
-# Install audiomate
-RUN pip3 install --upgrade git+https://github.com/danbmh/audiomate.git@new_features
+# Install audiomate, with some fixes
+RUN apt-get update && apt-get install -y sox
+RUN pip3 install --no-cache-dir audiomate
+RUN sed -i 's/from down import Downloader/from pget.down import Downloader/g' /usr/local/lib/python3.8/dist-packages/pget/__init__.py
+RUN sed -i 's/print "Resume is not applicable at this stage."/print("Resume is not applicable at this stage.")/g' /usr/local/lib/python3.8/dist-packages/pget/down.py
 
 # Install corcua
 RUN git clone --depth 1 https://gitlab.com/Jaco-Assistant/corcua.git

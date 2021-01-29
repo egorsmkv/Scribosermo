@@ -221,6 +221,7 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
 
             if (time.time() - last_save_time) / 60 > config["autosave_every_min"]:
                 save_manager.save()
+                last_save_time = time.time()
 
         # Evaluate
         eval_loss = eval(dataset_eval)

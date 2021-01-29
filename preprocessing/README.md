@@ -87,8 +87,7 @@ python3 /deepspeech-polyglot/preprocessing/download_data.py --language "${LANGUA
 --common_voice --mailabs --voxforge
 --lingualibre --tatoeba
 
-# Download common-voice single-word datasets
-python3 /deepspeech-polyglot/preprocessing/download_data.py --language "" "/data_original/xx/" --cv_singleword
+# Download common-voice single-word datasets to "/data_original/xx/" (only possible by hand, contains multiple languages)
 mkdir /data_original/${LANGUAGE}/cv_singleword/
 mv /data_original/xx/cv-corpus-5-singleword/${LANGUAGE}/ /data_original/${LANGUAGE}/cv_singleword/${LANGUAGE}/
 
@@ -148,12 +147,21 @@ Preparation times for german datasets using Intel i7-8700K:
 - common_voice: ~12h
 - swc: ~6h
 
+<br>
+
+Some datasets are in the wrong format, convert them from DeepSpeech to corcua format like this:
+
+```bash
+python3 /deepspeech-polyglot/preprocessing/convert_ds2cc.py --source_path "/data_prepared/de/tuda/" \
+  --target_path "/data_prepared/de/tuda2/" --train "train_s.csv" --dev "dev_s.csv" --test "test_s.csv"
+```
+
 Other commands:
 
 ```bash
 export LANGUAGE="de"
 
-# To shuffle and replace non alphabet characters and clean the files run (repeat for all 3 csv files):
+# To replace non alphabet characters and clean the files run (repeat for all 3 csv files, but don't clean the test file):
 python3 /deepspeech-polyglot/preprocessing/dataset_operations.py "/data_prepared/en/librispeech/train-all.csv" \
   "/data_prepared/en/librispeech/train-all_azce.csv" --replace --clean --exclude
 

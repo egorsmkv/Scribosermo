@@ -46,7 +46,6 @@ def main():
     parser.add_argument("--tuda", action="store_true")
     parser.add_argument("--voxforge", action="store_true")
     parser.add_argument("--zamia_speech", action="store_true")
-    parser.add_argument("--cv_singleword", action="store_true")
     parser.add_argument("--kurzgesagt", action="store_true")
     parser.add_argument("--musstewissen", action="store_true")
     parser.add_argument("--pulsreportage", action="store_true")
@@ -133,11 +132,6 @@ def main():
         dl = io.ZamiaSpeechDownloader(lang=args.language)
         print("Downloading zamia-speech-{} ...".format(args.language))
         dl.download(os.path.join(args.target_path, "zamia_speech"))
-
-    if args.cv_singleword:
-        print("Downloading cv-singleword ...")
-        link = "https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-5-singleword/cv-corpus-5-singleword.tar.gz"
-        download_and_extract(link, args.target_path)
 
     if args.kurzgesagt:
         print("Downloading kurzgesagt ...")
