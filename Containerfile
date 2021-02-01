@@ -52,6 +52,9 @@ RUN pip3 install --no-cache-dir audiomate
 RUN sed -i 's/from down import Downloader/from pget.down import Downloader/g' /usr/local/lib/python3.8/dist-packages/pget/__init__.py
 RUN sed -i 's/print "Resume is not applicable at this stage."/print("Resume is not applicable at this stage.")/g' /usr/local/lib/python3.8/dist-packages/pget/down.py
 
+# Training profiler
+RUN pip3 install --upgrade --no-cache-dir tensorboard-plugin-profile
+
 # Install corcua
 RUN git clone --depth 1 https://gitlab.com/Jaco-Assistant/corcua.git
 RUN pip3 install --no-cache-dir -e corcua/

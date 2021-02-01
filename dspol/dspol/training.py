@@ -185,36 +185,33 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
     last_save_time = time.time()
     training_start_time = time.time()
     training_epochs = 0
-    # tf.profiler.experimental.start('/checkpoints/profiles/')
 
     for epoch in range(start_epoch, stop_epoch):
         start_time = time.time()
+        epoch_steps = 0
         print("\nStarting new training epoch ...")
 
-        for samples in dataset_train:
+        dist_dataset_iterator = iter(dataset_train)
+        for samples in dist_dataset_iterator:
 
-            # tf.summary.trace_on(graph=True, profiler=False)
+            if epoch_steps in config["profile_steps"]:
+                # Train step with profiling
+                with tf.profiler.experimental.Profile(checkpoint_dir):
+                    with tf.profiler.experimental.Trace("train", step_num=step, _r=1):
+                        print("Profiling performance of next step ...")
+                        samples = next(dist_dataset_iterator)
+                        loss = distributed_train_step(samples)
+            else:
+                # Normal train step
+                loss = distributed_train_step(samples)
 
-            # tf.profiler.experimental.client.trace('grpc://localhost:6009',
-            #                                       checkpoint_dir, 2000)
-
-            # with tf.profiler.experimental.Trace('train', step_num=step, _r=1):
-            #     # Not recommended, but couldn't get next dataset element here
-            #     loss, predictions = train_step(samples, step)
-
-            loss = distributed_train_step(samples)
             step += 1
+            epoch_steps += 1
+            print("Step: {} - Epoch: {} - Loss: {}".format(step, epoch, loss.numpy()))
 
             with summary_writer.as_default():
                 tf.summary.experimental.set_step(step)
                 tf.summary.scalar("loss", loss)
-
-            print("Step: {} - Epoch: {} - Loss: {}".format(step, epoch, loss.numpy()))
-
-            # with summary_writer.as_default():
-            #     tf.summary.trace_export(
-            #         name="my_func_trace",
-            #         step=0)
 
             if log_greedy_steps != 0 and step % log_greedy_steps == 0:
                 distributed_log_greedy(samples)
@@ -226,6 +223,12 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
         # Evaluate
         eval_loss = eval(dataset_eval)
 
+        # Count epochs without improvement for early stopping and reducing learning rate on plateaus
+        if eval_loss > best_eval_loss - config["esrp_min_delta"]:
+            epochs_without_improvement += 1
+        else:
+            epochs_without_improvement = 0
+
         # Save new best model
         if eval_loss < best_eval_loss:
             best_eval_loss = eval_loss
@@ -236,12 +239,6 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
         msg = "Epoch {} took {} hours\n"
         duration = utils.seconds_to_hours(time.time() - start_time)
         print(msg.format(epoch, duration))
-
-        # Count epochs without improvement for early stopping and reducing learning rate on plateaus
-        if eval_loss > best_eval_loss - config["esrp_min_delta"]:
-            epochs_without_improvement += 1
-        else:
-            epochs_without_improvement = 0
 
         # Early stopping
         if (
@@ -273,8 +270,6 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
     msg = "\nCompleted training after {} epochs with best evaluation loss of {:.4f} after {} hours"
     duration = utils.seconds_to_hours(time.time() - training_start_time)
     print(msg.format(training_epochs, best_eval_loss, duration))
-
-    # tf.profiler.experimental.stop()
 
 
 # ==================================================================================================
@@ -363,10 +358,6 @@ def main():
     dataset_train = strategy.experimental_distribute_dataset(dataset_train)
     dataset_eval = strategy.experimental_distribute_dataset(dataset_eval)
 
-    # tf.profiler.experimental.server.start(6009)
-    # tf.summary.trace_on(graph=True, profiler=True)
-    # tf.summary.trace_on(graph=True, profiler=False)
-
     feature_type = config["audio_features"]["use_type"]
     c_input = config["audio_features"][feature_type]["num_features"]
     c_output = len(alphabet) + 1
@@ -445,7 +436,8 @@ def main():
     # Load old checkpoint and its epoch number if existing
     start_epoch = 0
     if save_manager.latest_checkpoint:
-        start_epoch = int(save_manager.latest_checkpoint.split("-")[-1])
+        pass
+        # start_epoch = int(save_manager.latest_checkpoint.split("-")[-1])
         # checkpoint.restore(save_manager.latest_checkpoint)
     start_epoch += 1
 

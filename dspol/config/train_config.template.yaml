@@ -68,6 +68,10 @@ repeat_ds_times: 3
 # Print a single greedy prediction while training, disable by setting value to zero.
 log_prediction_steps: 25
 
+# Profile given training steps in each epoch. Use to find performance bottlenecks.
+# Viewable in tensorboard under "profile" tab.
+profile_steps: [15, 125]
+
 # Print files with worst predictions. Sort either by "loss" or "greedy_cer". Usable for debugging.
 log_worst_test_losses: 3
 sort_wtl_key: "greedy_cer"
