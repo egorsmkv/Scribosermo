@@ -36,12 +36,12 @@ before_script:
   - source venv/bin/activate
   - pip --version
   - pip install -r requirements_test.txt
+  - pip freeze
 
 linting:
   stage: test
   script:
-    # - seed-isort-config
-    - isort --recursive --check-only --diff .
+    - isort --check-only --diff .
     - black --check --exclude venv .
     - npx prettylint "**/*.{json,md,yml}"
     - pylint --disable=import-error --disable=parse-error ${SRC_DIRS}

@@ -2,12 +2,9 @@ import argparse
 import os
 import sys
 
-# The if block is required for isort
-if True:  # pylint: disable=using-constant-test
-    file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
-    sys.path.insert(1, file_path + "../preprocessing")
-    import text_cleaning
-
+file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
+sys.path.insert(1, file_path + "../preprocessing")
+import text_cleaning  # noqa: E402 pylint: disable=wrong-import-position
 
 # ==================================================================================================
 
