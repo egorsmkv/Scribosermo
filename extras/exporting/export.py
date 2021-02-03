@@ -13,10 +13,10 @@ metadata = {
     "audio_sample_rate": 16000,
     "audio_window_samples": int(16000 * 0.02),
     "audio_step_samples": int(16000 * 0.01),
-    "use_fixed_norm": True,
+    "use_fixed_norm": False,
 }
 
-checkpoint_dir = "/checkpoints/en/tmp5/"
+checkpoint_dir = "/checkpoints/en/qnetp15/"
 export_dir = os.path.join(checkpoint_dir, "exported/")
 
 # ==================================================================================================

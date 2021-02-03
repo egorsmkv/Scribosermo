@@ -16,4 +16,7 @@ python3 /deepspeech-polyglot/extras/exporting/export.py
 # Test exported models
 python3 /deepspeech-polyglot/extras/exporting/testing_pb.py
 python3 /deepspeech-polyglot/extras/exporting/testing_tflite.py
+
+# Disable gpus for performance tests
+export CUDA_VISIBLE_DEVICES=""
 ```

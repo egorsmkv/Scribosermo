@@ -19,7 +19,9 @@ _DeepSpeech-Polyglot is a framework to train Speech-to-Text networks in differen
 
 ## Usage
 
-Note: This repository is about training STT-networks only, you can't really _"use"_ it to transcribe files.
+Note: This repository is focused on training STT-networks.
+You can find a short and experimental inference example [here](extras/exporting/testing_pb.py),
+but please solve any problems you have with it yourself.
 
 Requirements are:
 
