@@ -141,7 +141,7 @@ augmentations:
       # Drops random values
       use_train: true
       use_test: false
-      max_percentage: 0.05
+      max_rate: 0.05
     speed_change:
       # Applies random speed changes, using clipped normal distribution.
       use_train: true

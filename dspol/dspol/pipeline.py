@@ -119,7 +119,7 @@ def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = 
             if (aug["use_train"] and train_mode) or (
                 aug["use_test"] and not train_mode
             ):
-                tensor = augmentations.spec_dropout(tensor, aug["max_percentage"])
+                tensor = augmentations.spec_dropout(tensor, aug["max_rate"])
 
         if "random_speed" in augs:
             aug = augs["random_speed"]
@@ -340,7 +340,7 @@ def create_pipeline(
             ),
         )
 
-    if cache_path != "":
+    if config["use_pipeline_cache"]:
         ds = ds.cache(cache_path)
 
     # ds = ds.repeat(50)

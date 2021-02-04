@@ -119,14 +119,14 @@ def spec_cutout(spectrogram, n=5, max_freq_size=27, max_time_size=100):
 # ==================================================================================================
 
 
-def spec_dropout(spectrogram, max_percentage=0.1):
+def spec_dropout(spectrogram, max_rate=0.1):
     """Drops random values of the spectrogram"""
 
-    percentage = tf.random.uniform(shape=[], maxval=max_percentage, dtype=tf.float32)
+    rate = tf.random.uniform(shape=[], maxval=max_rate, dtype=tf.float32)
     distrib = tf.random.uniform(
         tf.shape(spectrogram), minval=0.0, maxval=1.0, dtype=tf.float32
     )
-    mask = 1 - tf.math.floor(distrib + percentage)
+    mask = 1 - tf.math.floor(distrib + rate)
     spectrogram = spectrogram * mask
     return spectrogram
 
