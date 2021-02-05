@@ -154,6 +154,9 @@ Some datasets are in the wrong format, convert them from DeepSpeech to corcua fo
 ```bash
 python3 /deepspeech-polyglot/preprocessing/convert_ds2cc.py --source_path "/data_prepared/de/tuda/" \
   --target_path "/data_prepared/de/tuda2/" --train "train_s.csv" --dev "dev_s.csv" --test "test_s.csv"
+
+# Remove "/DeepSpeech" path prefix
+sed 's/\/DeepSpeech//g' train.csv > train2.csv
 ```
 
 Other commands:

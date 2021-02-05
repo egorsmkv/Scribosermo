@@ -9,7 +9,6 @@ import tensorflow as tf
 # training container, you can find a prebuilt pip-package in the published assets here:
 # https://github.com/mozilla/DeepSpeech/releases/tag/v0.9.3
 from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
-from scipy.io import wavfile
 
 # ==================================================================================================
 
@@ -79,7 +78,7 @@ def timed_transcription(model, wav_path):
 
     time_start = time.time()
 
-    _, audio = wavfile.read(wav_path)
+    audio, _ = sf.read(wav_path, dtype="int16")
     audio = audio / np.iinfo(np.int16).max
     audio = np.expand_dims(audio, axis=0)
     time_audio = time.time()
