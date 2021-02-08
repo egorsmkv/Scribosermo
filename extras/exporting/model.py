@@ -168,6 +168,16 @@ class MyModel(Model):
     # ==============================================================================================
 
     @staticmethod
+    def normalize_volume(signal):
+        """Normalize volume to range [-1,1]"""
+
+        gain = 1.0 / (tf.reduce_max(tf.abs(signal)) + 1e-7)
+        signal = signal * gain
+        return signal
+
+    # ==============================================================================================
+
+    @staticmethod
     def preemphasis(signal, coef=0.97):
         """Emphasizes high-frequency signal components"""
 
@@ -190,7 +200,6 @@ class MyModel(Model):
 
     def make_model(self):
         input_tensor = tfl.Input(shape=[None], name="input_samples")
-        # input_tensor = tfl.Input(shape=[73152], name="input_samples")
 
         # Used for easier debugging changes
         x = tf.identity(input_tensor)
@@ -198,7 +207,9 @@ class MyModel(Model):
         # Drop batch axis and expand to shape: [len_signal, 1]
         audio = tf.reshape(x[0], [-1, 1])
 
-        # Signal augmentation
+        # Signal augmentations
+        if self.metadata["use_volume_norm"]:
+            audio = self.normalize_volume(audio)
         audio = self.preemphasis(audio, coef=0.97)
 
         # Spectrogram
@@ -208,17 +219,6 @@ class MyModel(Model):
             stride=self.metadata["audio_step_samples"],
             magnitude_squared=True,
         )
-        # import math
-        # import tflite_tools
-        # pcm = tf.squeeze(audio, axis=-1)
-        # n_fft = 2 ** math.ceil(math.log2(self.metadata["audio_window_samples"]))
-        # spectrogram = tflite_tools._stft_magnitude_tflite(
-        #     signals=pcm,
-        #     frame_length=int(self.metadata["audio_window_samples"]),
-        #     frame_step=int(self.metadata["audio_step_samples"]),
-        #     fft_length=n_fft,
-        # )
-        # spectrogram = tf.expand_dims(spectrogram, axis=0)
 
         # LogFilterbanks
         mel_spectrograms = tf.tensordot(spectrogram, self.lmw_matrix, 1)
@@ -278,7 +278,6 @@ class MyModel(Model):
     # This input signature is required that we can export and load the model in ".pb" format
     # with a variable sequence length, instead of using the one of the first input.
     @tf.function(input_signature=[tf.TensorSpec([None, None], tf.float32)])
-    # @tf.function(input_signature=[tf.TensorSpec([None, 73152], tf.float32)])
     def call(self, x):
         """Call with input shape: [1, len_signal], output shape: [len_steps, 1, n_alphabet]"""
 

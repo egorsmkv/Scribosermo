@@ -12,34 +12,51 @@ from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
 
 # ==================================================================================================
 
-test_wav_path = "/deepspeech-polyglot/extras/exporting/data/test.wav"
 checkpoint_dir = "/checkpoints/en/qnetp15/exported/pb/"
+test_wav_path = "/deepspeech-polyglot/extras/exporting/data/test.wav"
 alphabet_path = "/deepspeech-polyglot/data/alphabet_en.json"
 ds_alphabet_path = "/deepspeech-polyglot/data/alphabet_en.txt"
 ds_scorer_path = "/data_prepared/texts/en/kenlm_en.scorer"
 
-with open(alphabet_path, "r", encoding="utf-8") as file:
-    alphabet = json.load(file)
-idx2char = tf.lookup.StaticHashTable(
-    initializer=tf.lookup.KeyValueTensorInitializer(
-        keys=tf.constant([i for i, u in enumerate(alphabet)]),
-        values=tf.constant([u for i, u in enumerate(alphabet)]),
-    ),
-    default_value=tf.constant(" "),
-)
+# ==================================================================================================
 
-ds_alphabet = Alphabet(ds_alphabet_path)
-ds_scorer = Scorer(
-    alpha=0.931289039105002,
-    beta=1.1834137581510284,
-    scorer_path=ds_scorer_path,
-    alphabet=ds_alphabet,
-)
+
+def load_alphabet_lookup(ab_path):
+    """ Load alphabet and character lookup table """
+
+    with open(ab_path, "r", encoding="utf-8") as file:
+        alphabet = json.load(file)
+
+    idx2char = tf.lookup.StaticHashTable(
+        initializer=tf.lookup.KeyValueTensorInitializer(
+            keys=tf.constant([i for i, u in enumerate(alphabet)]),
+            values=tf.constant([u for i, u in enumerate(alphabet)]),
+        ),
+        default_value=tf.constant(" "),
+    )
+    return alphabet, idx2char
+
 
 # ==================================================================================================
 
 
-def print_prediction_greedy(prediction):
+def load_scorer(dsab_path, scorer_path):
+    """ Load alphabet in DeepSpeech format and the scorer """
+
+    ds_alphabet = Alphabet(dsab_path)
+    ds_scorer = Scorer(
+        alpha=0.931289039105002,
+        beta=1.1834137581510284,
+        scorer_path=scorer_path,
+        alphabet=ds_alphabet,
+    )
+    return ds_alphabet, ds_scorer
+
+
+# ==================================================================================================
+
+
+def print_prediction_greedy(prediction, idx2char):
 
     logit_lengths = tf.constant(tf.shape(prediction)[0], shape=(1,))
     decoded = tf.nn.ctc_greedy_decoder(prediction, logit_lengths, merge_repeated=True)
@@ -53,7 +70,7 @@ def print_prediction_greedy(prediction):
 # ==================================================================================================
 
 
-def print_prediction_scorer(prediction):
+def print_prediction_scorer(prediction, ds_alphabet, ds_scorer, print_text=True):
 
     tpred = tf.transpose(prediction, perm=[1, 0, 2])
     ldecoded = ctc_beam_search_decoder(
@@ -67,30 +84,26 @@ def print_prediction_scorer(prediction):
         num_results=1,
     )
     lm_text = ldecoded[0][1]
-    print("Prediction scorer: {}".format(lm_text))
+
+    if print_text:
+        print("Prediction scorer: {}".format(lm_text))
 
 
 # ==================================================================================================
 
 
-def timed_transcription(model, wav_path):
-    """Transcribe an audio file and measure times for intermediate steps"""
-
-    time_start = time.time()
-
+def load_audio(wav_path):
     audio, _ = sf.read(wav_path, dtype="int16")
     audio = audio / np.iinfo(np.int16).max
     audio = np.expand_dims(audio, axis=0)
-    time_audio = time.time()
+    audio = audio.astype(np.float32)
+    return audio
 
-    prediction = model.predict(audio)
-    time_model = time.time()
 
-    print_prediction_greedy(prediction)
-    time_greedy = time.time()
+# ==================================================================================================
 
-    print_prediction_scorer(prediction)
-    time_scorer = time.time()
+
+def print_times(time_start, time_audio, time_model, time_greedy, time_scorer, wav_path):
 
     dur_audio = time_audio - time_start
     dur_model = time_model - time_audio
@@ -114,7 +127,32 @@ def timed_transcription(model, wav_path):
 # ==================================================================================================
 
 
+def timed_transcription(model, wav_path, idx2char, ds_alphabet, ds_scorer):
+    """Transcribe an audio file and measure times for intermediate steps"""
+
+    time_start = time.time()
+
+    audio = load_audio(wav_path)
+    time_audio = time.time()
+
+    prediction = model.predict(audio)
+    time_model = time.time()
+
+    print_prediction_greedy(prediction, idx2char)
+    time_greedy = time.time()
+
+    print_prediction_scorer(prediction, ds_alphabet, ds_scorer)
+    time_scorer = time.time()
+
+    print_times(time_start, time_audio, time_model, time_greedy, time_scorer, wav_path)
+
+
+# ==================================================================================================
+
+
 def main():
+    alphabet, idx2char = load_alphabet_lookup(alphabet_path)
+    ds_alphabet, ds_scorer = load_scorer(ds_alphabet_path, ds_scorer_path)
 
     # Load model and print some infos about it
     print("\nLoading model ...")
@@ -129,20 +167,16 @@ def main():
     _ = model.predict(np.random.uniform(-1, 1, [1, 123456]))
 
     # Run random decoding step to initialize the scorer
-    _ = ctc_beam_search_decoder(
-        np.random.uniform(0, 1, [213, len(alphabet) + 1]).tolist(),
+    print_prediction_scorer(
+        np.random.uniform(0, 1, [213, 1, len(alphabet) + 1]),
         ds_alphabet,
-        beam_size=1024,
-        cutoff_prob=1.0,
-        cutoff_top_n=300,
-        scorer=ds_scorer,
-        hot_words=dict(),
-        num_results=1,
+        ds_scorer,
+        print_text=False,
     )
 
     # Now run the transcription
     print("")
-    timed_transcription(model, test_wav_path)
+    timed_transcription(model, test_wav_path, idx2char, ds_alphabet, ds_scorer)
 
 
 # ==================================================================================================

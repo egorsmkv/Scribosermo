@@ -5,7 +5,7 @@ Tools to export the model for easier inference.
 Notes:
 
 - Using fixed normalization (required for streaming) slightly reduces WER from 3.7% to 4.4%
-- Exporting to tflite currently only works with a fixed sized input signal length
+- Enabling tflite optimization reduces performance too
 
 Edit the files to your needs:
 

@@ -55,6 +55,9 @@ RUN sed -i 's/print "Resume is not applicable at this stage."/print("Resume is n
 # Training profiler
 RUN pip3 install --upgrade --no-cache-dir tensorboard-plugin-profile
 
+# TfLite runtime
+RUN pip3 install --no-cache-dir --extra-index-url https://google-coral.github.io/py-repo/ tflite_runtime
+
 # Install corcua
 RUN git clone --depth 1 https://gitlab.com/Jaco-Assistant/corcua.git
 RUN pip3 install --no-cache-dir -e corcua/

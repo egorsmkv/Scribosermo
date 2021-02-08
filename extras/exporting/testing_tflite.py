@@ -1,52 +1,89 @@
-import librosa
+import time
+
 import numpy as np
-import tensorflow as tf
+import tflite_runtime.interpreter as tflite
+
+import testing_pb
 
 # ==================================================================================================
 
-checkpoint_file = "/checkpoints/en/tmp5/exported/model.tflite"
-test_wav = "/deepspeech-polyglot/extras/exporting/data/test.wav"
-
-alphabet = " abcdefghijklmnopqrstuvwxyz'"
-idx2char = tf.lookup.StaticHashTable(
-    initializer=tf.lookup.KeyValueTensorInitializer(
-        keys=tf.constant([i for i, u in enumerate(alphabet)]),
-        values=tf.constant([u for i, u in enumerate(alphabet)]),
-    ),
-    default_value=tf.constant(" "),
-)
+checkpoint_file = "/checkpoints/en/qnetp15/exported/model.tflite"
+test_wav_path = "/deepspeech-polyglot/extras/exporting/data/test.wav"
+alphabet_path = "/deepspeech-polyglot/data/alphabet_en.json"
+ds_alphabet_path = "/deepspeech-polyglot/data/alphabet_en.txt"
+ds_scorer_path = "/data_prepared/texts/en/kenlm_en.scorer"
 
 # ==================================================================================================
 
 
-def print_prediction(prediction):
-    logit_lengths = tf.constant(tf.shape(prediction)[0], shape=(1,))
-    decoded = tf.nn.ctc_greedy_decoder(prediction, logit_lengths, merge_repeated=True)
+def predict(interpreter, audio):
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
 
-    values = tf.cast(decoded[0][0].values, dtype=tf.int32)
-    values = idx2char.lookup(values).numpy()
-    values = b"".join(values)
-    print("Prediction: {}".format(values))
+    # Enable dynamic shape inputs
+    interpreter.resize_tensor_input(input_details[0]["index"], audio.shape)
+    interpreter.allocate_tensors()
+
+    interpreter.set_tensor(input_details[0]["index"], audio)
+    interpreter.invoke()
+
+    output_data = interpreter.get_tensor(output_details[0]["index"])
+    return output_data
+
+
+# ==================================================================================================
+
+
+def timed_transcription(interpreter, wav_path, idx2char, ds_alphabet, ds_scorer):
+    """Transcribe an audio file and measure times for intermediate steps"""
+
+    time_start = time.time()
+
+    audio = testing_pb.load_audio(wav_path)
+    time_audio = time.time()
+
+    prediction = predict(interpreter, audio)
+    time_model = time.time()
+
+    testing_pb.print_prediction_greedy(prediction, idx2char)
+    time_greedy = time.time()
+
+    testing_pb.print_prediction_scorer(prediction, ds_alphabet, ds_scorer)
+    time_scorer = time.time()
+
+    testing_pb.print_times(
+        time_start, time_audio, time_model, time_greedy, time_scorer, wav_path
+    )
 
 
 # ==================================================================================================
 
 
 def main():
-    audio, _ = librosa.load(test_wav, sr=16000)
-    audio = np.expand_dims(audio, axis=0)
+    alphabet, idx2char = testing_pb.load_alphabet_lookup(alphabet_path)
+    ds_alphabet, ds_scorer = testing_pb.load_scorer(ds_alphabet_path, ds_scorer_path)
 
-    interpreter = tf.lite.Interpreter(model_path=checkpoint_file)
-    interpreter.allocate_tensors()
+    print("\nLoading model ...")
+    interpreter = tflite.Interpreter(model_path=checkpoint_file)
+    print("Input details:", interpreter.get_input_details())
 
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
+    print("Running some initialization steps ...")
+    # Run some random predictions to initialize the model
+    _ = predict(interpreter, np.random.uniform(-1, 1, [1, 12345]).astype(np.float32))
+    _ = predict(interpreter, np.random.uniform(-1, 1, [1, 1234]).astype(np.float32))
+    _ = predict(interpreter, np.random.uniform(-1, 1, [1, 123456]).astype(np.float32))
 
-    interpreter.set_tensor(input_details[0]["index"], audio)
-    interpreter.invoke()
+    # Run random decoding step to initialize the scorer
+    testing_pb.print_prediction_scorer(
+        np.random.uniform(0, 1, [213, 1, len(alphabet) + 1]),
+        ds_alphabet,
+        ds_scorer,
+        print_text=False,
+    )
 
-    output_data = interpreter.get_tensor(output_details[0]["index"])
-    print_prediction(output_data)
+    # Now run the transcription
+    print("")
+    timed_transcription(interpreter, test_wav_path, idx2char, ds_alphabet, ds_scorer)
 
 
 # ==================================================================================================
