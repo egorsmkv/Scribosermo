@@ -244,7 +244,6 @@ class MyModel(Model):
 
         # Prepare for ctc decoding
         x = tf.nn.softmax(x)
-        x = tf.transpose(x, perm=[1, 0, 2])
 
         output_tensor = tf.identity(x, name="logits")
 

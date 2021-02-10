@@ -1,9 +1,15 @@
+import json
 import time
 
 import numpy as np
+import soundfile as sf
+import tensorflow as tf  # noqa, AudioSpectrogram requires FlexDelegation to tensorflow
 import tflite_runtime.interpreter as tflite
 
-import testing_pb
+# If you want to improve the transcriptions with an additional language model, without using the
+# training container, you can find a prebuilt pip-package in the published assets here:
+# https://github.com/mozilla/DeepSpeech/releases/tag/v0.9.3
+from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
 
 # ==================================================================================================
 
@@ -12,6 +18,17 @@ test_wav_path = "/deepspeech-polyglot/extras/exporting/data/test.wav"
 alphabet_path = "/deepspeech-polyglot/data/alphabet_en.json"
 ds_alphabet_path = "/deepspeech-polyglot/data/alphabet_en.txt"
 ds_scorer_path = "/data_prepared/texts/en/kenlm_en.scorer"
+
+with open(alphabet_path, "r", encoding="utf-8") as file:
+    alphabet = json.load(file)
+
+ds_alphabet = Alphabet(ds_alphabet_path)
+ds_scorer = Scorer(
+    alpha=0.931289039105002,
+    beta=1.1834137581510284,
+    scorer_path=ds_scorer_path,
+    alphabet=ds_alphabet,
+)
 
 # ==================================================================================================
 
@@ -34,34 +51,73 @@ def predict(interpreter, audio):
 # ==================================================================================================
 
 
-def timed_transcription(interpreter, wav_path, idx2char, ds_alphabet, ds_scorer):
+def print_prediction_scorer(prediction, print_text=True):
+
+    ldecoded = ctc_beam_search_decoder(
+        prediction.tolist(),
+        ds_alphabet,
+        beam_size=1024,
+        cutoff_prob=1.0,
+        cutoff_top_n=300,
+        scorer=ds_scorer,
+        hot_words=dict(),
+        num_results=1,
+    )
+    lm_text = ldecoded[0][1]
+
+    if print_text:
+        print("Prediction scorer: {}".format(lm_text))
+
+
+# ==================================================================================================
+
+
+def load_audio(wav_path):
+    audio, _ = sf.read(wav_path, dtype="int16")
+    audio = audio / np.iinfo(np.int16).max
+    audio = np.expand_dims(audio, axis=0)
+    audio = audio.astype(np.float32)
+    return audio
+
+
+# ==================================================================================================
+
+
+def timed_transcription(interpreter, wav_path):
     """Transcribe an audio file and measure times for intermediate steps"""
 
     time_start = time.time()
 
-    audio = testing_pb.load_audio(wav_path)
+    audio = load_audio(wav_path)
     time_audio = time.time()
 
     prediction = predict(interpreter, audio)
     time_model = time.time()
 
-    testing_pb.print_prediction_greedy(prediction, idx2char)
-    time_greedy = time.time()
-
-    testing_pb.print_prediction_scorer(prediction, ds_alphabet, ds_scorer)
+    print_prediction_scorer(prediction[0])
     time_scorer = time.time()
 
-    testing_pb.print_times(
-        time_start, time_audio, time_model, time_greedy, time_scorer, wav_path
-    )
+    dur_audio = time_audio - time_start
+    dur_model = time_model - time_audio
+    dur_scorer = time_scorer - time_model
+
+    len_audio = float(sf.info(wav_path).duration)
+    msg = "\nLength of audio was {:.3f}s, loading it took {:.3f}s."
+    print(msg.format(len_audio, dur_audio))
+
+    msg = "Calculating the predictions did take {:.3f}s "
+    msg += "and decoding with a scorer {:.3f}s."
+    print(msg.format(dur_model, dur_scorer))
+
+    rtf_scorer = (dur_model + dur_scorer) / len_audio
+    msg = "The Real-Time-Factor for scorer decoding is {:.3f}."
+    print(msg.format(rtf_scorer))
 
 
 # ==================================================================================================
 
 
 def main():
-    alphabet, idx2char = testing_pb.load_alphabet_lookup(alphabet_path)
-    ds_alphabet, ds_scorer = testing_pb.load_scorer(ds_alphabet_path, ds_scorer_path)
 
     print("\nLoading model ...")
     interpreter = tflite.Interpreter(model_path=checkpoint_file)
@@ -74,16 +130,14 @@ def main():
     _ = predict(interpreter, np.random.uniform(-1, 1, [1, 123456]).astype(np.float32))
 
     # Run random decoding step to initialize the scorer
-    testing_pb.print_prediction_scorer(
-        np.random.uniform(0, 1, [213, 1, len(alphabet) + 1]),
-        ds_alphabet,
-        ds_scorer,
+    print_prediction_scorer(
+        np.random.uniform(0, 1, [213, len(alphabet) + 1]),
         print_text=False,
     )
 
     # Now run the transcription
     print("")
-    timed_transcription(interpreter, test_wav_path, idx2char, ds_alphabet, ds_scorer)
+    timed_transcription(interpreter, test_wav_path)
 
 
 # ==================================================================================================

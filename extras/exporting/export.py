@@ -19,7 +19,7 @@ metadata = {
 
 checkpoint_dir = "/checkpoints/en/qnetp15/"
 export_dir = os.path.join(checkpoint_dir, "exported/")
-optimize_tflite = False
+optimize_tflite = True
 
 # ==================================================================================================
 

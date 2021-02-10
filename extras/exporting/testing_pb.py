@@ -18,48 +18,32 @@ alphabet_path = "/deepspeech-polyglot/data/alphabet_en.json"
 ds_alphabet_path = "/deepspeech-polyglot/data/alphabet_en.txt"
 ds_scorer_path = "/data_prepared/texts/en/kenlm_en.scorer"
 
-# ==================================================================================================
+with open(alphabet_path, "r", encoding="utf-8") as file:
+    alphabet = json.load(file)
+idx2char = tf.lookup.StaticHashTable(
+    initializer=tf.lookup.KeyValueTensorInitializer(
+        keys=tf.constant([i for i, u in enumerate(alphabet)]),
+        values=tf.constant([u for i, u in enumerate(alphabet)]),
+    ),
+    default_value=tf.constant(" "),
+)
 
-
-def load_alphabet_lookup(ab_path):
-    """ Load alphabet and character lookup table """
-
-    with open(ab_path, "r", encoding="utf-8") as file:
-        alphabet = json.load(file)
-
-    idx2char = tf.lookup.StaticHashTable(
-        initializer=tf.lookup.KeyValueTensorInitializer(
-            keys=tf.constant([i for i, u in enumerate(alphabet)]),
-            values=tf.constant([u for i, u in enumerate(alphabet)]),
-        ),
-        default_value=tf.constant(" "),
-    )
-    return alphabet, idx2char
-
-
-# ==================================================================================================
-
-
-def load_scorer(dsab_path, scorer_path):
-    """ Load alphabet in DeepSpeech format and the scorer """
-
-    ds_alphabet = Alphabet(dsab_path)
-    ds_scorer = Scorer(
-        alpha=0.931289039105002,
-        beta=1.1834137581510284,
-        scorer_path=scorer_path,
-        alphabet=ds_alphabet,
-    )
-    return ds_alphabet, ds_scorer
-
+ds_alphabet = Alphabet(ds_alphabet_path)
+ds_scorer = Scorer(
+    alpha=0.931289039105002,
+    beta=1.1834137581510284,
+    scorer_path=ds_scorer_path,
+    alphabet=ds_alphabet,
+)
 
 # ==================================================================================================
 
 
-def print_prediction_greedy(prediction, idx2char):
+def print_prediction_greedy(prediction):
 
-    logit_lengths = tf.constant(tf.shape(prediction)[0], shape=(1,))
-    decoded = tf.nn.ctc_greedy_decoder(prediction, logit_lengths, merge_repeated=True)
+    tpred = tf.transpose(prediction, perm=[1, 0, 2])
+    logit_lengths = tf.constant(tf.shape(tpred)[0], shape=(1,))
+    decoded = tf.nn.ctc_greedy_decoder(tpred, logit_lengths, merge_repeated=True)
 
     values = tf.cast(decoded[0][0].values, dtype=tf.int32)
     values = idx2char.lookup(values).numpy()
@@ -70,11 +54,10 @@ def print_prediction_greedy(prediction, idx2char):
 # ==================================================================================================
 
 
-def print_prediction_scorer(prediction, ds_alphabet, ds_scorer, print_text=True):
+def print_prediction_scorer(prediction, print_text=True):
 
-    tpred = tf.transpose(prediction, perm=[1, 0, 2])
     ldecoded = ctc_beam_search_decoder(
-        tpred[0].numpy().tolist(),
+        prediction.tolist(),
         ds_alphabet,
         beam_size=1024,
         cutoff_prob=1.0,
@@ -103,7 +86,22 @@ def load_audio(wav_path):
 # ==================================================================================================
 
 
-def print_times(time_start, time_audio, time_model, time_greedy, time_scorer, wav_path):
+def timed_transcription(model, wav_path):
+    """Transcribe an audio file and measure times for intermediate steps"""
+
+    time_start = time.time()
+
+    audio = load_audio(wav_path)
+    time_audio = time.time()
+
+    prediction = model.predict(audio)
+    time_model = time.time()
+
+    print_prediction_greedy(prediction)
+    time_greedy = time.time()
+
+    print_prediction_scorer(prediction[0])
+    time_scorer = time.time()
 
     dur_audio = time_audio - time_start
     dur_model = time_model - time_audio
@@ -127,32 +125,7 @@ def print_times(time_start, time_audio, time_model, time_greedy, time_scorer, wa
 # ==================================================================================================
 
 
-def timed_transcription(model, wav_path, idx2char, ds_alphabet, ds_scorer):
-    """Transcribe an audio file and measure times for intermediate steps"""
-
-    time_start = time.time()
-
-    audio = load_audio(wav_path)
-    time_audio = time.time()
-
-    prediction = model.predict(audio)
-    time_model = time.time()
-
-    print_prediction_greedy(prediction, idx2char)
-    time_greedy = time.time()
-
-    print_prediction_scorer(prediction, ds_alphabet, ds_scorer)
-    time_scorer = time.time()
-
-    print_times(time_start, time_audio, time_model, time_greedy, time_scorer, wav_path)
-
-
-# ==================================================================================================
-
-
 def main():
-    alphabet, idx2char = load_alphabet_lookup(alphabet_path)
-    ds_alphabet, ds_scorer = load_scorer(ds_alphabet_path, ds_scorer_path)
 
     # Load model and print some infos about it
     print("\nLoading model ...")
@@ -168,15 +141,13 @@ def main():
 
     # Run random decoding step to initialize the scorer
     print_prediction_scorer(
-        np.random.uniform(0, 1, [213, 1, len(alphabet) + 1]),
-        ds_alphabet,
-        ds_scorer,
+        np.random.uniform(0, 1, [213, len(alphabet) + 1]),
         print_text=False,
     )
 
     # Now run the transcription
     print("")
-    timed_transcription(model, test_wav_path, idx2char, ds_alphabet, ds_scorer)
+    timed_transcription(model, test_wav_path)
 
 
 # ==================================================================================================
