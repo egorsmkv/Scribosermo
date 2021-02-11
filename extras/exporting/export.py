@@ -28,12 +28,6 @@ def export_tflite(model, save_path, optimize):
 
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
 
-    # Extend supported ops to be able to create the spectrogram
-    converter.target_spec.supported_ops = [
-        tf.lite.OpsSet.TFLITE_BUILTINS,
-        tf.lite.OpsSet.SELECT_TF_OPS,
-    ]
-
     if optimize:
         converter.optimizations = [tf.lite.Optimize.DEFAULT]
 
@@ -48,17 +42,18 @@ def export_tflite(model, save_path, optimize):
 
 def main():
     nn_model = tf.keras.models.load_model(checkpoint_dir)
-    model = exmodel.MyModel(nn_model, metadata)
+    model_pb = exmodel.MyModel(nn_model, metadata, specmode="pb")
+    model_tl = exmodel.MyModel(nn_model, metadata, specmode="tflite")
 
-    model.build(input_shape=(None, None))
-    model.compile()
-    model.summary()
+    model_pb.build(input_shape=(None, None))
+    model_tl.build(input_shape=(None, None))
+    model_pb.summary()
 
     # Export as .pb model
-    tf.keras.models.save_model(model, export_dir + "pb/", include_optimizer=False)
+    tf.keras.models.save_model(model_pb, export_dir + "pb/", include_optimizer=False)
 
     # Export as .tflite model
-    export_tflite(model, export_dir + "model.tflite", optimize=optimize_tflite)
+    export_tflite(model_tl, export_dir + "model.tflite", optimize=optimize_tflite)
 
 
 # ==================================================================================================

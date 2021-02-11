@@ -3,7 +3,6 @@ import time
 
 import numpy as np
 import soundfile as sf
-import tensorflow as tf  # noqa, AudioSpectrogram requires FlexDelegation to tensorflow
 import tflite_runtime.interpreter as tflite
 
 # If you want to improve the transcriptions with an additional language model, without using the

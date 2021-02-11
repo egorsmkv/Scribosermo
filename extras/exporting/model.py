@@ -1,12 +1,16 @@
+import math
+
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
+
+import tflite_tools
 
 # ==================================================================================================
 
 
 class MyModel(Model):
-    def __init__(self, nn_model, metadata):
+    def __init__(self, nn_model, metadata, specmode):
         super(MyModel, self).__init__()
 
         # Spectrogram normalization constants. Taken from:
@@ -163,7 +167,7 @@ class MyModel(Model):
             upper_edge_hertz=self.metadata["audio_sample_rate"] / 2,
         )
 
-        self.model = self.make_model()
+        self.model = self.make_model(specmode)
 
     # ==============================================================================================
 
@@ -198,7 +202,7 @@ class MyModel(Model):
 
     # ==============================================================================================
 
-    def make_model(self):
+    def make_model(self, specmode):
         input_tensor = tfl.Input(shape=[None], name="input_samples")
 
         # Used for easier debugging changes
@@ -213,12 +217,27 @@ class MyModel(Model):
         audio = self.preemphasis(audio, coef=0.97)
 
         # Spectrogram
-        spectrogram = tf.raw_ops.AudioSpectrogram(
-            input=audio,
-            window_size=self.metadata["audio_window_samples"],
-            stride=self.metadata["audio_step_samples"],
-            magnitude_squared=True,
-        )
+        if specmode == "pb":
+            spectrogram = tf.raw_ops.AudioSpectrogram(
+                input=audio,
+                window_size=self.metadata["audio_window_samples"],
+                stride=self.metadata["audio_step_samples"],
+                magnitude_squared=True,
+            )
+        elif specmode == "tflite":
+            # We need a workaround here, because the default spectrogram is not supported in tflite
+            # But this doesn't work with normal tf runtime, so both implementations are required
+            pcm = tf.squeeze(audio, axis=-1, name="pcm")
+            n_fft = 2 ** math.ceil(math.log2(self.metadata["audio_window_samples"]))
+            spectrogram = tflite_tools.stft_magnitude_tflite(
+                signals=pcm,
+                frame_length=int(self.metadata["audio_window_samples"]),
+                frame_step=int(self.metadata["audio_step_samples"]),
+                fft_length=n_fft,
+            )
+            spectrogram = tf.expand_dims(spectrogram, axis=0, name="expand_spec")
+        else:
+            raise ValueError()
 
         # LogFilterbanks
         mel_spectrograms = tf.tensordot(spectrogram, self.lmw_matrix, 1)
