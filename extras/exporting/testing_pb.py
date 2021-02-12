@@ -8,6 +8,7 @@ import tensorflow as tf
 # If you want to improve the transcriptions with an additional language model, without using the
 # training container, you can find a prebuilt pip-package in the published assets here:
 # https://github.com/mozilla/DeepSpeech/releases/tag/v0.9.3
+# or for use on a Raspberry Pi you can use the one from extras/misc directory
 from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
 
 # ==================================================================================================
