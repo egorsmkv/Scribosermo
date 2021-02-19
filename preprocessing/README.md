@@ -152,11 +152,12 @@ python3 /deepspeech-polyglot/preprocessing/dataset_operations.py "/data_prepared
 
 ```
 
-Combine specific csv files:
+Combine specific csv files: \
+(you can either use `--files_str` like shown below or `--files_txt` with a path to a text file containing one dataset per line)
 
 ```bash
 python3 /deepspeech-polyglot/preprocessing/combine_datasets.py --file_output "/data_prepared/en/librispeech/train-all.csv" \
-  --files "/data_prepared/en/librispeech/train-clean-100.csv /data_prepared/en/librispeech/train-clean-360.csv /data_prepared/en/librispeech/train-other-500.csv"
+  --files_str "/data_prepared/en/librispeech/train-clean-100.csv /data_prepared/en/librispeech/train-clean-360.csv /data_prepared/en/librispeech/train-other-500.csv"
 ```
 
 <br/>
