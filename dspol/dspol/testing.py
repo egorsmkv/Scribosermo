@@ -13,11 +13,11 @@ config = utils.get_config()
 checkpoint_dir = config["checkpoint_dir"]
 model: tf.keras.Model
 
-ds_alphabet = Alphabet(config["scorer_alphabet"])
+ds_alphabet = Alphabet(config["scorer"]["alphabet"])
 ds_scorer = Scorer(
-    alpha=0.931289039105002,
-    beta=1.1834137581510284,
-    scorer_path=config["scorer_path"],
+    alpha=config["scorer"]["alpha"],
+    beta=config["scorer"]["beta"],
+    scorer_path=config["scorer"]["path"],
     alphabet=ds_alphabet,
 )
 

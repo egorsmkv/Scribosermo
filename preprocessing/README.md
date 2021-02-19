@@ -8,28 +8,49 @@ Try preparation and training with a small dataset first, before you start to dow
 ## Datasets
 
 **German (de):**
+[Alcohol Language Corpus](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/ALC/ALC.4.php) (~48h),
 [BAS-Formtask](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/FORMTASK/FORMTASK.2.php) (~18h),
 [BAS-Sprecherinnen](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/SprecherInnen/SprecherInnen.1.php) (~2h),
-[Common Voice](https://voice.mozilla.org/) (~701h),
+[Brothers](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/BROTHERS/BROTHERS.2.php) (~7h),
+[Common Voice](https://voice.mozilla.org/) (~777h),
 [Common Voice Single Words](https://voice.mozilla.org/) (~9h, included in the main dataset),
 [CSS10](https://www.kaggle.com/bryanpark/german-single-speaker-speech-dataset) (~16h),
 GoogleWavenet (~165h, artificial training data generated with the google text to speech service),
 Gothic (~39h, extracted from Gothic 1-3 games),
-[Kurzgesagt](https://www.youtube.com/c/KurzgesagtDE/videos) (~8h),
+[Guild2-Renaissance](https://www.gog.com/game/the_guild_2_renaissance) (~11h),
+[Hempel](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/HEMPEL/HEMPEL.4.php) (~25h),
+[Kurzgesagt](https://www.youtube.com/c/KurzgesagtDE/videos) (~9h),
 [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~4h),
 [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~234h),
+[Multilingual LibriSpeech](http://www.openslr.org/94/) (~1995h),
+[Multilingual TEDx](http://www.openslr.org/100/) (~14h),
 MussteWissen [Deutsch](https://www.youtube.com/c/musstewissenDeutsch/videos) [Mathe](https://www.youtube.com/c/musstewissenMathe/videos) [Physik](https://www.youtube.com/c/musstewissenPhysik/videos) [Chemie](https://www.youtube.com/c/musstewissenChemie/videos) (~11h),
-[PULS-Reportage](https://www.youtube.com/puls/videos) (~12h),
-[Spoken Wikipedia Corpora (SWC)](https://nats.gitlab.io/swc/) (~248h),
+[PhattSessionz](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/PHATTSESSIONZ/PHATTSESSIONZ.2.php) (~238h),
+[PhoneDat 1](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/PD1/PD1.3.php) (~21h),
+[PULS-Reportage](https://www.youtube.com/puls/videos) (~16h),
+[Regional Variants of German](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/RVG1_CLARIN/RVG1_CLARIN.3.php) (~129h),
+[RVG - Juveniles](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/RVG-J/RVG-J.2.php) (~49h),
+[SC10](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/SC10/SC10.4.php) (~6h),
+[Smartweb Handheld Corpus](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/SHC/SHC.2.php) (~29h),
+[SI100](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/SI100/SI100.2.php) (~36h),
+[Skyrim Legacy+DLCs](https://store.steampowered.com/app/72850/The_Elder_Scrolls_V_Skyrim/) (~89h),
+[Smartweb Motorbike Corpus](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/SMC/SMC.2.php) (~6h),
+[Spoken Wikipedia Corpora](https://nats.gitlab.io/swc/) (~248h),
 [Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) (~7h),
-[TerraX](https://www.youtube.com/c/terra-x/videos) (~38h),
-[German Distant Speech Corpus (TUDA-De)](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) (~185h),
+[Thorsten](http://www.openslr.org/95/) (~23h),
+[TerraX](https://www.youtube.com/c/terra-x/videos) (~48h),
+[TUDA](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) (~185h),
+[Verbmobil 1](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/VM1/VM1.3.php) (~34h),
+[Verbmobil 2](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/VM2/VM2.3.php) (~22h),
 [Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) (~32h),
-[Y-Kollektiv](https://www.youtube.com/c/ykollektiv/videos) (~52h),
+[WaSeP](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/WaSeP/WaSeP.2.php) (~3h),
+[Witcher3-GOTY](https://www.gog.com/game/the_witcher_3_wild_hunt_game_of_the_year_edition) (~44h),
+[Y-Kollektiv](https://www.youtube.com/c/ykollektiv/videos) (~58h),
 [Zamia-Speech](https://goofy.zamia.org/zamia-speech/corpora/zamia_de/) (~19h),
+[ZipTel](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/ZIPTEL/ZIPTEL.3.php) (~13h)
 
 **English (en):**
-[LibriSpeech](http://www.openslr.org/11) (~982h),
+[LibriSpeech](http://www.openslr.org/11) (~982h)
 
 **Spanish (es):**
 [Common Voice](https://voice.mozilla.org/) (~390h),
@@ -37,7 +58,7 @@ MussteWissen [Deutsch](https://www.youtube.com/c/musstewissenDeutsch/videos) [Ma
 [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~1h),
 [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~108h),
 [Tatoeba](https://tatoeba.org/spa/sentences/search?query=&from=spa&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) (~59h),
-[Voxforge](http://www.voxforge.org/home/) (~52h),
+[Voxforge](http://www.voxforge.org/home/) (~52h)
 
 **French (fr):**
 [Common Voice](https://voice.mozilla.org/) (~546h),
@@ -45,23 +66,23 @@ MussteWissen [Deutsch](https://www.youtube.com/c/musstewissenDeutsch/videos) [Ma
 [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~40h),
 [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~184h),
 [Tatoeba](https://tatoeba.org/fra/sentences/search?query=&from=fra&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) (~2h),
-[Voxforge](http://www.voxforge.org/home/) (~37h),
+[Voxforge](http://www.voxforge.org/home/) (~37h)
 
 **Italian (it):**
 [Common Voice](https://voice.mozilla.org/) (~149h),
 [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~0h),
 [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~127h),
-[Voxforge](http://www.voxforge.org/home/) (~20h),
+[Voxforge](http://www.voxforge.org/home/) (~20h)
 
 **Polish (pl):**
 [Common Voice](https://voice.mozilla.org/) (~113h),
 [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~2h),
-[M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~54h),
+[M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~54h)
 
 **Noise:**
 [Freesound Dataset Kaggle 2019](https://zenodo.org/record/3612637#.Xjq7OuEo9rk) (~103h),
 [RNNoise](https://people.xiph.org/~jm/demo/rnnoise/) (~44h),
-[Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) (~5h),
+[Zamia-Noise](http://goofy.zamia.org/zamia-speech/corpora/noise.tar.xz) (~5h)
 
 <br>
 
@@ -90,15 +111,15 @@ python3 /deepspeech-polyglot/preprocessing/download_playlists.py --target_path "
 You can download some datasets with _corcua_ (see [corcua's readme](https://gitlab.com/Jaco-Assistant/corcua#usage-examples) for special arguments):
 
 ```bash
-python3 -c 'from corcua import downloaders; downloaders.mls.Downloader().download_dataset(path="/data_original/de/MLS/", overwrite=True, args={"language": "de"})'
+python3 -c 'from corcua import downloaders; downloaders.mls.Downloader().download_dataset(path="/data_original/de/MLS/", overwrite=True, args={"language": "de"}); print("FINISHED");'
 ```
 
 For the datasets from _audiomate_ use those commands:
 
 ```bash
-python3 -c 'from audiomate.corpus import io; io.SWCDownloader(lang="de").download("/data_original/de/swc/")'
-python3 -c 'from audiomate.corpus import io; io.TatoebaDownloader(include_languages=["de"]).download("/data_original/de/tatoeba/")'
-python3 -c 'from audiomate.corpus import io; io.TudaDownloader().download("/data_original/de/tuda"/)'
+python3 -c 'from audiomate.corpus import io; io.SWCDownloader(lang="de").download("/data_original/de/swc/"); print("FINISHED");'
+python3 -c 'from audiomate.corpus import io; io.TatoebaDownloader(include_languages=["deu"]).download("/data_original/de/tatoeba/"); print("FINISHED");'
+python3 -c 'from audiomate.corpus import io; io.TudaDownloader().download("/data_original/de/tuda"/); print("FINISHED");'
 ```
 
 <br/>
@@ -107,20 +128,20 @@ python3 -c 'from audiomate.corpus import io; io.TudaDownloader().download("/data
 
 Depending on the dataset size, this step may take some hours.
 
-Prepare datasets with _Corcua_ like this (see [corcua's readme](https://gitlab.com/Jaco-Assistant/corcua#usage-examples) for special arguments):
+Prepare datasets with _corcua_ like this (see [corcua's readme](https://gitlab.com/Jaco-Assistant/corcua#usage-examples) for special arguments):
 
 ```bash
 python3 -c 'from corcua import readers, writers; \
   ds = readers.mls.Reader().load_dataset({"path": "/data_original/de/MLS/mls_german_opus/"}); \
-  writers.base_writer.Writer().save_dataset(ds, path="/data_prepared/de/MLS/", sample_rate=16000, overwrite=True);'
+  writers.base_writer.Writer().save_dataset(ds, path="/data_prepared/de/MLS/", sample_rate=16000, overwrite=True); print("FINISHED");'
 ```
 
-And datasets from _Audiomate_:
+And datasets from _audiomate_:
 
 ```bash
-python3 -c 'import audiomate; \
+python3 -c 'import audiomate; from audiomate.corpus import io; \
   ds = audiomate.Corpus.load("/data_original/de/swc/", reader="swc"); \
-  io.MozillaDeepSpeechWriter().save(ds, "/data_prepared/de/swc/");'
+  io.MozillaDeepSpeechWriter().save(ds, "/data_prepared/de/swc/"); print("FINISHED");'
 ```
 
 <br>
@@ -131,17 +152,17 @@ Split _tuda_ dataset into the correct partitions:
 python3 deepspeech-polyglot/preprocessing/split_dataset.py /data_prepared/de/tuda/all.csv --tuda --file_appendix _s
 ```
 
-Some datasets (those downloaded with audiomate for example) are in the wrong format, you can convert them from _DeepSpeech_ to _corcua_ format like this:
+Some datasets (those downloaded with audiomate for example) are in _DeepSpeech_ format, you can convert them to _corcua_ format like this:
 
 ```bash
 python3 /deepspeech-polyglot/preprocessing/convert_ds2cc.py --source_path "/data_prepared/de/tuda/" \
-  --target_path "/data_prepared/de/tuda2/" --train "train_s.csv" --dev "dev_s.csv" --test "test_s.csv"
+  --target_path "/data_prepared/de/tuda2/" --train "train_s.csv" --dev "dev_s.csv" --test "test_s.csv" --remove_text_commas
 
-# Remove "/DeepSpeech" path prefix
+# Remove "/DeepSpeech" path prefix (old directory structure)
 sed 's/\/DeepSpeech//g' train.csv > train2.csv
 ```
 
-Replace non alphabet characters and remove some audio files:
+Replace non alphabet characters and clean out some audio files:
 
 ```bash
 export LANGUAGE="de"
@@ -149,7 +170,6 @@ export LANGUAGE="de"
 # Repeat for all 3 csv files, but don't clean the test file:
 python3 /deepspeech-polyglot/preprocessing/dataset_operations.py "/data_prepared/en/librispeech/train-all.csv" \
   "/data_prepared/en/librispeech/train-all_azce.csv" --replace --exclude --clean
-
 ```
 
 Combine specific csv files: \
@@ -164,7 +184,7 @@ python3 /deepspeech-polyglot/preprocessing/combine_datasets.py --file_output "/d
 
 #### Download and prepare noise data
 
-Note: Currently the noise files can't be used for automatic augmentation.
+Note: Currently the noise files can't be used for automatic augmentation. This was a feature used in DeepSpeech.
 So if you want to train with the new network implementations, you can skip this step.
 
 Get data:

@@ -15,5 +15,6 @@ singularity exec \
   --bind /cfs/share/cache/db_xds/data_original/:/data_original/ \
   --bind /cfs/share/cache/db_xds/data_prepared/:/data_prepared/ \
   --bind ~/deepspeech-polyglot/:/deepspeech-polyglot/ \
+  --bind ~/corcua/:/corcua/ \
   /cfs/share/cache/db_xds/images/dspol.sif \
   /bin/bash -c 'python3 /deepspeech-polyglot/dspol/run_train.py'

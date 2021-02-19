@@ -16,9 +16,14 @@ data_paths:
   test: "/data_prepared/{LANGUAGE}/voxforge/test_azce.csv"
 
 alphabet_path: "/deepspeech-polyglot/data/alphabet_{LANGUAGE}.json"
-scorer_path: "/data_prepared/texts/{LANGUAGE}/kenlm_{LANGUAGE}.scorer"
-scorer_alphabet: "/deepspeech-polyglot/data/alphabet_{LANGUAGE}.txt"
 audio_sample_rate: 16000
+
+# Improve predictions with n-gram language model, only used for testing and inference
+scorer:
+  path: "/data_prepared/texts/{LANGUAGE}/kenlm_{LANGUAGE}.scorer"
+  alphabet: "/deepspeech-polyglot/data/alphabet_{LANGUAGE}.txt"
+  alpha: 0.931289039105002
+  beta: 1.1834137581510284
 
 # Depends on your gpu memory. If using multiple gpus, the value will be automatically multiplied.
 # In most cases a higher value is better, but if it's too high, you will get an Out-Of-Memory error.
