@@ -84,9 +84,9 @@ def get_texts(predictions, samples):
         ldecoded = ctc_beam_search_decoder(
             spred.numpy().tolist(),
             ds_alphabet,
-            beam_size=1024,
+            beam_size=config["scorer"]["beam_size"],
             cutoff_prob=1.0,
-            cutoff_top_n=300,
+            cutoff_top_n=512,
             scorer=ds_scorer,
             hot_words=dict(),
             num_results=1,

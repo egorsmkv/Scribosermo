@@ -24,6 +24,7 @@ scorer:
   alphabet: "/deepspeech-polyglot/data/alphabet_{LANGUAGE}.txt"
   alpha: 0.931289039105002
   beta: 1.1834137581510284
+  beam_size: 256
 
 # Depends on your gpu memory. If using multiple gpus, the value will be automatically multiplied.
 # In most cases a higher value is better, but if it's too high, you will get an Out-Of-Memory error.

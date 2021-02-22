@@ -1,4 +1,5 @@
 import json
+import multiprocessing as mp
 import time
 
 import numpy as np
@@ -56,9 +57,9 @@ def print_prediction_scorer(prediction, print_text=True):
     ldecoded = ctc_beam_search_decoder(
         prediction.tolist(),
         ds_alphabet,
-        beam_size=1024,
+        beam_size=256,
         cutoff_prob=1.0,
-        cutoff_top_n=300,
+        cutoff_top_n=512,
         scorer=ds_scorer,
         hot_words=dict(),
         num_results=1,
@@ -120,7 +121,9 @@ def timed_transcription(interpreter, wav_path):
 def main():
 
     print("\nLoading model ...")
-    interpreter = tflite.Interpreter(model_path=checkpoint_file)
+    interpreter = tflite.Interpreter(
+        model_path=checkpoint_file, num_threads=mp.cpu_count()
+    )
     print("Input details:", interpreter.get_input_details())
 
     print("Running some initialization steps ...")

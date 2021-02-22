@@ -64,7 +64,7 @@ podman build --cgroup-manager=cgroupfs -f deepspeech-polyglot/extras/misc/Contai
 Run script:
 
 ```bash
-podman run --privileged --rm --network host -it \
+sudo podman run --privileged --rm --network host -it \
   --volume "$(pwd)"/deepspeech-polyglot/extras/exporting/:/deepspeech-polyglot/extras/exporting/:ro \
   --volume "$(pwd)"/deepspeech-polyglot/data/:/deepspeech-polyglot/data/:ro \
   --volume "$(pwd)"/checkpoints/:/checkpoints/:ro \

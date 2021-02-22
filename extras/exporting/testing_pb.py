@@ -60,9 +60,9 @@ def print_prediction_scorer(prediction, print_text=True):
     ldecoded = ctc_beam_search_decoder(
         prediction.tolist(),
         ds_alphabet,
-        beam_size=1024,
+        beam_size=256,
         cutoff_prob=1.0,
-        cutoff_top_n=300,
+        cutoff_top_n=512,
         scorer=ds_scorer,
         hot_words=dict(),
         num_results=1,
