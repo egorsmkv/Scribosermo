@@ -5,7 +5,7 @@ import pandas as pd
 
 # ==================================================================================================
 def extract(input_csv: str, output_txt: str):
-    ds_pd = pd.read_csv(input_csv, encoding="utf-8", sep="\t")
+    ds_pd = pd.read_csv(input_csv, encoding="utf-8", sep="\t", keep_default_na=False)
     ds_tx = ds_pd["text"].tolist()
     text = "\n".join(ds_tx)
 

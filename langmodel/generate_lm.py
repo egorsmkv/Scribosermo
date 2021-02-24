@@ -55,7 +55,7 @@ def convert_and_filter_topk(input_dir: str, output_dir: str, top_k: int):
 
     top_words_sum = sum(count for word, count in top_counter)
     word_fraction = (top_words_sum / total_words) * 100
-    msg = "  Your top-{} words are {:.4f} percent of all words"
+    msg = "  Your top-{} words cover {:.4f} percent of all words"
     print(msg.format(top_k, word_fraction))
 
     print('  Your most common word "{}" occurred {} times'.format(*top_counter[0]))

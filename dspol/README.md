@@ -27,4 +27,7 @@ export CUDA_VISIBLE_DEVICES=1
 
 # Start Tensorboard
 tensorboard --logdir /checkpoints/en/tmp/
+
+# Print important log infos (with additional lines before and after)
+cat log.txt | grep -B 7 -A 1 "Saved"
 ```

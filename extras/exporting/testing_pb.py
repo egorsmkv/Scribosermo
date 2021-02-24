@@ -145,6 +145,10 @@ def main():
         np.random.uniform(0, 1, [213, len(alphabet) + 1]),
         print_text=False,
     )
+    print_prediction_scorer(
+        np.random.uniform(0, 1, [321, len(alphabet) + 1]),
+        print_text=False,
+    )
 
     # Now run the transcription
     print("")

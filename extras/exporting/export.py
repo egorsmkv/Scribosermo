@@ -19,7 +19,6 @@ metadata = {
 
 checkpoint_dir = "/checkpoints/en/qnetp15/"
 export_dir = os.path.join(checkpoint_dir, "exported/")
-optimize_tflite = True
 
 # ==================================================================================================
 
@@ -53,7 +52,8 @@ def main():
     tf.keras.models.save_model(model_pb, export_dir + "pb/", include_optimizer=False)
 
     # Export as .tflite model
-    export_tflite(model_tl, export_dir + "model.tflite", optimize=optimize_tflite)
+    export_tflite(model_tl, export_dir + "model_full.tflite", optimize=False)
+    export_tflite(model_tl, export_dir + "model_quantized.tflite", optimize=True)
 
 
 # ==================================================================================================

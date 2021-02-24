@@ -52,7 +52,7 @@ def load_yaml_file(path: str) -> dict:
 
 
 def merge_dicts(source: dict, target: dict) -> dict:
-    """Overwrite values in target dict recursivly with values from source dict"""
+    """Overwrite values in target dict recursively with values from source dict"""
 
     for key, value in source.items():
         if isinstance(value, dict):

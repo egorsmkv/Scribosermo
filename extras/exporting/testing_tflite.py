@@ -14,7 +14,7 @@ from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
 
 # ==================================================================================================
 
-checkpoint_file = "/checkpoints/en/qnetp15/exported/model.tflite"
+checkpoint_file = "/checkpoints/en/qnetp15/exported/model_quantized.tflite"
 test_wav_path = "/deepspeech-polyglot/extras/exporting/data/test.wav"
 alphabet_path = "/deepspeech-polyglot/data/alphabet_en.json"
 ds_alphabet_path = "/deepspeech-polyglot/data/alphabet_en.txt"
@@ -135,6 +135,10 @@ def main():
     # Run random decoding step to initialize the scorer
     print_prediction_scorer(
         np.random.uniform(0, 1, [213, len(alphabet) + 1]),
+        print_text=False,
+    )
+    print_prediction_scorer(
+        np.random.uniform(0, 1, [321, len(alphabet) + 1]),
         print_text=False,
     )
 

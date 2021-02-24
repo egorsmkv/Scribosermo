@@ -10,7 +10,5 @@ for f in py_files:
 __all__ = importable
 
 # Allow submodule usage with '.' operator
-# The if block is required for isort
-if True:  # pylint: disable=using-constant-test
-    for im in importable:
-        importlib.import_module(".{}".format(im), __package__)
+for im in importable:
+    importlib.import_module(".{}".format(im), __package__)

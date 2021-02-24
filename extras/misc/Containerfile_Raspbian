@@ -1,4 +1,4 @@
-FROM yummygooey/raspbian-buster:latest
+FROM docker.io/yummygooey/raspbian-buster:latest
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV LANG C.UTF-8
