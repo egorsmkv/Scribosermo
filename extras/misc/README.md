@@ -61,7 +61,8 @@ Build container:
 podman build --cgroup-manager=cgroupfs -f deepspeech-polyglot/extras/misc/Containerfile_Raspbian -t dspol_raspbian
 ```
 
-Run script:
+Run script: \
+(For performance tests, restart the pi every time, to prevent caching speedups)
 
 ```bash
 sudo podman run --privileged --rm --network host -it \

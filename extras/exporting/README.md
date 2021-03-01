@@ -20,3 +20,17 @@ python3 /deepspeech-polyglot/extras/exporting/testing_tflite.py
 # Disable gpus for performance tests
 export CUDA_VISIBLE_DEVICES=""
 ```
+
+Performance test options: \
+(For performance tests, restart the computer every time, to prevent caching speedups)
+
+```bash
+# Disable gpus inside the container
+export CUDA_VISIBLE_DEVICES=""
+
+# Options to start container using only the first cpu core
+--cpus=1.0 --cpuset-cpus=0
+
+# Option to start container using all cpus with only an equivalent quota of one cpu core
+--cpus=$(LC_NUMERIC=C awk "BEGIN {print 1/`nproc`}")
+```

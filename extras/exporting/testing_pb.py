@@ -1,4 +1,5 @@
 import json
+import random
 import time
 
 import numpy as np
@@ -136,19 +137,20 @@ def main():
 
     print("Running some initialization steps ...")
     # Run some random predictions to initialize the model
-    _ = model.predict(np.random.uniform(-1, 1, [1, 12345]))
-    _ = model.predict(np.random.uniform(-1, 1, [1, 1234]))
-    _ = model.predict(np.random.uniform(-1, 1, [1, 123456]))
+    for _ in range(5):
+        st = time.time()
+        length = random.randint(1234, 123456)
+        data = np.random.uniform(-1, 1, [1, length]).astype(np.float32)
+        _ = model.predict(data)
+        print("TM:", time.time() - st)
 
-    # Run random decoding step to initialize the scorer
-    print_prediction_scorer(
-        np.random.uniform(0, 1, [213, len(alphabet) + 1]),
-        print_text=False,
-    )
-    print_prediction_scorer(
-        np.random.uniform(0, 1, [321, len(alphabet) + 1]),
-        print_text=False,
-    )
+    # Run random decoding steps to initialize the scorer
+    for _ in range(15):
+        st = time.time()
+        length = random.randint(123, 657)
+        data = np.random.uniform(0, 1, [length, len(alphabet) + 1])
+        print_prediction_scorer(data, print_text=False)
+        print("TD:", time.time() - st)
 
     # Now run the transcription
     print("")

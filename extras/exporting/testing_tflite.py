@@ -1,5 +1,6 @@
 import json
 import multiprocessing as mp
+import random
 import time
 
 import numpy as np
@@ -15,6 +16,7 @@ from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
 # ==================================================================================================
 
 checkpoint_file = "/checkpoints/en/qnetp15/exported/model_quantized.tflite"
+# checkpoint_file = "/checkpoints/en/qnetp15/exported/model_full.tflite"
 test_wav_path = "/deepspeech-polyglot/extras/exporting/data/test.wav"
 alphabet_path = "/deepspeech-polyglot/data/alphabet_en.json"
 ds_alphabet_path = "/deepspeech-polyglot/data/alphabet_en.txt"
@@ -128,19 +130,20 @@ def main():
 
     print("Running some initialization steps ...")
     # Run some random predictions to initialize the model
-    _ = predict(interpreter, np.random.uniform(-1, 1, [1, 12345]).astype(np.float32))
-    _ = predict(interpreter, np.random.uniform(-1, 1, [1, 1234]).astype(np.float32))
-    _ = predict(interpreter, np.random.uniform(-1, 1, [1, 123456]).astype(np.float32))
+    for _ in range(5):
+        st = time.time()
+        length = random.randint(1234, 123456)
+        data = np.random.uniform(-1, 1, [1, length]).astype(np.float32)
+        _ = predict(interpreter, data)
+        print("TM:", time.time() - st)
 
-    # Run random decoding step to initialize the scorer
-    print_prediction_scorer(
-        np.random.uniform(0, 1, [213, len(alphabet) + 1]),
-        print_text=False,
-    )
-    print_prediction_scorer(
-        np.random.uniform(0, 1, [321, len(alphabet) + 1]),
-        print_text=False,
-    )
+    # Run random decoding steps to initialize the scorer
+    for _ in range(15):
+        st = time.time()
+        length = random.randint(123, 657)
+        data = np.random.uniform(0, 1, [length, len(alphabet) + 1])
+        print_prediction_scorer(data, print_text=False)
+        print("TD:", time.time() - st)
 
     # Now run the transcription
     print("")
