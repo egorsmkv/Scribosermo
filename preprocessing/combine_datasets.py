@@ -30,7 +30,7 @@ def read_and_validate(cfiles):
             dir_path = os.path.dirname(cfile)
 
             def join_path(file, path: str = ""):
-                return os.path.join(path, file)
+                return os.path.abspath(os.path.join(path, file))
 
             # Without using partial, pylint complains about an "cell-var-from-loop" error
             pfunc = partial(join_path, path=dir_path)

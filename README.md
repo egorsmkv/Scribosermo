@@ -110,6 +110,7 @@ Supported networks with their trainable parameter count (using English alphabet)
 
 By default, the checkpoints are provided under the same licence as this repository, but a lot of
 datasets have extra conditions (for example non-commercial use only) which also have to be applied.
+The QuartzNet models are double licenced withs Nvidia's NGC, because they use their pretrained weights.
 Please check this yourself for the models you want to use.
 
 **English**:

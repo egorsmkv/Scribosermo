@@ -59,8 +59,13 @@ autosave_every_min: 30
 
 # Copy another checkpoint and continue from there.
 # If using this, make sure your config matches the one of the pretrained checkpoint.
+# If training with a different sized alphabet, the last layer will be reinitialized automatically.
 continue_pretrained: false
 pretrained_checkpoint_dir: "/checkpoints/en/qnet5/"
+
+# Used for transfer-learning. Only the last layer will be trained.
+# After the frozen training, start a new training with the complete network.
+freeze_base_net: false
 
 use_pipeline_cache: true
 empty_cache_dir: true

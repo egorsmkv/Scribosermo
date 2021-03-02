@@ -82,10 +82,14 @@ def train_step(samples):
         loss = tf.reduce_mean(loss)
 
     trainable_variables = model.trainable_variables
+    if config["freeze_base_net"]:
+        trainable_variables = model.trainable_variables[-2:]
+        print("Training only last layer")
+
     gradients = tape.gradient(loss, trainable_variables)
     # gradients = optimizer.get_unscaled_gradients(scaled_gradients)
     gradients, global_norm = tf.clip_by_global_norm(gradients, 1.0)
-    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    optimizer.apply_gradients(zip(gradients, trainable_variables))
 
     return loss
 
@@ -166,11 +170,22 @@ def distributed_log_greedy(dist_inputs):
     to extract the data values of the first device before running a non distributed prediction"""
 
     samples = strategy.experimental_local_results(dist_inputs)[0]
-    conv_samps = {
-        "features": samples["features"].values[0],
-        "feature_length": samples["feature_length"].values[0],
-        "label": samples["label"].values[0],
-    }
+
+    if hasattr(samples["features"], "values"):
+        # Multi-GPU distribution
+        conv_samps = {
+            "features": samples["features"].values[0],
+            "feature_length": samples["feature_length"].values[0],
+            "label": samples["label"].values[0],
+        }
+    else:
+        # Single-GPU distribution
+        conv_samps = {
+            "features": samples["features"],
+            "feature_length": samples["feature_length"],
+            "label": samples["label"],
+        }
+
     log_greedy_text(conv_samps)
 
 
@@ -296,6 +311,132 @@ def eval(dataset_eval):
 # ==================================================================================================
 
 
+def build_pipelines():
+    """ Initialize train/eval data pipelines """
+
+    global_train_batch_size = (
+        config["batch_sizes"]["train"] * strategy.num_replicas_in_sync
+    )
+    global_eval_batch_size = (
+        config["batch_sizes"]["eval"] * strategy.num_replicas_in_sync
+    )
+
+    # Create pipelines
+    cache = config["cache_dir"] + "train" if config["use_pipeline_cache"] else ""
+    dataset_train = pipeline.create_pipeline(
+        csv_path=config["data_paths"]["train"],
+        batch_size=global_train_batch_size,
+        config=config,
+        train_mode=True,
+        cache_path=cache,
+    )
+    cache = config["cache_dir"] + "eval" if config["use_pipeline_cache"] else ""
+    dataset_eval = pipeline.create_pipeline(
+        csv_path=config["data_paths"]["eval"],
+        batch_size=global_eval_batch_size,
+        config=config,
+        train_mode=False,
+        cache_path=cache,
+    )
+
+    dataset_train = strategy.experimental_distribute_dataset(dataset_train)
+    dataset_eval = strategy.experimental_distribute_dataset(dataset_eval)
+
+    return dataset_train, dataset_eval
+
+
+# ==================================================================================================
+
+
+def create_optimizer():
+    """ Initialize training optimizer """
+
+    with strategy.scope():
+        optimizer_type = config["optimizer"]["name"]
+        if optimizer_type == "adamw":
+            optim = tfa.optimizers.AdamW(
+                learning_rate=config["optimizer"]["learning_rate"],
+                weight_decay=config["optimizer"]["weight_decay"],
+            )
+        elif optimizer_type == "novograd":
+            optim = tfa.optimizers.NovoGrad(
+                learning_rate=config["optimizer"]["learning_rate"],
+                weight_decay=config["optimizer"]["weight_decay"],
+                beta_1=config["optimizer"]["beta1"],
+                beta_2=config["optimizer"]["beta2"],
+            )
+        # optim = mixed_precision.LossScaleOptimizer(optim, loss_scale='dynamic')
+
+    return optim
+
+
+# ==================================================================================================
+
+
+def load_model():
+    feature_type = config["audio_features"]["use_type"]
+    c_input = config["audio_features"][feature_type]["num_features"]
+    c_output = len(alphabet) + 1
+
+    # Get the model type either from the config or the existing checkpoint
+    if config["continue_pretrained"] or not config["empty_ckpt_dir"]:
+        path = os.path.join(checkpoint_dir, "config_export.json")
+        exported_config = utils.load_json_file(path)
+        network_type = exported_config["network"]["name"]
+    else:
+        network_type = config["network"]["name"]
+
+    # Build the network
+    print("Creating new {} model ...".format(network_type))
+    with strategy.scope():
+        if network_type == "deepspeech1":
+            new_model = nets.deepspeech1.MyModel(c_input, c_output)
+        elif network_type == "deepspeech2":
+            new_model = nets.deepspeech2.MyModel(c_input, c_output)
+        elif network_type == "jasper":
+            new_model = nets.jasper.MyModel(
+                c_input,
+                c_output,
+                blocks=config["network"]["blocks"],
+                module_repeat=config["network"]["module_repeat"],
+                dense_residuals=config["network"]["dense_residuals"],
+            )
+        elif network_type == "quartznet":
+            new_model = nets.quartznet.MyModel(
+                c_input,
+                c_output,
+                blocks=config["network"]["blocks"],
+                module_repeat=config["network"]["module_repeat"],
+            )
+
+    # Copy weights. Compared to loading the model directly, this has the benefit that parts of the
+    # model code can be changed as long the layers are kept.
+    if config["continue_pretrained"] or not config["empty_ckpt_dir"]:
+        print("Copying model weights from checkpoint ...")
+        exported_model = tf.keras.models.load_model(checkpoint_dir)
+
+        # Get shapes of last (decoding) layer
+        last_layer_shape_exp = [w.shape for w in exported_model.get_weights()][-2]
+        last_layer_shape_new = [w.shape for w in new_model.get_weights()][-2]
+
+        if last_layer_shape_new == last_layer_shape_exp:
+            # Copy all weights
+            new_model.set_weights(exported_model.get_weights())
+        else:
+            # Copy exported weights from all but the last layer.
+            # Keep the newly initialized weights for the missing layer.
+            merged_weights = exported_model.get_weights()[:-2]
+            merged_weights.extend(new_model.get_weights()[-2:])
+            new_model.set_weights(merged_weights)
+            print("Reinitialized last layer")
+
+    new_model.build(input_shape=(None, None, c_input))
+    return new_model
+
+
+# ==================================================================================================
+
+
 def main():
     global model, summary_writer, save_manager, optimizer, strategy
 
@@ -329,79 +470,14 @@ def main():
         # Create and empty directory
         os.makedirs(checkpoint_dir, exist_ok=True)
 
-    # Enable testing with multiple gpus
+    # Enable training with multiple gpus
     strategy = tf.distribute.MirroredStrategy()
-    global_train_batch_size = (
-        config["batch_sizes"]["train"] * strategy.num_replicas_in_sync
-    )
-    global_eval_batch_size = (
-        config["batch_sizes"]["eval"] * strategy.num_replicas_in_sync
-    )
 
-    # Create pipelines
-    cache = config["cache_dir"] + "train" if config["use_pipeline_cache"] else ""
-    dataset_train = pipeline.create_pipeline(
-        csv_path=config["data_paths"]["train"],
-        batch_size=global_train_batch_size,
-        config=config,
-        train_mode=True,
-        cache_path=cache,
-    )
-    cache = config["cache_dir"] + "eval" if config["use_pipeline_cache"] else ""
-    dataset_eval = pipeline.create_pipeline(
-        csv_path=config["data_paths"]["eval"],
-        batch_size=global_eval_batch_size,
-        config=config,
-        train_mode=False,
-        cache_path=cache,
-    )
-    dataset_train = strategy.experimental_distribute_dataset(dataset_train)
-    dataset_eval = strategy.experimental_distribute_dataset(dataset_eval)
+    # Initialize data pipelines
+    dataset_train, dataset_eval = build_pipelines()
 
-    feature_type = config["audio_features"]["use_type"]
-    c_input = config["audio_features"][feature_type]["num_features"]
-    c_output = len(alphabet) + 1
-
-    # Get the model type either from the config or the existing checkpoint
-    if config["continue_pretrained"] or not config["empty_ckpt_dir"]:
-        path = os.path.join(checkpoint_dir, "config_export.json")
-        exported_config = utils.load_json_file(path)
-        network_type = exported_config["network"]["name"]
-    else:
-        network_type = config["network"]["name"]
-
-    # Build the network
-    print("Creating new {} model ...".format(network_type))
-    with strategy.scope():
-        if network_type == "deepspeech1":
-            model = nets.deepspeech1.MyModel(c_input, c_output)
-        elif network_type == "deepspeech2":
-            model = nets.deepspeech2.MyModel(c_input, c_output)
-        elif network_type == "jasper":
-            model = nets.jasper.MyModel(
-                c_input,
-                c_output,
-                blocks=config["network"]["blocks"],
-                module_repeat=config["network"]["module_repeat"],
-                dense_residuals=config["network"]["dense_residuals"],
-            )
-        elif network_type == "quartznet":
-            model = nets.quartznet.MyModel(
-                c_input,
-                c_output,
-                blocks=config["network"]["blocks"],
-                module_repeat=config["network"]["module_repeat"],
-            )
-
-    # Copy weights. Compared to loading the model directly, this has the benefit that parts of the
-    # model code can be changed as long the layers are kept.
-    if config["continue_pretrained"] or not config["empty_ckpt_dir"]:
-        print("Copying model weights from checkpoint ...")
-        exported_model = tf.keras.models.load_model(checkpoint_dir)
-        model.set_weights(exported_model.get_weights())
-
-    # Print network summary
-    model.build(input_shape=(None, None, c_input))
+    # Create and initialize the model, either from scratch or with loading exported weights
+    model = load_model()
     model.summary()
     # tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
 
@@ -411,21 +487,7 @@ def main():
         json.dump(config, file, indent=2)
 
     # Select optimizer
-    with strategy.scope():
-        optimizer_type = config["optimizer"]["name"]
-        if optimizer_type == "adamw":
-            optimizer = tfa.optimizers.AdamW(
-                learning_rate=config["optimizer"]["learning_rate"],
-                weight_decay=config["optimizer"]["weight_decay"],
-            )
-        elif optimizer_type == "novograd":
-            optimizer = tfa.optimizers.NovoGrad(
-                learning_rate=config["optimizer"]["learning_rate"],
-                weight_decay=config["optimizer"]["weight_decay"],
-                beta_1=config["optimizer"]["beta1"],
-                beta_2=config["optimizer"]["beta2"],
-            )
-        # optimizer = mixed_precision.LossScaleOptimizer(optimizer, loss_scale='dynamic')
+    optimizer = create_optimizer()
 
     summary_writer = tf.summary.create_file_writer(checkpoint_dir)
     checkpoint = tf.train.Checkpoint(model=model, optimizer=optimizer)

@@ -61,7 +61,7 @@ MussteWissen [Deutsch](https://www.youtube.com/c/musstewissenDeutsch/videos) [Ma
 [Voxforge](http://www.voxforge.org/home/) (~52h)
 
 **French (fr):**
-[Common Voice](https://voice.mozilla.org/) (~546h),
+[Common Voice](https://voice.mozilla.org/) (~617h),
 [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) (~19h),
 [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~40h),
 [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~184h),
