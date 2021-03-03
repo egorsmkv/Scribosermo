@@ -9,6 +9,7 @@ import model as exmodel
 metadata = {
     "network": "Quartznet",
     "num_features": 64,
+    "num_mfcc_features": 0,
     "num_spectrogram_bins": 257,
     "audio_sample_rate": 16000,
     "audio_window_samples": int(16000 * 0.02),

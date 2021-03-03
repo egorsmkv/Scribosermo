@@ -245,6 +245,13 @@ class MyModel(Model):
             spectrogram.shape[:-1].concatenate(self.lmw_matrix.shape[-1:])
         )
         features = tf.math.log(mel_spectrograms + 1e-6)
+
+        # Optionally calculate MFCC features
+        if self.metadata["num_mfcc_features"] > 0:
+            features = tflite_tools.mfcc_tflite(features)
+            features = features[..., : self.metadata["num_mfcc_features"]]
+
+        # Remove batch dimension
         features = features[0]
 
         # Feature augmentation

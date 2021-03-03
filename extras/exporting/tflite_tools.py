@@ -2,6 +2,7 @@
 # https://github.com/antonyharfield/tflite-models-audioset-yamnet/blob/master/features_tflite.py
 # With updates from: https://github.com/tensorflow/tensorflow/issues/27303#issuecomment-675008946
 # And from: https://github.com/tensorflow/tensorflow/issues/27303#issuecomment-577361337
+# With MFCC from: https://gist.github.com/padoremu/8288b47ce76e9530eb288d4eec2e0b4d
 
 import numpy as np
 import tensorflow as tf
@@ -10,7 +11,8 @@ import tensorflow as tf
 
 
 def _dft_matrix(dft_length):
-    """Calculate the full DFT matrix in numpy."""
+    """Calculate the full DFT matrix in numpy"""
+
     omega = (0 + 1j) * 2.0 * np.pi / float(dft_length)
     # Don't include 1/sqrt(N) scaling, tf.signal.rfft doesn't apply it.
     return np.exp(omega * np.outer(np.arange(dft_length), np.arange(dft_length)))
@@ -20,7 +22,8 @@ def _dft_matrix(dft_length):
 
 
 def _naive_rdft(signal_tensor, fft_length, padding="center"):
-    """Implement real-input Fourier Transform by matmul."""
+    """Implement real-input Fourier Transform by matmul"""
+
     # We are right-multiplying by the DFT matrix, and we are keeping
     # only the first half ("positive frequencies").
     # So discard the second half of rows, but transpose the array for
@@ -38,11 +41,11 @@ def _naive_rdft(signal_tensor, fft_length, padding="center"):
         np.imag(complex_dft_matrix_kept_values).astype(np.float32),
         name="imaginary_dft_matrix",
     )
-    signal_frame_length = signal_tensor.shape[-1]  # .value
+    signal_frame_length = signal_tensor.shape[-1]
     half_pad = (fft_length - signal_frame_length) // 2
 
     if padding == "center":
-        # Center-padding.
+        # Center-padding
         pad_values = tf.concat(
             [
                 tf.zeros([tf.rank(signal_tensor) - 1, 2], tf.int32),
@@ -51,7 +54,7 @@ def _naive_rdft(signal_tensor, fft_length, padding="center"):
             axis=0,
         )
     elif padding == "right":
-        # Right-padding.
+        # Right-padding
         pad_values = tf.concat(
             [
                 tf.zeros([tf.rank(signal_tensor) - 1, 2], tf.int32),
@@ -88,6 +91,7 @@ def stft_tflite(signal, frame_length, frame_step, fft_length):
         Two (num_frames, fft_length) tensors containing the real and imaginary parts
         of the short-time Fourier transform of the input signal.
     """
+
     # Make the window be shape (1, frame_length) instead of just frame_length
     # in an effort to help the tflite broadcast logic.
     window = tf.reshape(
@@ -114,7 +118,8 @@ def stft_tflite(signal, frame_length, frame_step, fft_length):
 
 
 def stft_magnitude_tflite(signals, frame_length, frame_step, fft_length):
-    """Calculate spectrogram avoiding tflite incompatible ops."""
+    """Calculate spectrogram avoiding tflite incompatible ops"""
+
     real_stft, imag_stft = stft_tflite(signals, frame_length, frame_step, fft_length)
     stft_magnitude = tf.sqrt(
         tf.add(real_stft * real_stft, imag_stft * imag_stft),
@@ -122,3 +127,28 @@ def stft_magnitude_tflite(signals, frame_length, frame_step, fft_length):
     )
 
     return stft_magnitude
+
+
+# ==================================================================================================
+
+
+def mfcc_tflite(log_mel_spectrogram):
+    """Calculate MFCC with tflite ops"""
+
+    axis_dim = log_mel_spectrogram.shape[-1]
+    scale_arg = -tf.range(float(axis_dim)) * np.pi * 0.5 / float(axis_dim)
+    scale_real = 2.0 * tf.cos(scale_arg)
+    scale_imag = 2.0 * tf.sin(scale_arg)
+
+    rfft_real, rfft_imag = _naive_rdft(
+        log_mel_spectrogram, fft_length=2 * axis_dim, padding="right"
+    )
+    rfft_real = rfft_real[:, :, :axis_dim]
+
+    # Conjugate to match tf.signal convention:
+    rfft_imag = -rfft_imag[:, :, :axis_dim]
+
+    dct2 = rfft_real * scale_real - rfft_imag * scale_imag
+    mfcc = dct2 * tf.math.rsqrt(2 * float(axis_dim))
+
+    return mfcc

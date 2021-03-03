@@ -147,7 +147,10 @@ class MyModel(Model):
 
     # ==============================================================================================
 
-    def call(self, x, training=False):
+    # This input signature is required that we can export and load the model in ".pb" format
+    # with a variable sequence length, instead of using the one of the first input.
+    @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
+    def call(self, x):
         """Call with input shape: [batch_size, steps_a, n_input],
         outputs tensor of shape: [batch_size, steps_b, n_output]"""
 
