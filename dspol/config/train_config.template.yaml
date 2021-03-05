@@ -109,25 +109,25 @@ audio_features:
 
 augmentations:
   signal:
-    normalize_volume:
-      # Scale loudest volume to value of 1
-      use_train: false
-      use_test: false
-    resample:
-      # Resamples to given sample rate and back again.
-      use_train: false
-      use_test: false
-      tmp_sample_rate: 8000
     dither:
       # Add minimal random noise to data to prevent quantization artefacts
       use_train: true
       use_test: true
       factor: 0.00001
+    normalize_volume:
+      # Scale loudest volume to value of 1
+      use_train: false
+      use_test: false
     preemphasis:
       # Emphasizes high-frequency signal components
       use_train: true
       use_test: true
       coefficient: 0.97
+    resample:
+      # Resamples to given sample rate and back again.
+      use_train: false
+      use_test: false
+      tmp_sample_rate: 8000
     random_volume:
       # Random volume levels
       use_train: false
@@ -141,6 +141,22 @@ augmentations:
       delay: 50
       decay: 10
   spectrogram:
+    random_pitch:
+      # Applies random pitch changes, using clipped normal distribution.
+      use_train: true
+      use_test: false
+      mean: 1.0
+      stddev: 0.05
+      cut_min: 0.8
+      cut_max: 1.3
+    random_speed:
+      # Applies random speed changes, using clipped normal distribution.
+      use_train: true
+      use_test: false
+      mean: 1.0
+      stddev: 0.1
+      cut_min: 0.7
+      cut_max: 1.5
     freq_mask:
       # Zeros out one or multiple random frequency ranges
       use_train: true
@@ -165,35 +181,19 @@ augmentations:
       use_train: true
       use_test: false
       max_rate: 0.05
-    random_speed:
-      # Applies random speed changes, using clipped normal distribution.
-      use_train: true
-      use_test: false
-      mean: 1.0
-      stddev: 0.1
-      cut_min: 0.7
-      cut_max: 1.5
-    random_pitch:
-      # Applies random pitch changes, using clipped normal distribution.
-      use_train: true
-      use_test: false
-      mean: 1.0
-      stddev: 0.05
-      cut_min: 0.8
-      cut_max: 1.3
   features:
-    normalize_features:
-      # Normalize features per channel/frequency
-      use_train: true
-      use_test: true
-    random_add:
-      # Add additional random noise to features
-      use_train: false
-      use_test: false
-      factor: 0.05
     random_multiply:
       # Add multiplicative random noise to features
       use_train: false
       use_test: false
       mean: 1.0
       stddev: 0.05
+    random_add:
+      # Add additional random noise to features
+      use_train: false
+      use_test: false
+      factor: 0.05
+    normalize_features:
+      # Normalize features per channel/frequency
+      use_train: true
+      use_test: true

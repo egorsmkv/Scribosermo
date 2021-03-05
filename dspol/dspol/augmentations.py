@@ -5,11 +5,10 @@ import tensorflow_io as tfio
 # ==================================================================================================
 
 
-def resample(signal, sample_rate, tmp_sample_rate):
-    """Resample to given sample rate and back again"""
+def dither(signal, factor):
+    """Amount of additional white-noise dithering to prevent quantization artefacts"""
 
-    signal = tfio.audio.resample(signal, sample_rate, tmp_sample_rate)
-    signal = tfio.audio.resample(signal, tmp_sample_rate, sample_rate)
+    signal += factor * tf.random.normal(shape=tf.shape(signal))
     return signal
 
 
@@ -21,6 +20,28 @@ def normalize_volume(signal):
 
     gain = 1.0 / (tf.reduce_max(tf.abs(signal)) + 1e-7)
     signal = signal * gain
+    return signal
+
+
+# ==================================================================================================
+
+
+def preemphasis(signal, coef=0.97):
+    """Emphasizes high-frequency signal components"""
+
+    psig = signal[1:] - coef * signal[:-1]
+    signal = tf.concat([[signal[0]], psig], axis=0)
+    return signal
+
+
+# ==================================================================================================
+
+
+def resample(signal, sample_rate, tmp_sample_rate):
+    """Resample to given sample rate and back again"""
+
+    signal = tfio.audio.resample(signal, sample_rate, tmp_sample_rate)
+    signal = tfio.audio.resample(signal, tmp_sample_rate, sample_rate)
     return signal
 
 
@@ -129,22 +150,70 @@ def reverb(signal, audio_sample_rate, delay: float = 20, decay: float = 10):
 # ==================================================================================================
 
 
-def dither(signal, factor):
-    """Amount of additional white-noise dithering to prevent quantization artefacts"""
+def random_pitch(
+    spectrogram, mean: float, stddev: float, cut_min: float, cut_max: float
+):
+    """Apply random pitch changes, using clipped normal distribution.
+    Inspired by: DeepSpeech/training/deepspeech_training/util/augmentations.py"""
 
-    signal += factor * tf.random.normal(shape=tf.shape(signal))
-    return signal
+    # Get a random pitch and clip it, that we don't reach edge cases where the speed is negative
+    pitch = tf.random.normal(shape=[], mean=mean, stddev=stddev)
+    pitch = tf.minimum(tf.maximum(pitch, cut_min), cut_max)
+
+    old_shape = tf.shape(spectrogram)
+    old_freq_size = tf.cast(old_shape[2], tf.float32)
+    new_freq_size = tf.cast(old_freq_size * pitch, tf.int32)
+
+    # Adding a temporary channel dimension for resizing
+    spectrogram = tf.expand_dims(spectrogram, -1)
+    spectrogram = tf.image.resize(spectrogram, [old_shape[1], new_freq_size])
+
+    # Crop or pad that we get same number of bins as before
+    if pitch > 1:
+        spectrogram = tf.image.crop_to_bounding_box(
+            spectrogram,
+            offset_height=0,
+            offset_width=0,
+            target_height=old_shape[1],
+            target_width=tf.math.minimum(old_shape[2], new_freq_size),
+        )
+    elif pitch < 1:
+        spectrogram = tf.image.pad_to_bounding_box(
+            spectrogram,
+            offset_height=0,
+            offset_width=0,
+            target_height=tf.shape(spectrogram)[1],
+            target_width=old_shape[2],
+        )
+
+    spectrogram = tf.squeeze(spectrogram, axis=-1)
+    return spectrogram
 
 
 # ==================================================================================================
 
 
-def preemphasis(signal, coef=0.97):
-    """Emphasizes high-frequency signal components"""
+def random_speed(
+    spectrogram, mean: float, stddev: float, cut_min: float, cut_max: float
+):
+    """Apply random speed changes, using clipped normal distribution.
+    Transforming the spectrogram is much faster than transforming the audio signal.
+    Inspired by: DeepSpeech/training/deepspeech_training/util/augmentations.py"""
 
-    psig = signal[1:] - coef * signal[:-1]
-    signal = tf.concat([[signal[0]], psig], axis=0)
-    return signal
+    # Get a random speed and clip it, that we don't reach edge cases where the speed is negative
+    change = tf.random.normal(shape=[], mean=mean, stddev=stddev)
+    change = tf.minimum(tf.maximum(change, cut_min), cut_max)
+
+    old_shape = tf.shape(spectrogram)
+    old_time_size = tf.cast(old_shape[1], tf.float32)
+    new_time_size = tf.cast(old_time_size / change, tf.int32)
+
+    # Adding a temporary channel dimension for resizing
+    spectrogram = tf.expand_dims(spectrogram, -1)
+    spectrogram = tf.image.resize(spectrogram, [new_time_size, old_shape[2]])
+    spectrogram = tf.squeeze(spectrogram, axis=-1)
+
+    return spectrogram
 
 
 # ==================================================================================================
@@ -238,49 +307,6 @@ def spec_dropout(spectrogram, max_rate=0.1):
 # ==================================================================================================
 
 
-def random_pitch(
-    spectrogram, mean: float, stddev: float, cut_min: float, cut_max: float
-):
-    """Apply random pitch changes, using clipped normal distribution.
-    Inspired by: DeepSpeech/training/deepspeech_training/util/augmentations.py"""
-
-    # Get a random pitch and clip it, that we don't reach edge cases where the speed is negative
-    pitch = tf.random.normal(shape=[], mean=mean, stddev=stddev)
-    pitch = tf.minimum(tf.maximum(pitch, cut_min), cut_max)
-
-    old_shape = tf.shape(spectrogram)
-    old_freq_size = tf.cast(old_shape[2], tf.float32)
-    new_freq_size = tf.cast(old_freq_size * pitch, tf.int32)
-
-    # Adding a temporary channel dimension for resizing
-    spectrogram = tf.expand_dims(spectrogram, -1)
-    spectrogram = tf.image.resize(spectrogram, [old_shape[1], new_freq_size])
-
-    # Crop or pad that we get same number of bins as before
-    if pitch > 1:
-        spectrogram = tf.image.crop_to_bounding_box(
-            spectrogram,
-            offset_height=0,
-            offset_width=0,
-            target_height=old_shape[1],
-            target_width=tf.math.minimum(old_shape[2], new_freq_size),
-        )
-    elif pitch < 1:
-        spectrogram = tf.image.pad_to_bounding_box(
-            spectrogram,
-            offset_height=0,
-            offset_width=0,
-            target_height=tf.shape(spectrogram)[1],
-            target_width=old_shape[2],
-        )
-
-    spectrogram = tf.squeeze(spectrogram, axis=-1)
-    return spectrogram
-
-
-# ==================================================================================================
-
-
 def random_multiply(features, mean: float, stddev: float):
     """Add multiplicative random noise to features"""
 
@@ -298,29 +324,3 @@ def per_feature_norm(features):
 
     features = (features - f_mean) / (f_std + 1e-7)
     return features
-
-
-# ==================================================================================================
-
-
-def random_speed(
-    spectrogram, mean: float, stddev: float, cut_min: float, cut_max: float
-):
-    """Apply random speed changes, using clipped normal distribution.
-    Transforming the spectrogram is much faster than transforming the audio signal.
-    Inspired by: DeepSpeech/training/deepspeech_training/util/augmentations.py"""
-
-    # Get a random speed and clip it, that we don't reach edge cases where the speed is negative
-    change = tf.random.normal(shape=[], mean=mean, stddev=stddev)
-    change = tf.minimum(tf.maximum(change, cut_min), cut_max)
-
-    old_shape = tf.shape(spectrogram)
-    old_time_size = tf.cast(old_shape[1], tf.float32)
-    new_time_size = tf.cast(old_time_size / change, tf.int32)
-
-    # Adding a temporary channel dimension for resizing
-    spectrogram = tf.expand_dims(spectrogram, -1)
-    spectrogram = tf.image.resize(spectrogram, [new_time_size, old_shape[2]])
-    spectrogram = tf.squeeze(spectrogram, axis=-1)
-
-    return spectrogram

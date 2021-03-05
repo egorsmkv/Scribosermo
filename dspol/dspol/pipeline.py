@@ -58,12 +58,26 @@ def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = 
     if datatype == "signal":
         augs = config["augmentations"]["signal"]
 
+        if "dither" in augs:
+            aug = augs["dither"]
+            if (aug["use_train"] and train_mode) or (
+                aug["use_test"] and not train_mode
+            ):
+                tensor = augmentations.dither(tensor, aug["factor"])
+
         if "normalize_volume" in augs:
             aug = augs["normalize_volume"]
             if (aug["use_train"] and train_mode) or (
                 aug["use_test"] and not train_mode
             ):
                 tensor = augmentations.normalize_volume(tensor)
+
+        if "preemphasis" in augs:
+            aug = augs["preemphasis"]
+            if (aug["use_train"] and train_mode) or (
+                aug["use_test"] and not train_mode
+            ):
+                tensor = augmentations.preemphasis(tensor, aug["coefficient"])
 
         if "resample" in augs:
             aug = augs["resample"]
@@ -73,20 +87,6 @@ def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = 
                 tensor = augmentations.resample(
                     tensor, audio_sample_rate, aug["tmp_sample_rate"]
                 )
-
-        if "dither" in augs:
-            aug = augs["dither"]
-            if (aug["use_train"] and train_mode) or (
-                aug["use_test"] and not train_mode
-            ):
-                tensor = augmentations.dither(tensor, aug["factor"])
-
-        if "preemphasis" in augs:
-            aug = augs["preemphasis"]
-            if (aug["use_train"] and train_mode) or (
-                aug["use_test"] and not train_mode
-            ):
-                tensor = augmentations.preemphasis(tensor, aug["coefficient"])
 
         if "random_volume" in augs:
             aug = augs["random_volume"]
@@ -108,6 +108,24 @@ def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = 
 
     if datatype == "spectrogram":
         augs = config["augmentations"]["spectrogram"]
+
+        if "random_pitch" in augs:
+            aug = augs["random_pitch"]
+            if (aug["use_train"] and train_mode) or (
+                aug["use_test"] and not train_mode
+            ):
+                tensor = augmentations.random_pitch(
+                    tensor, aug["mean"], aug["stddev"], aug["cut_min"], aug["cut_max"]
+                )
+
+        if "random_speed" in augs:
+            aug = augs["random_speed"]
+            if (aug["use_train"] and train_mode) or (
+                aug["use_test"] and not train_mode
+            ):
+                tensor = augmentations.random_speed(
+                    tensor, aug["mean"], aug["stddev"], aug["cut_min"], aug["cut_max"]
+                )
 
         if "freq_mask" in augs:
             aug = augs["freq_mask"]
@@ -139,40 +157,8 @@ def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = 
             ):
                 tensor = augmentations.spec_dropout(tensor, aug["max_rate"])
 
-        if "random_speed" in augs:
-            aug = augs["random_speed"]
-            if (aug["use_train"] and train_mode) or (
-                aug["use_test"] and not train_mode
-            ):
-                tensor = augmentations.random_speed(
-                    tensor, aug["mean"], aug["stddev"], aug["cut_min"], aug["cut_max"]
-                )
-
-        if "random_pitch" in augs:
-            aug = augs["random_pitch"]
-            if (aug["use_train"] and train_mode) or (
-                aug["use_test"] and not train_mode
-            ):
-                tensor = augmentations.random_pitch(
-                    tensor, aug["mean"], aug["stddev"], aug["cut_min"], aug["cut_max"]
-                )
-
     if datatype == "features":
         augs = config["augmentations"]["features"]
-
-        if "normalize_features" in augs:
-            aug = augs["normalize_features"]
-            if (aug["use_train"] and train_mode) or (
-                aug["use_test"] and not train_mode
-            ):
-                tensor = augmentations.per_feature_norm(tensor)
-
-        if "random_add" in augs:
-            aug = augs["random_add"]
-            if (aug["use_train"] and train_mode) or (
-                aug["use_test"] and not train_mode
-            ):
-                tensor = augmentations.dither(tensor, aug["factor"])
 
         if "random_multiply" in augs:
             aug = augs["random_multiply"]
@@ -182,6 +168,20 @@ def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = 
                 tensor = augmentations.random_multiply(
                     tensor, aug["mean"], aug["stddev"]
                 )
+
+        if "random_add" in augs:
+            aug = augs["random_add"]
+            if (aug["use_train"] and train_mode) or (
+                aug["use_test"] and not train_mode
+            ):
+                tensor = augmentations.dither(tensor, aug["factor"])
+
+        if "normalize_features" in augs:
+            aug = augs["normalize_features"]
+            if (aug["use_train"] and train_mode) or (
+                aug["use_test"] and not train_mode
+            ):
+                tensor = augmentations.per_feature_norm(tensor)
 
     return tensor
 
