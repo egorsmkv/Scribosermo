@@ -88,6 +88,24 @@ def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = 
             ):
                 tensor = augmentations.preemphasis(tensor, aug["coefficient"])
 
+        if "random_volume" in augs:
+            aug = augs["random_volume"]
+            if (aug["use_train"] and train_mode) or (
+                aug["use_test"] and not train_mode
+            ):
+                tensor = augmentations.random_volume(
+                    tensor, aug["min_dbfs"], aug["min_dbfs"]
+                )
+
+        if "reverb" in augs:
+            aug = augs["reverb"]
+            if (aug["use_train"] and train_mode) or (
+                aug["use_test"] and not train_mode
+            ):
+                tensor = augmentations.reverb(
+                    tensor, audio_sample_rate, aug["delay"], aug["decay"]
+                )
+
     if datatype == "spectrogram":
         augs = config["augmentations"]["spectrogram"]
 
@@ -130,6 +148,15 @@ def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = 
                     tensor, aug["mean"], aug["stddev"], aug["cut_min"], aug["cut_max"]
                 )
 
+        if "random_pitch" in augs:
+            aug = augs["random_pitch"]
+            if (aug["use_train"] and train_mode) or (
+                aug["use_test"] and not train_mode
+            ):
+                tensor = augmentations.random_pitch(
+                    tensor, aug["mean"], aug["stddev"], aug["cut_min"], aug["cut_max"]
+                )
+
     if datatype == "features":
         augs = config["augmentations"]["features"]
 
@@ -147,6 +174,15 @@ def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = 
             ):
                 tensor = augmentations.dither(tensor, aug["factor"])
 
+        if "random_multiply" in augs:
+            aug = augs["random_multiply"]
+            if (aug["use_train"] and train_mode) or (
+                aug["use_test"] and not train_mode
+            ):
+                tensor = augmentations.random_multiply(
+                    tensor, aug["mean"], aug["stddev"]
+                )
+
     return tensor
 
 
@@ -157,7 +193,10 @@ def load_audio(sample, config: dict, train_mode: bool = False):
     audio_binary = tf.io.read_file(sample["filepath"])
     audio, _ = tf.audio.decode_wav(audio_binary)
 
+    audio = tf.squeeze(audio, axis=-1)
     audio = apply_augmentations(audio, "signal", config, train_mode)
+
+    audio = tf.expand_dims(audio, axis=-1)
     sample["raw_audio"] = audio
     return sample
 
