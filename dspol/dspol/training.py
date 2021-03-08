@@ -440,6 +440,9 @@ def load_model():
 def main():
     global model, summary_writer, save_manager, optimizer, strategy
 
+    print("Starting training with config:")
+    print(json.dumps(config, indent=2))
+
     # Use growing gpu memory
     gpus = tf.config.experimental.list_physical_devices("GPU")
     for gpu in gpus:

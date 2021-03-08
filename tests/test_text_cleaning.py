@@ -58,7 +58,7 @@ def test_clean_sentence_list_es():
 
     sentences = ["¿Quién quiere casarse ...?"]
     correct_sentences = [
-        "quién quiere casarse",
+        "quien quiere casarse",
     ]
     cleaned_sentences = text_cleaning.clean_sentence_list(sentences)
 
@@ -76,7 +76,7 @@ def test_clean_sentence_list_fr():
         "«Une chance qu'il est arrivé.",
     ]
     correct_sentences = [
-        "une chance qu'il est arrivé",
+        "une chance qu'il est arrive",
     ]
     cleaned_sentences = text_cleaning.clean_sentence_list(sentences)
 

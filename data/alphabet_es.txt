@@ -29,12 +29,6 @@ w
 x
 y
 z
-á
-é
-í
-ó
-ú
-ý
+'
 ñ
-ü
 # The last (non-comment) line needs to end with a newline.
