@@ -422,13 +422,32 @@ def load_model():
         if last_layer_shape_new == last_layer_shape_exp:
             # Copy all weights
             new_model.set_weights(exported_model.get_weights())
+            print("Copied weights of all layers")
         else:
             # Copy exported weights from all but the last layer.
-            # Keep the newly initialized weights for the missing layer.
             merged_weights = exported_model.get_weights()[:-2]
-            merged_weights.extend(new_model.get_weights()[-2:])
+
+            if not config["extend_old_alphabet"]:
+                # Keep the newly initialized weights for the missing layer.
+                print("Newly initializing last layer ...")
+                nll_weights = new_model.get_weights()[-2:]
+                merged_weights.extend(nll_weights)
+            else:
+                # Use some parts of the exported weights and some from the newly initialized
+                print("Extending last layer ...")
+                ell_weights = exported_model.get_weights()[-2:]
+                nll_weights = new_model.get_weights()[-2:]
+
+                for ell, nll in zip(ell_weights, nll_weights):
+                    # Insert the new character between the old ones and the ctc-symbol
+                    first_chars = ell[..., : ell.shape[-1] - 1]
+                    new_chars = nll[..., ell.shape[-1] - 1 : nll.shape[-1] - 1]
+                    ctc_char = ell[..., -1:]
+
+                    mixed = tf.concat([first_chars, new_chars, ctc_char], axis=-1)
+                    merged_weights.append(mixed)
+
             new_model.set_weights(merged_weights)
-            print("Reinitialized last layer")
 
     new_model.build(input_shape=(None, None, c_input))
     return new_model
