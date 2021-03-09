@@ -95,7 +95,7 @@ Implemented networks:
 Notes on the networks:
 
 - Not every network is fully tested, but each could be trained with one single audio file.
-- Some networks might differ from their paper implementations.
+- Some networks might differ slightly from their paper implementations.
 
 Supported networks with their trainable parameter count (using English alphabet):
 
@@ -132,8 +132,7 @@ You can contribute to this project in multiple ways:
 - Experiment with the language models
 - Add a new language:
 
-  - Extend `data/langdicts.json` and add the alphabet files
-  - Append some test to `tests/test_text_cleaning.py`
+  - Extend `data/` directory with the `alphabet` and `langdicts` files
   - Add speech datasets
   - Find text corpora for the language model
 
@@ -158,7 +157,7 @@ You can contribute to this project in multiple ways:
 ## Old experiments
 
 The following experiments were run with an old version of this repository,
-using the DeepSpeech-1 network from [Mozilla-DeepSpeech](https://github.com/mozilla/DeepSpeech). \
+using the DeepSpeech1 network from [Mozilla-DeepSpeech](https://github.com/mozilla/DeepSpeech). \
 While they are outdated, some of them might still provide helpful information for training the new networks.
 
 Old checkpoints and scorers:

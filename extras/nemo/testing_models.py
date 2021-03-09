@@ -29,7 +29,7 @@ idx2char = tf.lookup.StaticHashTable(
 )
 
 pl_config = {
-    "alphabet_path": "/deepspeech-polyglot/data/alphabet_de.json",
+    "alphabet_path": "/deepspeech-polyglot/data/de/alphabet.json",
     "audio_sample_rate": 16000,
     "audio_features": {
         "use_type": "lfbank",

@@ -87,7 +87,7 @@ export LANGUAGE="de"
 # Polish: --default_alpha 1.3060110864019918 --default_beta 3.5010876706821334
 
 /DeepSpeech/data/lm/generate_scorer_package \
-  --alphabet /deepspeech-polyglot/data/alphabet_${LANGUAGE}.txt \
+  --alphabet /deepspeech-polyglot/data/${LANGUAGE}/alphabet.txt \
   --lm /data_prepared/texts/${LANGUAGE}/lm.binary \
   --vocab /data_prepared/texts/${LANGUAGE}/vocab-500000.txt \
   --package /data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer \

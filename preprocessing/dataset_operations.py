@@ -115,12 +115,17 @@ def main():
     parser.add_argument("--nostats", action="store_true")
     args = parser.parse_args()
 
+    file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
+
     pandarallel.initialize()
     print("This may take a few minutes ... ")
 
-    file_path = os.path.dirname(os.path.realpath(__file__)) + "/"
-    with open(file_path + "../data/excluded_files.json") as json_file:
-        excluded = json.load(json_file)
+    expath = file_path + "../data/excluded_files.json"
+    if os.path.exists(expath):
+        with open(expath) as json_file:
+            excluded = json.load(json_file)
+    else:
+        excluded = []
 
     if not (args.sort or args.replace or args.clean or args.exclude):
         print("No operation given")

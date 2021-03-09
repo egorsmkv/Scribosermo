@@ -45,17 +45,17 @@ def load_language():
         print("Cleaning texts with language '{}'".format(language))
 
     if langdicts is None:
-        langdicts = load_langdicts()
+        langdicts = load_langdicts(language)
     load_replacers(language)
 
 
 # ==================================================================================================
 
 
-def load_langdicts() -> dict:
+def load_langdicts(lang: str) -> dict:
     """ Load the langdicts """
 
-    path = file_path + "../data/langdicts.json"
+    path = file_path + "../data/{}/langdicts.json".format(lang)
     with open(path, "r", encoding="utf-8") as file:
         content = json.load(file)
     return content
@@ -67,7 +67,7 @@ def load_langdicts() -> dict:
 def load_alphabet(lang: str) -> list:
     """Load alphabet from file"""
 
-    path = file_path + "../data/alphabet_{}.json".format(lang)
+    path = file_path + "../data/{}/alphabet.json".format(lang)
     with open(path, "r", encoding="utf-8") as file:
         content = json.load(file)
     return content
@@ -79,14 +79,14 @@ def load_alphabet(lang: str) -> list:
 def load_replacers(lang):
     global decimal_pattern, ordinal_pattern, allowed_chars, umlaut_replacers, special_replacers, char_replacers
 
-    decimal_pattern = re.compile(langdicts["number_pattern"][lang]["decimal"])
-    ordinal_pattern = re.compile(langdicts["number_pattern"][lang]["ordinal"])
+    decimal_pattern = re.compile(langdicts["number_pattern"]["decimal"])
+    ordinal_pattern = re.compile(langdicts["number_pattern"]["ordinal"])
 
     allowed_chars = load_alphabet(lang)
-    umlaut_replacers = langdicts["umlaut_replacers"][lang]
-    special_replacers = langdicts["special_replacers"][lang]
+    umlaut_replacers = langdicts["umlaut_replacers"]
+    special_replacers = langdicts["special_replacers"]
 
-    replacer = langdicts["char_replacers"][lang]
+    replacer = langdicts["char_replacers"]
     char_replacers = {}
     for rep, replacement in replacer.items():
         # Switch keys and value

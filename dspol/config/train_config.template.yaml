@@ -15,13 +15,13 @@ data_paths:
   eval: "/data_prepared/{LANGUAGE}/voxforge/dev_azce.csv"
   test: "/data_prepared/{LANGUAGE}/voxforge/test_azce.csv"
 
-alphabet_path: "/deepspeech-polyglot/data/alphabet_{LANGUAGE}.json"
+alphabet_path: "/deepspeech-polyglot/data/{LANGUAGE}/alphabet.json"
 audio_sample_rate: 16000
 
 # Improve predictions with n-gram language model, only used for testing and inference
 scorer:
   path: "/data_prepared/texts/{LANGUAGE}/kenlm_{LANGUAGE}.scorer"
-  alphabet: "/deepspeech-polyglot/data/alphabet_{LANGUAGE}.txt"
+  alphabet: "/deepspeech-polyglot/data/{LANGUAGE}/alphabet.txt"
   alpha: 0.931289039105002
   beta: 1.1834137581510284
   beam_size: 256
@@ -37,7 +37,8 @@ batch_sizes:
 sort_datasets: true
 sort_ds_ascending: true
 
-training_epochs: 30
+training_epochs: 40
+autosave_every_min: 30
 
 # Early stop training if there was no improvement over the last epochs.
 use_early_stopping: true
@@ -48,14 +49,13 @@ use_lrp_reduction: true
 reduce_lr_plateau_epochs: 3
 lr_plateau_reduction: 0.1
 
-# Minimum reduction of loss to count as improvement.
-# Used for early stopping and reducing learning rate on plateaus.
+# Minimum reduction of loss to count as improvement for automatic early stopping and reducing
+# learning rate on plateaus.
 esrp_min_delta: 0.1
 
 # If there are old checkpoints in the directory, the training will be continued from there
 empty_ckpt_dir: true
 checkpoint_dir: "/checkpoints/{LANGUAGE}/tmp/"
-autosave_every_min: 30
 
 # Copy another checkpoint and continue from there.
 # If using this, make sure your config matches the one of the pretrained checkpoint.
@@ -86,7 +86,7 @@ log_prediction_steps: 25
 
 # Profile given training steps in each epoch. Use to find performance bottlenecks.
 # Viewable in tensorboard under "profile" tab.
-profile_steps: [15, 125]
+profile_steps: [35, 125]
 
 # Print files with worst predictions. Sort either by "loss" or "greedy_cer". Usable for debugging.
 log_worst_test_losses: 3
@@ -95,7 +95,7 @@ sort_wtl_key: "greedy_cer"
 # Like with the network, checkout the training source code to see which parameters are required.
 optimizer:
   name: "novograd"
-  learning_rate: 0.0001
+  learning_rate: 0.001
   weight_decay: 0.001
   beta1: 0.8
   beta2: 0.5
@@ -137,8 +137,8 @@ augmentations:
       # Random volume levels
       use_train: false
       use_test: false
-      min_dbfs: -40
-      max_dbfs: -10
+      min_dbfs: -30
+      max_dbfs: -20
     reverb:
       # Add reverberation. Very time consuming.
       use_train: false
@@ -164,26 +164,26 @@ augmentations:
       cut_max: 1.5
     freq_mask:
       # Zeros out one or multiple random frequency ranges
-      use_train: true
+      use_train: false
       use_test: false
-      n: 2
+      n: 1
       max_size: 6
     time_mask:
       # Zeros out one or multiple random time ranges
-      use_train: true
+      use_train: false
       use_test: false
-      n: 2
+      n: 1
       max_size: 25
     spec_cutout:
       # Zeros out one or multiple rectangles at random positions
       use_train: true
       use_test: false
-      n: 5
+      n: 3
       max_freq_size: 6
       max_time_size: 25
     spec_dropout:
       # Drops random values
-      use_train: true
+      use_train: false
       use_test: false
       max_rate: 0.05
   features:
