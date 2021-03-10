@@ -9,24 +9,25 @@ and [europarl+news](https://www.statmt.org/wmt13/translation-task.html):
 
 ```bash
 export LANGUAGE="de"
-mkdir data_original/texts/ && mkdir data_original/texts/${LANGUAGE}/
-mkdir data_prepared/texts/ && mkdir data_prepared/texts/${LANGUAGE}/
-cd data_original/texts/${LANGUAGE}/
+mkdir /data_original/texts/ && mkdir /data_original/texts/${LANGUAGE}/
+mkdir /data_prepared/texts/ && mkdir /data_prepared/texts/${LANGUAGE}/
 
 # German
+cd /data_original/texts/${LANGUAGE}/
 wget "http://ltdata1.informatik.uni-hamburg.de/kaldi_tuda_de/German_sentences_8mil_filtered_maryfied.txt.gz" -O tuda_sentences.txt.gz
 gzip -d tuda_sentences.txt.gz
 
 # German or French or Spanish
+cd /data_original/texts/
 wget "https://www.statmt.org/wmt13/training-monolingual-nc-v8.tgz" -O news-commentary.tgz
-tar zxvf news-commentary.tgz && mv training/news-commentary-v8.${LANGUAGE} news-commentary-v8.${LANGUAGE}
+tar zxvf news-commentary.tgz && mv training/news-commentary-v8.${LANGUAGE} ${LANGUAGE}/news-commentary-v8.txt
 rm news-commentary.tgz && rm -r training/
 wget "https://www.statmt.org/wmt13/training-monolingual-europarl-v7.tgz" -O europarl.tgz
-tar zxvf europarl.tgz && mv training/europarl-v7.${LANGUAGE} europarl-v7.${LANGUAGE}
+tar zxvf europarl.tgz && mv training/europarl-v7.${LANGUAGE} ${LANGUAGE}/europarl-v7.txt
 rm europarl.tgz && rm -r training/
 # If you have enough space you can also download the other years (2007-2011)
 wget "https://www.statmt.org/wmt13/training-monolingual-news-2012.tgz" -O news-2012.tgz
-tar zxvf news-2012.tgz && mv training-monolingual/news.2012.${LANGUAGE}.shuffled news.2012.${LANGUAGE}
+tar zxvf news-2012.tgz && mv training-monolingual/news.2012.${LANGUAGE}.shuffled ${LANGUAGE}/news.2012.txt
 rm news-2012.tgz && rm -r training-monolingual/
 ```
 
