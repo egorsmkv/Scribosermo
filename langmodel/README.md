@@ -59,7 +59,7 @@ python3 /deepspeech-polyglot/langmodel/prepare_vocab.py \
 <br/>
 
 Create the language model: \
-(If you want to keep the intermediate `.arpa` files, you can add the `--keep_arpa`)
+(If you want to keep the intermediate `.arpa` files, you can add the `--keep_arpa` flag)
 
 ```bash
 # Run in container
@@ -82,8 +82,7 @@ export LANGUAGE="de"
 # Optimized scorer alpha and beta values:
 # English (taken from DeepSpeech repo): --default_alpha 0.931289039105002 --default_beta 1.1834137581510284
 # German: --default_alpha 0.7842902115058261 --default_beta 0.6346150241906542
-# Spanish: --default_alpha 0.749166959347089 --default_beta 1.6627453128820517
-# French: --default_alpha 0.9000153993017823 --default_beta 2.478779501401466
+# Spanish+French: --default_alpha 0.749166959347089 --default_beta 1.6627453128820517
 # Italian: --default_alpha 0.910619981788069 --default_beta 0.15660475671195578
 # Polish: --default_alpha 1.3060110864019918 --default_beta 3.5010876706821334
 

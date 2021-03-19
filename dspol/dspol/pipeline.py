@@ -366,7 +366,7 @@ def create_pipeline(
     else:
         ds = ds.padded_batch(
             batch_size=batch_size,
-            drop_remainder=True,
+            drop_remainder=False,
             padded_shapes=(
                 {
                     "features": [None, num_features],
