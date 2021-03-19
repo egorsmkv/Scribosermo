@@ -18,7 +18,6 @@ from . import nets, pipeline, utils
 
 config = utils.get_config()
 checkpoint_dir = config["checkpoint_dir"]
-cache_dir = config["cache_dir"]
 
 alphabet = utils.load_alphabet(config)
 idx2char: tf.lookup.StaticHashTable
@@ -322,21 +321,17 @@ def build_pipelines():
     )
 
     # Create pipelines
-    cache = config["cache_dir"] + "train" if config["use_pipeline_cache"] else ""
     dataset_train = pipeline.create_pipeline(
         csv_path=config["data_paths"]["train"],
         batch_size=global_train_batch_size,
         config=config,
         train_mode=True,
-        cache_path=cache,
     )
-    cache = config["cache_dir"] + "eval" if config["use_pipeline_cache"] else ""
     dataset_eval = pipeline.create_pipeline(
         csv_path=config["data_paths"]["eval"],
         batch_size=global_eval_batch_size,
         config=config,
         train_mode=False,
-        cache_path=cache,
     )
 
     dataset_train = strategy.experimental_distribute_dataset(dataset_train)
@@ -472,12 +467,6 @@ def main():
 
     # Build this after setting the gpu config, else it will raise an initialization error
     create_idx2char()
-
-    if config["empty_cache_dir"]:
-        # Delete and recreate cache dir
-        if os.path.exists(cache_dir):
-            utils.delete_dir(cache_dir)
-    os.makedirs(cache_dir, exist_ok=True)
 
     if config["empty_ckpt_dir"]:
         # Delete and recreate checkpoint dir

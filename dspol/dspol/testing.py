@@ -227,7 +227,6 @@ def main():
         batch_size=global_batch_size,
         config=exported_config,
         train_mode=False,
-        cache_path="",
     )
 
     # Build model and print network summary
