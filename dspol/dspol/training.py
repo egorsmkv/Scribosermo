@@ -492,6 +492,11 @@ def main():
         # Create and empty directory
         os.makedirs(checkpoint_dir, exist_ok=True)
 
+    # Export current config next to the checkpoints
+    path = os.path.join(checkpoint_dir, "config_export.json")
+    with open(path, "w+", encoding="utf-8") as file:
+        json.dump(config, file, indent=2)
+
     # Enable training with multiple gpus
     strategy = tf.distribute.MirroredStrategy()
 
@@ -500,13 +505,6 @@ def main():
 
     # Create and initialize the model, either from scratch or with loading exported weights
     model = load_model()
-    model.summary()
-    # tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
-
-    # Export current config next to the checkpoints
-    path = os.path.join(checkpoint_dir, "config_export.json")
-    with open(path, "w+", encoding="utf-8") as file:
-        json.dump(config, file, indent=2)
 
     # Select optimizer
     optimizer = create_optimizer()
@@ -517,14 +515,20 @@ def main():
         checkpoint, directory=checkpoint_dir, max_to_keep=1
     )
 
-    # Load old checkpoint and its epoch number if existing
-    start_epoch = 0
-    if save_manager.latest_checkpoint:
-        pass
-        # start_epoch = int(save_manager.latest_checkpoint.split("-")[-1])
-        # checkpoint.restore(save_manager.latest_checkpoint)
-    start_epoch += 1
+    # Optionally overwrite model with backup checkpoint
+    if config["restore_ckpt_insteadof_pb_file"]:
+        print("Overwriting model with backup from the ckpt file ...")
+        with strategy.scope():
+            checkpoint.restore(save_manager.latest_checkpoint)
+
+    # Print model summary
+    model.summary()
+
+    # Optionally save model before doing any training updates
+    if config["save_fresh_model"]:
+        tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
 
     # Finally the training can start
+    start_epoch = 1
     max_epoch = config["training_epochs"]
     train(dataset_train, dataset_eval, start_epoch, max_epoch)
