@@ -135,10 +135,10 @@ def get_texts(predictions, samples):
 def print_results(results: List[dict]):
     """Prints test summary and worst predictions"""
 
-    if config["log_worst_test_losses"] > 0:
+    if config["log_worst_test_predictions"] > 0:
         print("\nPredictions with highest {}:".format(config["sort_wtl_key"]))
         results = sorted(results, key=lambda r: r[config["sort_wtl_key"]], reverse=True)
-        wres = results[: config["log_worst_test_losses"]]
+        wres = results[: config["log_worst_test_predictions"]]
 
         keep_keys = ["filepath", "label", "greedy_text", "greedy_cer", "loss"]
         for wr in wres:
@@ -227,7 +227,6 @@ def main():
         batch_size=global_batch_size,
         config=exported_config,
         train_mode=False,
-        cache_path="",
     )
 
     # Build model and print network summary

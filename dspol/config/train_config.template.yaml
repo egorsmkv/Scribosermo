@@ -56,6 +56,12 @@ esrp_min_delta: 0.1
 # If there are old checkpoints in the directory, the training will be continued from there
 empty_ckpt_dir: true
 checkpoint_dir: "/checkpoints/{LANGUAGE}/tmp/"
+# Restore the last training backup save instead of the exported (best) model
+restore_ckpt_insteadof_pb_file: false
+
+# Save model before doing any training updates. This can be useful for debugging or alternatively
+# for comparison runs, because following trainings can be started with the same initialization.
+save_fresh_model: false
 
 # Copy another checkpoint and continue from there.
 # If using this, make sure your config matches the one of the pretrained checkpoint.
@@ -72,15 +78,6 @@ extend_old_alphabet: false
 # After the frozen training, start a new training with the complete network.
 freeze_base_net: false
 
-use_pipeline_cache: true
-empty_cache_dir: true
-cache_dir: "/tmp/dspol_cache/"
-
-# Repeats training dataset that the same files are augmented multiple times.
-# Helpful if the augmentations are very slow and the pipeline cache shall be used for many epochs
-repeat_train_dataset: false
-repeat_ds_times: 3
-
 # Print a single greedy prediction while training, disable by setting value to zero.
 log_prediction_steps: 25
 
@@ -89,10 +86,11 @@ log_prediction_steps: 25
 profile_steps: [35, 125]
 
 # Print files with worst predictions. Sort either by "loss" or "greedy_cer". Usable for debugging.
-log_worst_test_losses: 3
+log_worst_test_predictions: 3
 sort_wtl_key: "greedy_cer"
 
 # Like with the network, checkout the training source code to see which parameters are required.
+# The recommended learning-rate also depends on the used batch-size, if it's large, use a higher lr.
 optimizer:
   name: "novograd"
   learning_rate: 0.001

@@ -18,7 +18,6 @@ from . import nets, pipeline, utils
 
 config = utils.get_config()
 checkpoint_dir = config["checkpoint_dir"]
-cache_dir = config["cache_dir"]
 
 alphabet = utils.load_alphabet(config)
 idx2char: tf.lookup.StaticHashTable
@@ -322,21 +321,17 @@ def build_pipelines():
     )
 
     # Create pipelines
-    cache = config["cache_dir"] + "train" if config["use_pipeline_cache"] else ""
     dataset_train = pipeline.create_pipeline(
         csv_path=config["data_paths"]["train"],
         batch_size=global_train_batch_size,
         config=config,
         train_mode=True,
-        cache_path=cache,
     )
-    cache = config["cache_dir"] + "eval" if config["use_pipeline_cache"] else ""
     dataset_eval = pipeline.create_pipeline(
         csv_path=config["data_paths"]["eval"],
         batch_size=global_eval_batch_size,
         config=config,
         train_mode=False,
-        cache_path=cache,
     )
 
     dataset_train = strategy.experimental_distribute_dataset(dataset_train)
@@ -473,12 +468,6 @@ def main():
     # Build this after setting the gpu config, else it will raise an initialization error
     create_idx2char()
 
-    if config["empty_cache_dir"]:
-        # Delete and recreate cache dir
-        if os.path.exists(cache_dir):
-            utils.delete_dir(cache_dir)
-    os.makedirs(cache_dir, exist_ok=True)
-
     if config["empty_ckpt_dir"]:
         # Delete and recreate checkpoint dir
         if os.path.exists(checkpoint_dir):
@@ -492,6 +481,11 @@ def main():
         # Create and empty directory
         os.makedirs(checkpoint_dir, exist_ok=True)
 
+    # Export current config next to the checkpoints
+    path = os.path.join(checkpoint_dir, "config_export.json")
+    with open(path, "w+", encoding="utf-8") as file:
+        json.dump(config, file, indent=2)
+
     # Enable training with multiple gpus
     strategy = tf.distribute.MirroredStrategy()
 
@@ -500,13 +494,6 @@ def main():
 
     # Create and initialize the model, either from scratch or with loading exported weights
     model = load_model()
-    model.summary()
-    # tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
-
-    # Export current config next to the checkpoints
-    path = os.path.join(checkpoint_dir, "config_export.json")
-    with open(path, "w+", encoding="utf-8") as file:
-        json.dump(config, file, indent=2)
 
     # Select optimizer
     optimizer = create_optimizer()
@@ -517,14 +504,20 @@ def main():
         checkpoint, directory=checkpoint_dir, max_to_keep=1
     )
 
-    # Load old checkpoint and its epoch number if existing
-    start_epoch = 0
-    if save_manager.latest_checkpoint:
-        pass
-        # start_epoch = int(save_manager.latest_checkpoint.split("-")[-1])
-        # checkpoint.restore(save_manager.latest_checkpoint)
-    start_epoch += 1
+    # Optionally overwrite model with backup checkpoint
+    if config["restore_ckpt_insteadof_pb_file"]:
+        print("Overwriting model with backup from the ckpt file ...")
+        with strategy.scope():
+            checkpoint.restore(save_manager.latest_checkpoint)
+
+    # Print model summary
+    model.summary()
+
+    # Optionally save model before doing any training updates
+    if config["save_fresh_model"]:
+        tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
 
     # Finally the training can start
+    start_epoch = 1
     max_epoch = config["training_epochs"]
     train(dataset_train, dataset_eval, start_epoch, max_epoch)

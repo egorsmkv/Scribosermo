@@ -319,7 +319,6 @@ def create_pipeline(
     batch_size: int,
     config: dict,
     train_mode: bool = False,
-    cache_path: str = "",
 ):
     """Create data-iterator from tab separated csv file"""
 
@@ -330,10 +329,6 @@ def create_pipeline(
     # Keep the german 0 as "null" string
     df = pd.read_csv(csv_path, encoding="utf-8", sep="\t", keep_default_na=False)
     df = df[["filepath", "duration", "text"]]
-
-    if config["repeat_train_dataset"] and train_mode is True:
-        # Replicate the data multiple times
-        df = pd.concat([df] * config["repeat_ds_times"], ignore_index=True)
 
     if config["sort_datasets"]:
         df = df.sort_values("duration", ascending=config["sort_ds_ascending"])
@@ -366,7 +361,7 @@ def create_pipeline(
     else:
         ds = ds.padded_batch(
             batch_size=batch_size,
-            drop_remainder=True,
+            drop_remainder=False,
             padded_shapes=(
                 {
                     "features": [None, num_features],
@@ -379,9 +374,5 @@ def create_pipeline(
             ),
         )
 
-    if config["use_pipeline_cache"]:
-        ds = ds.cache(cache_path)
-
-    # ds = ds.repeat(50)
     ds = ds.prefetch(buffer_size=AUTOTUNE)
     return ds
