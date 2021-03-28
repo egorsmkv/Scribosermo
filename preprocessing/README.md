@@ -36,13 +36,13 @@ MussteWissen [Deutsch](https://www.youtube.com/c/musstewissenDeutsch/videos) [Ma
 [Skyrim Legacy+DLCs](https://store.steampowered.com/app/72850/The_Elder_Scrolls_V_Skyrim/) (~89h),
 [Smartweb Motorbike Corpus](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/SMC/SMC.2.php) (~6h),
 [Spoken Wikipedia Corpora](https://nats.gitlab.io/swc/) (~248h),
-[Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) (~7h),
+[Tatoeba](https://tatoeba.org/deu/sentences/search?query=&from=deu&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) (~8h),
 [Thorsten](http://www.openslr.org/95/) (~23h),
 [TerraX](https://www.youtube.com/c/terra-x/videos) (~48h),
 [TUDA](https://www.inf.uni-hamburg.de/en/inst/ab/lt/resources/data/acoustic-models.html) (~185h),
 [Verbmobil 1](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/VM1/VM1.3.php) (~34h),
 [Verbmobil 2](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/VM2/VM2.3.php) (~22h),
-[Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) (~32h),
+[Voxforge](http://www.voxforge.org/home/forums/other-languages/german/open-speech-data-corpus-for-german) (~33h),
 [WaSeP](https://clarin.phonetik.uni-muenchen.de/BASRepository/Public/Corpora/WaSeP/WaSeP.2.php) (~3h),
 [Witcher3-GOTY](https://www.gog.com/game/the_witcher_3_wild_hunt_game_of_the_year_edition) (~44h),
 [Y-Kollektiv](https://www.youtube.com/c/ykollektiv/videos) (~58h),
@@ -53,18 +53,21 @@ MussteWissen [Deutsch](https://www.youtube.com/c/musstewissenDeutsch/videos) [Ma
 [LibriSpeech](http://www.openslr.org/11) (~982h)
 
 **Spanish (es):**
-[Common Voice](https://voice.mozilla.org/) (~390h),
+[Common Voice](https://voice.mozilla.org/) (~331h),
 [CSS10](https://www.kaggle.com/bryanpark/spanish-single-speaker-speech-dataset) (~24h),
+[LibriVox-Spanish](https://www.kaggle.com/carlfm01/120h-spanish-speech) (~120h),
 [LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~1h),
-[M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~108h),
-[Tatoeba](https://tatoeba.org/spa/sentences/search?query=&from=spa&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) (~59h),
+[M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~109h),
+[mTEDx](http://www.openslr.org/100/) (~185h),
+[Tatoeba](https://tatoeba.org/spa/sentences/search?query=&from=spa&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) (~60h),
 [Voxforge](http://www.voxforge.org/home/) (~52h)
 
 **French (fr):**
 [Common Voice](https://voice.mozilla.org/) (~617h),
 [CSS10](https://www.kaggle.com/bryanpark/french-single-speaker-speech-dataset) (~19h),
-[LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~40h),
+[LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~45h),
 [M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~184h),
+[mTEDx](http://www.openslr.org/100/) (~183h),
 [Tatoeba](https://tatoeba.org/fra/sentences/search?query=&from=fra&to=und&user=&orphans=no&unapproved=no&has_audio=yes&tags=&list=&native=&trans_filter=limit&trans_to=und&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort_reverse=&sort=relevance) (~2h),
 [Voxforge](http://www.voxforge.org/home/) (~37h)
 
@@ -118,7 +121,6 @@ For the datasets from _audiomate_ use those commands:
 
 ```bash
 python3 -c 'from audiomate.corpus import io; io.SWCDownloader(lang="de").download("/data_original/de/swc/"); print("FINISHED");'
-python3 -c 'from audiomate.corpus import io; io.TatoebaDownloader(include_languages=["deu"]).download("/data_original/de/tatoeba/"); print("FINISHED");'
 python3 -c 'from audiomate.corpus import io; io.TudaDownloader().download("/data_original/de/tuda"/); print("FINISHED");'
 ```
 
@@ -168,8 +170,8 @@ Replace non alphabet characters and clean out some audio files:
 export LANGUAGE="de"
 
 # Repeat for all 3 csv files, but don't clean the test file:
-python3 /deepspeech-polyglot/preprocessing/dataset_operations.py "/data_prepared/en/librispeech/train-all.csv" \
-  "/data_prepared/en/librispeech/train-all_azce.csv" --replace --exclude --clean
+python3 /deepspeech-polyglot/preprocessing/dataset_operations.py "/data_prepared/${LANGUAGE}/common_voice/train.csv" \
+  "/data_prepared/${LANGUAGE}/common_voice/train_azce.csv" --replace --exclude --clean
 ```
 
 Combine specific csv files: \

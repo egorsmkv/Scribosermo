@@ -30,4 +30,8 @@ tensorboard --logdir /checkpoints/en/tmp/
 
 # Print important log infos (with additional lines before and after)
 cat log.txt | grep -B 7 -A 1 "Saved"
+
+# Run as detached process 
+# (edit the run_container.sh file before: remove the "-it" flag and append training command, that training is directly started)
+nohup ./deepspeech-polyglot/run_container.sh > nohup.out 2>&1 &
 ```

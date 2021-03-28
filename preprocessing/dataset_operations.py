@@ -172,6 +172,14 @@ def main():
             lambda x: text_cleaning.clean_sentence(x)[0]
         )
 
+        if text_cleaning.language == "de":
+            # The German transcriptions for the number 0 seem to be wrong in some files, fix them
+            msg = 'Replaced transcription "nan" with "null" in {} samples'
+            print(msg.format(len(data[data["text"] == "nan"])))
+            data["text"] = data["text"].parallel_apply(
+                lambda x: "null" if x == "nan" else x
+            )
+
     if args.clean and not args.nostats:
         data = clean(data)
 
