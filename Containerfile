@@ -39,7 +39,7 @@ RUN python3 -m pip install --upgrade pip
 RUN apt-get update && apt-get install -y ffmpeg
 RUN pip install --no-cache-dir --upgrade pydub
 
-# Pre-install some libraries for faster installation time of dspol package
+# Pre-install some libraries for faster installation time of training package
 RUN pip3 install --no-cache-dir pandas
 RUN pip3 install --no-cache-dir librosa
 RUN pip3 install --no-cache-dir "tensorflow<2.4,>=2.3"
@@ -63,11 +63,11 @@ RUN git clone --depth 1 https://gitlab.com/Jaco-Assistant/corcua.git
 RUN pip3 install --no-cache-dir -e corcua/
 
 # Testing requirements
-COPY requirements_test.txt /deepspeech-polyglot/requirements_test.txt
-RUN pip3 install --no-cache-dir -r /deepspeech-polyglot/requirements_test.txt
+COPY requirements_test.txt /Scribosermo/requirements_test.txt
+RUN pip3 install --no-cache-dir -r /Scribosermo/requirements_test.txt
 
 # Training package
-COPY dspol/ /deepspeech-polyglot/dspol/
-RUN pip3 install --no-cache-dir -e /deepspeech-polyglot/dspol/
+COPY training/ /Scribosermo/training/
+RUN pip3 install --no-cache-dir -e /Scribosermo/training/
 
 CMD ["/bin/bash"]

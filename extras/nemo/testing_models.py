@@ -11,12 +11,12 @@ from onnx import TensorProto, helper
 from onnx_tf.backend import prepare
 from tensorflow.keras import Model
 
-from dspol import nets, pipeline, utils
+from scode import nets, pipeline, utils
 
 # ==================================================================================================
 
-test_csv = "/deepspeech-polyglot/extras/nemo/data/test.csv"
-test_wav = "/deepspeech-polyglot/extras/nemo/data/test.wav"
+test_csv = "/Scribosermo/extras/nemo/data/test.csv"
+test_wav = "/Scribosermo/extras/nemo/data/test.wav"
 qnet_blocks = 5
 
 alphabet = " abcdefghijklmnopqrstuvwxyz'"
@@ -29,7 +29,7 @@ idx2char = tf.lookup.StaticHashTable(
 )
 
 pl_config = {
-    "alphabet_path": "/deepspeech-polyglot/data/de/alphabet.json",
+    "alphabet_path": "/Scribosermo/data/de/alphabet.json",
     "audio_sample_rate": 16000,
     "audio_features": {
         "use_type": "lfbank",

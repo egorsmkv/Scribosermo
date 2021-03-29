@@ -1,6 +1,6 @@
 import tqdm
 
-from dspol import pipeline, testing, utils
+from scode import pipeline, testing, utils
 
 # ==================================================================================================
 

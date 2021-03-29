@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="dspol",
+    name="scode",
     version="0.0.1",
     author="Jaco Erithacus",
     author_email="jaco@mail.de",

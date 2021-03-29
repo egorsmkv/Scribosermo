@@ -4,5 +4,5 @@ Execute unit tests:
 
 ```bash
 # Run in container
-cd /deepspeech-polyglot/ && pytest --cov=preprocessing
+cd /Scribosermo/ && pytest --cov=preprocessing
 ```

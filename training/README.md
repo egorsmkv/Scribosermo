@@ -10,10 +10,10 @@ Go to `config/`, edit the `train_config.template.yaml` file and save as `train_c
 Run training or tests:
 
 ```bash
-python3 /deepspeech-polyglot/dspol/run_train.py
+python3 /Scribosermo/training/run_train.py
 
 # Besides the normal network test, there are also some debugging tests you can uncomment
-python3 /deepspeech-polyglot/dspol/run_tests.py
+python3 /Scribosermo/training/run_tests.py
 ```
 
 Some helpful commands:
@@ -33,5 +33,5 @@ cat log.txt | grep -B 7 -A 1 "Saved"
 
 # Run as detached process
 # (edit the run_container.sh file before: remove the "-it" flag and append training command, that training is directly started)
-nohup ./deepspeech-polyglot/run_container.sh > nohup.out 2>&1 &
+nohup ./Scribosermo/run_container.sh > nohup.out 2>&1 &
 ```

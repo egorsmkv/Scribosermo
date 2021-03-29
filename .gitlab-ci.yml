@@ -7,7 +7,7 @@ image: python:3
 # only cache local items.
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  SRC_DIRS: "dspol langmodel preprocessing tests"
+  SRC_DIRS: "training langmodel preprocessing tests"
 
 # Pip's cache doesn't store the python packages
 # https://pip.pypa.io/en/stable/reference/pip_install/#caching

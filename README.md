@@ -1,6 +1,6 @@
-# DeepSpeech-Polyglot
+# Scribosermo
 
-_DeepSpeech-Polyglot is a framework to train Speech-to-Text networks in different languages._
+_Scribosermo is a framework to train fast Speech-to-Text networks in different languages._
 
 <div align="center">
     <img src="media/deepspeech1_architecture.png" alt="deepspeech1 graph" width="45%"/>
@@ -9,11 +9,11 @@ _DeepSpeech-Polyglot is a framework to train Speech-to-Text networks in differen
 
 <br/>
 
-[![pipeline status](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/badges/master/pipeline.svg)](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/-/commits/master)
-[![coverage report](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/badges/master/coverage.svg)](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/-/commits/master)
+[![pipeline status](https://gitlab.com/Jaco-Assistant/Scribosermo/badges/master/pipeline.svg)](https://gitlab.com/Jaco-Assistant/Scribosermo/-/commits/master)
+[![coverage report](https://gitlab.com/Jaco-Assistant/Scribosermo/badges/master/coverage.svg)](https://gitlab.com/Jaco-Assistant/Scribosermo/-/commits/master)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-[![code complexity](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/-/jobs/artifacts/master/raw/badges/rcc.svg?job=analysis)](https://gitlab.com/Jaco-Assistant/deepspeech-polyglot/-/commits/master)
+[![code complexity](https://gitlab.com/Jaco-Assistant/Scribosermo/-/jobs/artifacts/master/raw/badges/rcc.svg?job=analysis)](https://gitlab.com/Jaco-Assistant/Scribosermo/-/commits/master)
 
 <br/>
 
@@ -35,12 +35,12 @@ Requirements are:
 File structure will look as follows:
 
 ```text
-my_deepspeech_folder
+my_speech2text_folder
     checkpoints
     corcua                 <- Library for datasets
     data_original
     data_prepared
-    deepspeech-polyglot    <- This repository
+    Scribosermo            <- This repository
 ```
 
 Clone [corcua](https://gitlab.com/Jaco-Assistant/corcua):
@@ -52,9 +52,9 @@ git clone https://gitlab.com/Jaco-Assistant/corcua.git
 Build and run docker container:
 
 ```bash
-docker build -f deepspeech-polyglot/Containerfile -t dspol ./deepspeech-polyglot/
+docker build -f Scribosermo/Containerfile -t scribosermo ./Scribosermo/
 
-./deepspeech-polyglot/run_container.sh
+./Scribosermo/run_container.sh
 ```
 
 <br/>
@@ -69,7 +69,7 @@ Follow [readme](langmodel/README.md) in `langmodel` directory for generating the
 
 #### Training
 
-Follow [readme](dspol/README.md) in `dspol` directory for training your network. \
+Follow [readme](training/README.md) in `training` directory for training your network. \
 For easier inference follow the exporting [readme](extras/exporting/README.md) in `extras/exporting` directory.
 
 <br/>

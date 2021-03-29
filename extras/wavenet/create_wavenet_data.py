@@ -9,7 +9,7 @@ from google.cloud import texttospeech
 # ==================================================================================================
 
 # Export application credentials
-gac_path = "/deepspeech-polyglot/extras/wavenet/google_application_credentials.json"
+gac_path = "/Scribosermo/extras/wavenet/google_application_credentials.json"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = gac_path
 
 speakers = [

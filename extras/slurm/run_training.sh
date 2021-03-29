@@ -14,7 +14,7 @@ singularity exec \
   --bind ~/checkpoints/:/checkpoints/ \
   --bind /cfs/share/cache/db_xds/data_original/:/data_original/ \
   --bind /cfs/share/cache/db_xds/data_prepared/:/data_prepared/ \
-  --bind ~/deepspeech-polyglot/:/deepspeech-polyglot/ \
+  --bind ~/Scribosermo/:/Scribosermo/ \
   --bind ~/corcua/:/corcua/ \
-  /cfs/share/cache/db_xds/images/dspol.sif \
-  /bin/bash -c 'python3 /deepspeech-polyglot/dspol/run_train.py'
+  /cfs/share/cache/db_xds/images/scribosermo.sif \
+  /bin/bash -c 'python3 /Scribosermo/training/run_train.py'

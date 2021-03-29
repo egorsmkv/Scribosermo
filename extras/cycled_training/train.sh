@@ -43,7 +43,7 @@ fi;
 DSARGS="--train_files ${TRAIN_FILE} \
         --dev_files ${DEV_FILE} \
         --test_files ${TEST_FILE} \
-        --alphabet_config_path /deepspeech-polyglot/data/alphabet_az.txt \
+        --alphabet_config_path /Scribosermo/data/en/alphabet.txt \
         --lm_trie_path /data_prepared/trie_az \
         --lm_binary_path /data_prepared/lm_az.binary \
         --test_batch_size ${BATCH_SIZE} \

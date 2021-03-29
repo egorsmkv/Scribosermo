@@ -26,25 +26,25 @@ sudo podman run --security-opt label=disable --rm --privileged multiarch/qemu-us
 Build `swig` for raspbian:
 
 ```bash
-podman build --cgroup-manager=cgroupfs -f deepspeech-polyglot/extras/misc/Containerfile_DecoderCrossbuild1 -t xbuildctc1
+podman build --cgroup-manager=cgroupfs -f Scribosermo/extras/misc/Containerfile_DecoderCrossbuild1 -t xbuildctc1
 
 podman run --rm -it \
-  --volume "$(pwd)"/deepspeech-polyglot/extras/misc/:/dspol/misc/ \
+  --volume "$(pwd)"/Scribosermo/extras/misc/:/Scribosermo/extras/misc/ \
   xbuildctc1
 
-cp /ds-swig.tar.gz /dspol/misc/
+cp /ds-swig.tar.gz /Scribosermo/extras/misc/
 ```
 
 Now build the `ds_ctcdecoder.whl` package and extract it from the container:
 
 ```bash
-docker build -f deepspeech-polyglot/extras/misc/Containerfile_DecoderCrossbuild2 -t xbuildctc2 deepspeech-polyglot/extras/misc/
+docker build -f Scribosermo/extras/misc/Containerfile_DecoderCrossbuild2 -t xbuildctc2 Scribosermo/extras/misc/
 
 docker run --rm -it \
-  --volume "$(pwd)"/deepspeech-polyglot/extras/misc/:/dspol/misc/ \
+  --volume "$(pwd)"/Scribosermo/extras/misc/:/Scribosermo/extras/misc/ \
   xbuildctc2
 
-cp /DeepSpeech/native_client/ctcdecode/dist/*.whl /dspol/misc/
+cp /DeepSpeech/native_client/ctcdecode/dist/*.whl /Scribosermo/extras/misc/
 ```
 
 ### Testing transcription on raspberry pi
@@ -58,7 +58,7 @@ sudo podman run --security-opt label=disable --rm --privileged multiarch/qemu-us
 Build container:
 
 ```bash
-podman build --cgroup-manager=cgroupfs -f deepspeech-polyglot/extras/misc/Containerfile_Raspbian -t dspol_raspbian
+podman build --cgroup-manager=cgroupfs -f Scribosermo/extras/misc/Containerfile_Raspbian -t scribosermo_raspbian
 ```
 
 Run script: \
@@ -66,11 +66,11 @@ Run script: \
 
 ```bash
 sudo podman run --privileged --rm --network host -it \
-  --volume "$(pwd)"/deepspeech-polyglot/extras/exporting/:/deepspeech-polyglot/extras/exporting/:ro \
-  --volume "$(pwd)"/deepspeech-polyglot/data/:/deepspeech-polyglot/data/:ro \
+  --volume "$(pwd)"/Scribosermo/extras/exporting/:/Scribosermo/extras/exporting/:ro \
+  --volume "$(pwd)"/Scribosermo/data/:/Scribosermo/data/:ro \
   --volume "$(pwd)"/checkpoints/:/checkpoints/:ro \
   --volume "$(pwd)"/data_prepared/texts/:/data_prepared/texts/:ro \
-  dspol_raspbian
+  scribosermo_raspbian
 
-python3 /deepspeech-polyglot/extras/exporting/testing_tflite.py
+python3 /Scribosermo/extras/exporting/testing_tflite.py
 ```

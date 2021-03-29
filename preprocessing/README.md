@@ -105,7 +105,7 @@ A lot of datasets have to be downloaded by hand, but for a few there are downloa
 Download the German youtube playlists like this:
 
 ```bash
-python3 /deepspeech-polyglot/preprocessing/download_playlists.py --target_path "/data_original/de/" [InsertDatasetHere]
+python3 /Scribosermo/preprocessing/download_playlists.py --target_path "/data_original/de/" [InsertDatasetHere]
 
 # Choose one of those datasets
 --kurzgesagt --musstewissen --pulsreportage --terrax --ykollektiv
@@ -151,13 +151,13 @@ python3 -c 'import audiomate; from audiomate.corpus import io; \
 Split _tuda_ dataset into the correct partitions:
 
 ```bash
-python3 deepspeech-polyglot/preprocessing/split_dataset.py /data_prepared/de/tuda/all.csv --tuda --file_appendix _s
+python3 Scribosermo/preprocessing/split_dataset.py /data_prepared/de/tuda/all.csv --tuda --file_appendix _s
 ```
 
 Some datasets (those downloaded with audiomate for example) are in _DeepSpeech_ format, you can convert them to _corcua_ format like this:
 
 ```bash
-python3 /deepspeech-polyglot/preprocessing/convert_ds2cc.py --source_path "/data_prepared/de/tuda/" \
+python3 /Scribosermo/preprocessing/convert_ds2cc.py --source_path "/data_prepared/de/tuda/" \
   --target_path "/data_prepared/de/tuda2/" --train "train_s.csv" --dev "dev_s.csv" --test "test_s.csv" --remove_text_commas
 
 # Remove "/DeepSpeech" path prefix (old directory structure)
@@ -170,7 +170,7 @@ Replace non alphabet characters and clean out some audio files:
 export LANGUAGE="de"
 
 # Repeat for all 3 csv files, but don't clean the test file:
-python3 /deepspeech-polyglot/preprocessing/dataset_operations.py "/data_prepared/${LANGUAGE}/common_voice/train.csv" \
+python3 /Scribosermo/preprocessing/dataset_operations.py "/data_prepared/${LANGUAGE}/common_voice/train.csv" \
   "/data_prepared/${LANGUAGE}/common_voice/train_azce.csv" --replace --exclude --clean
 ```
 
@@ -178,7 +178,7 @@ Combine specific csv files: \
 (you can either use `--files_str` like shown below or `--files_txt` with a path to a text file containing one dataset per line)
 
 ```bash
-python3 /deepspeech-polyglot/preprocessing/combine_datasets.py --file_output "/data_prepared/en/librispeech/train-all.csv" \
+python3 /Scribosermo/preprocessing/combine_datasets.py --file_output "/data_prepared/en/librispeech/train-all.csv" \
   --files_str "/data_prepared/en/librispeech/train-clean-100.csv /data_prepared/en/librispeech/train-clean-360.csv /data_prepared/en/librispeech/train-other-500.csv"
 ```
 
@@ -231,9 +231,9 @@ Prepare it:
 
 ```bash
 # Normalize all the audio files (run with python2):
-python /deepspeech-polyglot/preprocessing/normalize_noise_audio.py --from_dir /data_original/noise/ --to_dir /data_prepared/noise/ --max_sec 30
+python /Scribosermo/preprocessing/normalize_noise_audio.py --from_dir /data_original/noise/ --to_dir /data_prepared/noise/ --max_sec 30
 
 # Create csv files:
-python3 /deepspeech-polyglot/preprocessing/noise_to_csv.py
-python3 /deepspeech-polyglot/preprocessing/split_dataset.py /data_prepared/noise/all.csv  --split "70|15|15"
+python3 /Scribosermo/preprocessing/noise_to_csv.py
+python3 /Scribosermo/preprocessing/split_dataset.py /data_prepared/noise/all.csv  --split "70|15|15"
 ```

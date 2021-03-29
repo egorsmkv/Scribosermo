@@ -17,9 +17,9 @@ from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
 
 checkpoint_file = "/checkpoints/en/qnetp15/exported/model_quantized.tflite"
 # checkpoint_file = "/checkpoints/en/qnetp15/exported/model_full.tflite"
-test_wav_path = "/deepspeech-polyglot/extras/exporting/data/test.wav"
-alphabet_path = "/deepspeech-polyglot/data/en/alphabet.json"
-ds_alphabet_path = "/deepspeech-polyglot/data/en/alphabet.txt"
+test_wav_path = "/Scribosermo/extras/exporting/data/test.wav"
+alphabet_path = "/Scribosermo/data/en/alphabet.json"
+ds_alphabet_path = "/Scribosermo/data/en/alphabet.txt"
 ds_scorer_path = "/data_prepared/texts/en/kenlm_en.scorer"
 
 with open(alphabet_path, "r", encoding="utf-8") as file:

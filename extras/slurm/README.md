@@ -7,7 +7,7 @@ This file contains instructions how to run the training on a Nvidia-DGX with SLU
 Start a training:
 
 ```bash
-sbatch deepspeech-polyglot/extras/slurm/run_training.sh
+sbatch Scribosermo/extras/slurm/run_training.sh
 ```
 
 View training output
@@ -32,16 +32,16 @@ scancel JOBID
 
   ```bash
   # docker
-  ./deepspeech-polyglot/extras/slurm/convert_to_sifgz.sh d dspol
+  ./Scribosermo/extras/slurm/convert_to_sifgz.sh d scribosermo
   # podman
-  ./deepspeech-polyglot/extras/slurm/convert_to_sifgz.sh p dspol
+  ./Scribosermo/extras/slurm/convert_to_sifgz.sh p scribosermo
   ```
 
 - Upload and decompress the singularity image
 
   ```bash
-  scp dspol.sif.gz user@ip:/cfs/share/cache/db_xds/images/
-  gzip -d dspol.sif.gz
+  scp scribosermo.sif.gz user@ip:/cfs/share/cache/db_xds/images/
+  gzip -d scribosermo.sif.gz
   ```
 
 <br/>
@@ -57,7 +57,7 @@ python3 -c "import tensorflow as tf; sess = tf.Session(config=tf.ConfigProto(log
 Convert image.sif to sandbox folder (if local /tmp directory is to small). In commands simply exchange image.sif with sandbox directory:
 
 ```bash
-singularity build --sandbox dsgs_sandbox/ dspol.sif
+singularity build --sandbox dsgs_sandbox/ scribosermo.sif
 ```
 
 <br/>
@@ -68,11 +68,11 @@ Installation of singularity and needed dependencies without using root privilege
 File structure will look as follows:
 
 ```
-my_deepspeech_folder (named db_xds here)
+my_speech2text_folder (named db_xds here)
     checkpoints
     data_original
     data_prepared
-    deepspeech-polyglot    <- This repositiory
+    Scribosermo            <- This repositiory
 
     programs <- New folder for dependencies installations
 ```
@@ -140,8 +140,8 @@ singularity exec \
   --bind checkpoints/:/checkpoints/ \
   --bind data_original/:/data_original/ \
   --bind data_prepared/:/data_prepared/ \
-  --bind deepspeech-polyglot/:/deepspeech-polyglot/ \
-  dspol.sif
+  --bind Scribosermo/:/Scribosermo/ \
+  scribosermo.sif
 ```
 
 <br/>

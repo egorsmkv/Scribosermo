@@ -38,7 +38,7 @@ In addition to above sentence collections, we can extract more sentences from ou
 # Run in container
 export LANGUAGE="de"
 
-python3 /deepspeech-polyglot/langmodel/extract_transcripts.py \
+python3 /Scribosermo/langmodel/extract_transcripts.py \
   --input_csv /data_prepared/${LANGUAGE}/librispeech/train-all.csv \
   --output_txt /data_original/texts/${LANGUAGE}/librispeech.txt
 ```
@@ -51,7 +51,7 @@ Prepare the sentences.
 # Run in container
 export LANGUAGE="de"
 
-python3 /deepspeech-polyglot/langmodel/prepare_vocab.py \
+python3 /Scribosermo/langmodel/prepare_vocab.py \
   --input_dir /data_original/texts/${LANGUAGE}/ \
   --output_dir /data_prepared/texts/${LANGUAGE}/
 ```
@@ -65,7 +65,7 @@ Create the language model: \
 # Run in container
 export LANGUAGE="de"
 
-python3 /deepspeech-polyglot/langmodel/generate_lm.py \
+python3 /Scribosermo/langmodel/generate_lm.py \
   --input_dir /data_prepared/texts/${LANGUAGE}/ \
   --output_dir /data_prepared/texts/${LANGUAGE}/ \
   --top_k 500000 --kenlm_bins /DeepSpeech/native_client/kenlm/build/bin/ \
@@ -87,7 +87,7 @@ export LANGUAGE="de"
 # Polish: --default_alpha 1.3060110864019918 --default_beta 3.5010876706821334
 
 /DeepSpeech/data/lm/generate_scorer_package \
-  --alphabet /deepspeech-polyglot/data/${LANGUAGE}/alphabet.txt \
+  --alphabet /Scribosermo/data/${LANGUAGE}/alphabet.txt \
   --lm /data_prepared/texts/${LANGUAGE}/lm.binary \
   --vocab /data_prepared/texts/${LANGUAGE}/vocab-500000.txt \
   --package /data_prepared/texts/${LANGUAGE}/kenlm_${LANGUAGE}.scorer \

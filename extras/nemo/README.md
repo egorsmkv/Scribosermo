@@ -9,11 +9,11 @@ The goal here is to use the pretrained NeMo models from Nvidia with our tensorfl
 - Convert `.nemo` to `.onnx`:
 
   ```bash
-  docker build -f ./deepspeech-polyglot/extras/nemo/Containerfile_Nemo -t dsp_nemo ./deepspeech-polyglot/
+  docker build -f ./Scribosermo/extras/nemo/Containerfile_Nemo -t dsp_nemo ./Scribosermo/
 
   docker run --gpus all -it --rm -p 8888:8888 -p 6006:6006 \
     --ulimit memlock=-1 --ulimit stack=67108864  --shm-size=8g \
-    --volume `pwd`/deepspeech-polyglot/extras/nemo/:/dsp_nemo/ \
+    --volume `pwd`/Scribosermo/extras/nemo/:/dsp_nemo/ \
     --volume `pwd`/data_prepared/:/data_prepared/ \
     --device=/dev/snd dsp_nemo
 
@@ -31,11 +31,11 @@ The goal here is to use the pretrained NeMo models from Nvidia with our tensorfl
 - Build and start conversion container:
 
   ```bash
-  docker build -f ./deepspeech-polyglot/extras/nemo/Containerfile_Onnx -t onnx-tf ./deepspeech-polyglot/
+  docker build -f ./Scribosermo/extras/nemo/Containerfile_Onnx -t onnx-tf ./Scribosermo/
 
   docker run --rm --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 --gpus all \
-    --volume `pwd`/deepspeech-polyglot/:/deepspeech-polyglot/ \
-    --volume `pwd`/deepspeech-polyglot/extras/nemo/:/nemo/ \
+    --volume `pwd`/Scribosermo/:/Scribosermo/ \
+    --volume `pwd`/Scribosermo/extras/nemo/:/nemo/ \
     --volume `pwd`/checkpoints/:/checkpoints/ -it onnx-tf
   ```
 

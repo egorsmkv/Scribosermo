@@ -6,7 +6,7 @@ RUN pip3 install --no-cache-dir git+https://github.com/onnx/tensorflow-onnx
 
 # Requirements for testing with our pipeline
 RUN apt-get update && apt-get install -y libsndfile1
-COPY dspol/ /deepspeech-polyglot/dspol/
-RUN pip3 install --no-cache-dir -e /deepspeech-polyglot/dspol/
+COPY training/ /Scribosermo/training/
+RUN pip3 install --no-cache-dir -e /Scribosermo/training/
 
 CMD ["/bin/bash"]
