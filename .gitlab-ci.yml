@@ -44,8 +44,8 @@ linting:
     - isort --check-only --diff .
     - black --check --exclude venv .
     - npx prettylint "**/*.{json,md,yml}"
-    - pylint --disable=import-error --disable=parse-error ${SRC_DIRS}
-    - flake8 ${SRC_DIRS}
+    - pylint --disable=import-error --disable=parse-error .
+    - flake8 .
     - find . -type f \( -name '*.sh' -o -name '*.bash' \) ! -path './venv/*' | xargs shellcheck
 
 test:

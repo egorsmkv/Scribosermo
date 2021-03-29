@@ -33,6 +33,7 @@ strategy: tf.distribute.Strategy
 
 def create_idx2char():
     global idx2char
+
     idx2char = tf.lookup.StaticHashTable(
         initializer=tf.lookup.KeyValueTensorInitializer(
             keys=tf.constant([i for i, u in enumerate(alphabet)]),
@@ -137,6 +138,7 @@ def distributed_eval_step(dist_inputs):
 
 def log_greedy_text(samples):
     """Run a prediction and log the predicted text"""
+    global idx2char
 
     features = tf.expand_dims(samples["features"][0], axis=0)
     logit_lengths = tf.expand_dims(samples["feature_length"][0], axis=0)

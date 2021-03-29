@@ -41,6 +41,8 @@ def initialize(config):
 
 
 def text_to_ids(sample):
+    global char2idx
+
     text = tf.strings.lower(sample["text"])
     text_as_chars = tf.strings.bytes_split(text)
     text_as_ints = char2idx.lookup(text_as_chars)
@@ -54,6 +56,7 @@ def text_to_ids(sample):
 
 def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = False):
     """Checks which augmentations are selected and applies them"""
+    global audio_sample_rate
 
     if datatype == "signal":
         augs = config["augmentations"]["signal"]
@@ -205,6 +208,7 @@ def load_audio(sample, config: dict, train_mode: bool = False):
 
 
 def audio_to_spect(sample, config: dict, train_mode: bool = False):
+    global audio_window_samples, audio_step_samples
 
     spectrogram = tf.raw_ops.AudioSpectrogram(
         input=sample["raw_audio"],
@@ -239,6 +243,7 @@ def audio_to_spect(sample, config: dict, train_mode: bool = False):
 
 def audio_to_mfcc(sample, config: dict, train_mode: bool = False):
     """Calculate MFCC from spectrogram"""
+    global audio_sample_rate, num_features
 
     features = tf.raw_ops.Mfcc(
         spectrogram=sample["spectrogram"],
@@ -261,6 +266,7 @@ def audio_to_mfcc(sample, config: dict, train_mode: bool = False):
 
 def audio_to_lfbank(sample, config: dict, train_mode: bool = False):
     """Calculate log mel filterbanks from spectrogram"""
+    global audio_sample_rate, num_features
 
     # See: https://www.tensorflow.org/api_docs/python/tf/signal/mfccs_from_log_mel_spectrograms
     lmw_matrix = tf.signal.linear_to_mel_weight_matrix(
@@ -321,6 +327,7 @@ def create_pipeline(
     train_mode: bool = False,
 ):
     """Create data-iterator from tab separated csv file"""
+    global num_features
 
     # Initialize pipeline values, using config from method call, that we can easily reuse the config
     # from exported checkpoints
