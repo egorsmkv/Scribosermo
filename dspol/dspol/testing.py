@@ -1,3 +1,4 @@
+import json
 import os
 from typing import List
 
@@ -206,6 +207,9 @@ def run_test(dataset_test):
 
 def main():
     global model
+
+    print("Starting test with config:")
+    print(json.dumps(config, indent=2))
 
     # Allow growing gpu memory
     gpus = tf.config.experimental.list_physical_devices("GPU")
