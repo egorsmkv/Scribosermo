@@ -1,0 +1,202 @@
+# Define the network for training.
+# Only "name" is a required argument, the others depend on the network you want to use.
+# Checkout the network's source code to see which parameters are required to initialize it.
+network:
+  name: "quartznet"
+  blocks: 5
+  module_repeat: 5
+
+# All "{LANGUAGE}" occurrences in this file will be replaced with this value automatically.
+language: "de"
+
+# Columns "filepath", "duration" and "text" are required, additional columns will be ignored.
+data_paths:
+  train: "/data_prepared/{LANGUAGE}/voxforge/train_azce.csv"
+  eval: "/data_prepared/{LANGUAGE}/voxforge/dev_azce.csv"
+  test: "/data_prepared/{LANGUAGE}/voxforge/test_azce.csv"
+
+alphabet_path: "/Scribosermo/data/{LANGUAGE}/alphabet.json"
+audio_sample_rate: 16000
+
+# Improve predictions with n-gram language model, only used for testing and inference
+scorer:
+  path: "/data_prepared/texts/{LANGUAGE}/kenlm_{LANGUAGE}.scorer"
+  alphabet: "/Scribosermo/data/{LANGUAGE}/alphabet.txt"
+  alpha: 0.931289039105002
+  beta: 1.1834137581510284
+  beam_size: 256
+
+# Depends on your gpu memory. If using multiple gpus, the value will be automatically multiplied.
+# In most cases a higher value is better, but if it's too high, you will get an Out-Of-Memory error.
+batch_sizes:
+  train: 8
+  eval: 8
+  test: 1
+
+# Sort the datasets. You can use a descending sort to estimate the maximal batch size you can use.
+sort_datasets: true
+sort_ds_ascending: true
+
+training_epochs: 40
+autosave_every_min: 30
+
+# Early stop training if there was no improvement over the last epochs.
+use_early_stopping: true
+early_stopping_epochs: 7
+
+# Reduce learning rate by given factor if there was no improvement over the last epochs.
+use_lrp_reduction: true
+reduce_lr_plateau_epochs: 3
+lr_plateau_reduction: 0.1
+
+# Minimum reduction of loss to count as improvement for automatic early stopping and reducing
+# learning rate on plateaus.
+esrp_min_delta: 0.1
+
+# If there are old checkpoints in the directory, the training will be continued from there
+empty_ckpt_dir: true
+checkpoint_dir: "/checkpoints/{LANGUAGE}/tmp/"
+# Restore the last training backup save instead of the exported (best) model
+restore_ckpt_insteadof_pb_file: false
+
+# Save model before doing any training updates. This can be useful for debugging or alternatively
+# for comparison runs, because following trainings can be started with the same initialization.
+save_fresh_model: false
+
+# Copy another checkpoint and continue from there.
+# If using this, make sure your config matches the one of the pretrained checkpoint.
+continue_pretrained: false
+pretrained_checkpoint_dir: "/checkpoints/en/qnet5/"
+
+# Only for transfer-learning. Keep weights for alphabet characters from the exported model if the
+# alphabet size of the two languages is different. Only works if the new alphabet is bigger. New
+# letters have to be inserted at the end of the alphabet. If disabled, a training with a different
+# sized alphabet, will reinitialize the last layer automatically.
+extend_old_alphabet: false
+
+# Used for transfer-learning. Only the last layer will be trained.
+# After the frozen training, start a new training with the complete network.
+freeze_base_net: false
+
+# Print a single greedy prediction while training, disable by setting value to zero.
+log_prediction_steps: 25
+
+# Profile given training steps in each epoch. Use to find performance bottlenecks.
+# Viewable in tensorboard under "profile" tab.
+profile_steps: [35, 125]
+
+# Print files with worst predictions. Sort either by "loss" or "greedy_cer". Usable for debugging.
+log_worst_test_predictions: 3
+sort_wtl_key: "greedy_cer"
+
+# Like with the network, checkout the training source code to see which parameters are required.
+# The recommended learning-rate also depends on the used batch-size, if it's large, use a higher lr.
+optimizer:
+  name: "novograd"
+  learning_rate: 0.001
+  weight_decay: 0.001
+  beta1: 0.8
+  beta2: 0.5
+
+# Changing things here will break compatibility with the default production bindings.
+audio_features:
+  use_type: "lfbank"
+  mfcc:
+    num_features: 26
+    window_len: 0.032
+    window_step: 0.020
+  lfbank:
+    num_features: 64
+    window_len: 0.020
+    window_step: 0.010
+
+augmentations:
+  signal:
+    dither:
+      # Add minimal random noise to data to prevent quantization artefacts
+      use_train: true
+      use_test: true
+      factor: 0.00001
+    normalize_volume:
+      # Scale loudest volume to value of 1
+      use_train: false
+      use_test: false
+    preemphasis:
+      # Emphasizes high-frequency signal components
+      use_train: true
+      use_test: true
+      coefficient: 0.97
+    resample:
+      # Resamples to given sample rate and back again.
+      use_train: false
+      use_test: false
+      tmp_sample_rate: 8000
+    random_volume:
+      # Random volume levels
+      use_train: false
+      use_test: false
+      min_dbfs: -30
+      max_dbfs: -20
+    reverb:
+      # Add reverberation. Very time consuming.
+      use_train: false
+      use_test: false
+      delay: 50
+      decay: 10
+  spectrogram:
+    random_pitch:
+      # Applies random pitch changes, using clipped normal distribution.
+      use_train: true
+      use_test: false
+      mean: 1.0
+      stddev: 0.05
+      cut_min: 0.8
+      cut_max: 1.3
+    random_speed:
+      # Applies random speed changes, using clipped normal distribution.
+      use_train: true
+      use_test: false
+      mean: 1.0
+      stddev: 0.1
+      cut_min: 0.7
+      cut_max: 1.5
+    freq_mask:
+      # Zeros out one or multiple random frequency ranges
+      use_train: false
+      use_test: false
+      n: 1
+      max_size: 6
+    time_mask:
+      # Zeros out one or multiple random time ranges
+      use_train: false
+      use_test: false
+      n: 1
+      max_size: 25
+    spec_cutout:
+      # Zeros out one or multiple rectangles at random positions
+      use_train: true
+      use_test: false
+      n: 3
+      max_freq_size: 6
+      max_time_size: 25
+    spec_dropout:
+      # Drops random values
+      use_train: false
+      use_test: false
+      max_rate: 0.05
+  features:
+    random_multiply:
+      # Add multiplicative random noise to features
+      use_train: false
+      use_test: false
+      mean: 1.0
+      stddev: 0.05
+    random_add:
+      # Add additional random noise to features
+      use_train: false
+      use_test: false
+      factor: 0.05
+    normalize_features:
+      # Normalize features per channel/frequency
+      use_train: true
+      use_test: true

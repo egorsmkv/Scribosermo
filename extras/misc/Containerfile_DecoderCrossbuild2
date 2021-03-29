@@ -1,0 +1,52 @@
+FROM dsbuild
+WORKDIR /DeepSpeech/
+
+# Build binaries to install some requirements
+RUN cd /DeepSpeech/tensorflow/ && \
+  bazel build --workspace_status_command="bash native_client/bazel_workspace_status_cmd.sh" \
+  --config=monolithic --config=rpi3 --config=rpi3_opt -c opt --copt=-O3 --copt=-fvisibility=hidden //native_client:libdeepspeech.so
+
+RUN apt-get update && apt-get install -y multistrap
+RUN apt-get install -y nano
+
+# This command will fail with a missing apt-key, but adds some directories we will need in the next steps
+RUN multistrap -d multistrap-raspbian-buster -f native_client/multistrap_raspbian_buster.conf; exit 0
+
+# Fix the missing key
+RUN rm /etc/apt/trusted.gpg
+RUN gpg --keyserver keys.gnupg.net --recv-key 9165938D90FDDD2E
+RUN gpg -a --export 9165938D90FDDD2E | apt-key add -
+RUN cp /etc/apt/trusted.gpg /DeepSpeech/multistrap-raspbian-buster/etc/apt/trusted.gpg.d/
+
+# Run again, but now with key
+RUN multistrap -d multistrap-raspbian-buster -f native_client/multistrap_raspbian_buster.conf
+
+# Update to python 3.7 as this is what we have on RasPi buster
+RUN apt-get update && apt-get install -y python3.7
+RUN rm /usr/bin/python3 && ln -s python3.7 /usr/bin/python3
+RUN python3 -V
+
+# Link raspian libraries into host system
+RUN ln -s /DeepSpeech/multistrap-raspbian-buster/lib/ld-linux-armhf.so.3 /lib/
+RUN ln -s /DeepSpeech/multistrap-raspbian-buster/lib/arm-linux-gnueabihf /lib/
+RUN ln -s /DeepSpeech/multistrap-raspbian-buster/usr/lib/arm-linux-gnueabihf /usr/lib/
+
+# Install our prebuilt raspbian-swig
+RUN rm -rf /DeepSpeech/native_client/ds-swig/
+COPY ds-swig.tar.gz /DeepSpeech/native_client/
+RUN cd /DeepSpeech/native_client/ && tar xzf ds-swig.tar.gz
+
+# Link swig
+RUN ln -s /DeepSpeech/native_client/ds-swig/bin/swig /usr/bin/
+RUN mkdir -p /ds-swig/share/swig/
+RUN ln -s /DeepSpeech/native_client/ds-swig/share/swig/4.0.2 /ds-swig/share/swig/
+
+# Fix Makefile
+RUN sed -i 's/python .\/setup.py build_ext --num_/$(PYTHON_SYSCONFIGDATA) python .\/setup.py build_ext --num_/g' /DeepSpeech/native_client/ctcdecode/Makefile
+
+# Clean the cache and build the ctc-decoder package
+RUN cd /DeepSpeech/native_client/ctcdecode/ && make clean
+RUN cd /DeepSpeech/native_client/ctcdecode/ && make TARGET=rpi3 NUM_PROCESSES=$(nproc) bindings
+
+WORKDIR /DeepSpeech/
+CMD ["/bin/bash"]

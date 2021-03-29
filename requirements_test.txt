@@ -2,12 +2,11 @@ anybadge
 black
 flake8
 flake8_polyfill
-isort<5
+isort
 num2words
 pygount
 pylint
 pytest
 pytest-cov
 radon
-seed-isort-config
 tqdm

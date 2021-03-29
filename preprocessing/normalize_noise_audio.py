@@ -13,10 +13,20 @@ import os
 from functools import partial
 from multiprocessing import Pool
 
+import librosa
 import tqdm
 from pydub import AudioSegment
 
-from dataset_operations import get_duration, seconds_to_hours
+from dataset_operations import seconds_to_hours
+
+# ==================================================================================================
+
+
+def get_duration(filename):
+    """ Get duration of the wav file """
+    length = librosa.get_duration(filename=filename)
+    return length
+
 
 # ==================================================================================================
 

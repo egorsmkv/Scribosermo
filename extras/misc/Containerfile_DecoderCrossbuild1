@@ -1,0 +1,25 @@
+FROM yummygooey/raspbian-buster:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+WORKDIR /
+
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install -y wget nano
+
+RUN apt-get install -y build-essential
+RUN apt-get install -y libpcre++-dev libpcre3-dev
+RUN apt-get install -y libboost-all-dev
+
+# Build swig
+RUN wget http://prdownloads.sourceforge.net/swig/swig-4.0.2.tar.gz
+RUN tar xfz swig-4.0.2.tar.gz
+RUN cd swig-4.0.2 && ./configure --prefix=`realpath ../ds-swig`
+RUN cd swig-4.0.2 && make && make install
+
+# Package it, that it can be extracted from the container
+RUN tar czf ds-swig-4.0.2.tar.gz ds-swig/
+
+WORKDIR /
+CMD ["/bin/bash"]

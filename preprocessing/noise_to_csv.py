@@ -2,7 +2,7 @@ import os
 
 # ==================================================================================================
 
-noise_path = "/DeepSpeech/data_prepared/noise/"
+noise_path = "/data_prepared/noise/"
 noise_csv_path = noise_path + "all.csv"
 
 

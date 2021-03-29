@@ -1,0 +1,26 @@
+FROM docker.io/yummygooey/raspbian-buster:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+WORKDIR /
+
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install -y nano
+
+RUN apt-get install -y python3-pip python3-dev
+RUN pip3 install --upgrade pip
+
+# TfLite runtime
+RUN pip3 install --no-cache-dir --extra-index-url https://google-coral.github.io/py-repo/ tflite_runtime
+
+# Audio reading
+RUN apt-get update && apt-get install -y libffi-dev libsndfile1
+RUN pip3 install --no-cache-dir --upgrade setuptools soundfile
+
+# Install ds_ctcdecoder
+COPY ds_ctcdecoder*.whl /
+RUN pip3 install ds_ctcdecoder*.whl
+
+WORKDIR /
+CMD ["/bin/bash"]
