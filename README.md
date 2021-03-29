@@ -1,6 +1,6 @@
 # Scribosermo
 
-_Scribosermo is a framework to train fast Speech-to-Text networks in different languages._
+_Train fast Speech-to-Text networks in different languages._
 
 <div align="center">
     <img src="media/deepspeech1_architecture.png" alt="deepspeech1 graph" width="45%"/>
@@ -78,11 +78,11 @@ For easier inference follow the exporting [readme](extras/exporting/README.md) i
 
 You can find more details about the currently used datasets [here](preprocessing/README.md#Datasets).
 
-|              |      |     |     |     |     |     |       |
-| ------------ | ---- | --- | --- | --- | --- | --- | ----- |
-| Language     | DE   | EN  | ES  | FR  | IT  | PL  | Noise |
-| Duration (h) | 1619 | 982 | 710 | 837 | 299 | 169 | 152   |
-| Datasets     | 17   | 1   | 6   | 6   | 4   | 3   | 3     |
+|                  |      |     |     |      |     |     |       |
+| ---------------- | ---- | --- | --- | ---- | --- | --- | ----- |
+| Language         | DE   | EN  | ES  | FR   | IT  | PL  | Noise |
+| Duration (hours) | 2370 | 982 | 817 | 1028 | 299 | 169 | 152   |
+| Datasets         | 37   | 1   | 8   | 7    | 4   | 3   | 3     |
 
 <br>
 
@@ -113,11 +113,27 @@ datasets have extra conditions (for example non-commercial use only) which also 
 The QuartzNet models are double licenced withs Nvidia's NGC, because they use their pretrained weights.
 Please check this yourself for the models you want to use.
 
+**German**:
+
+Coming soon ...
+
 **English**:
 
 - Quartznet5x5 (WER: 4.5%): [Link](https://www.mediafire.com/file/tooxkchx6mmp13k/qnet5.zip/file)
 - Quartznet15x5 (WER: 3.7%): [Link](https://www.mediafire.com/file/8izmtnpjlwdcfye/qnet15.zip/file)
 - Scorer: [Link](https://github.com/mozilla/DeepSpeech/releases/tag/v0.9.3) (to DeepSpeech)
+
+**Spanish**:
+
+Coming soon ...
+
+**French**:
+
+Coming soon ...
+
+**Mozilla's DeepSpeech**:
+
+You can find the old models later on this page, in the `old experiments` [section](#old-experiments).
 
 <br/>
 
@@ -149,14 +165,14 @@ You can contribute to this project in multiple ways:
 |          |               |                                                                                                                 |                                                                                                                |
 | EN       | Quartznet15x5 | Results from Nvidia-Nemo, using LS-dev-clean as test dataset                                                    | WER greedy: 0.0379                                                                                             |
 | EN       | Quartznet15x5 | Converted model from Nvidia-Nemo, using LS-dev-clean as test dataset                                            | Loss: 5.8044 <br> CER greedy: 0.0160 <br> CER with lm: 0.0130 <br> WER greedy: 0.0515 <br> WER with lm: 0.0355 |
-| EN       | Quartznet15x5 | Pretrained model from Nvidia-Nemo, four extra epochs on LibriSpeech to reduce the different spectrogram problem | Loss: 5.3177 <br> CER greedy: 0.0143 <br> CER with lm: 0.0128 <br> WER greedy: 0.0467 <br> WER with lm: 0.0374 |
-| EN       | Quartznet15x5 | above, using LS-dev-clean as test dataset (for better comparison with results from Nemo)                        | Loss: 5.0822 <br> CER greedy: 0.0134 <br> CER with lm: 0.0110 <br> WER greedy: 0.0439 <br> WER with lm: 0.0319 |
+| EN       | Quartznet15x5 | Pretrained model from Nvidia-Nemo, four extra epochs on LibriSpeech to reduce the different spectrogram problem | Loss: 5.3074 <br> CER greedy: 0.0141 <br> CER with lm: 0.0128 <br> WER greedy: 0.0456 <br> WER with lm: 0.0374 |
+| EN       | Quartznet15x5 | above, using LS-dev-clean as test dataset (for better comparison with results from Nemo)                        | Loss: 5.1035 <br> CER greedy: 0.0132 <br> CER with lm: 0.0108 <br> WER greedy: 0.0435 <br> WER with lm: 0.0308 |
 
 <br/>
 
 ## Old experiments
 
-The following experiments were run with an old version of this repository,
+The following experiments were run with an old version of this repository, at that time named as _DeepSpeech-Polyglot_,
 using the DeepSpeech1 network from [Mozilla-DeepSpeech](https://github.com/mozilla/DeepSpeech). \
 While they are outdated, some of them might still provide helpful information for training the new networks.
 
