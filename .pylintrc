@@ -31,7 +31,10 @@ disable=format,
   unused-argument,
   wrong-import-order,
   broad-except,
-  global-statement
+  global-statement,
+# Tensorflow special warnings, that seem to be correct in most cases
+  unexpected-keyword-arg,
+  no-value-for-parameter  
 
 
 # Enable the message, report, category or checker with the given id(s). You can

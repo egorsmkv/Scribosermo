@@ -116,7 +116,7 @@ def reverb(signal, audio_sample_rate, delay: float = 20, decay: float = 10):
     decay = tf.random.uniform(shape=[], minval=0, maxval=decay)
 
     orig_dbfs = max_dbfs(signal)
-    decay = gain_db_to_ratio(-decay)
+    decay = gain_db_to_ratio(tf.math.negative(decay))
     result = tf.identity(signal)
     signal_len = tf.shape(signal)[0]
 

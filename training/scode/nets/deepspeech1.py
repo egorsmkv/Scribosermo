@@ -6,9 +6,9 @@ from tensorflow.keras import layers as tfl
 # ==================================================================================================
 
 
-class MyModel(Model):
+class MyModel(Model):  # pylint: disable=abstract-method
     def __init__(self, c_input, c_output):
-        super(MyModel, self).__init__()
+        super().__init__()
 
         self.n_hidden = 2048
         self.relu_clip = 20
@@ -31,9 +31,11 @@ class MyModel(Model):
         overlapping windows over the features.
         Using extra kernel init function to make the window layer exportable as saved model"""
 
-        filter = np.eye(self.window_size)
-        filter = filter.reshape(self.window_width, self.n_input, self.window_size)
-        eye_filter = tf.constant(filter, dtype=dtype)
+        kfilter = np.eye(self.window_size)
+        kfilter = np.reshape(
+            kfilter, [self.window_width, self.n_input, self.window_size]
+        )
+        eye_filter = tf.constant(kfilter, dtype=dtype)
         return eye_filter
 
     # ==============================================================================================
@@ -86,14 +88,15 @@ class MyModel(Model):
     # ==============================================================================================
 
     # Input signature is required to export this method into ".pb" format and use it while testing
+    @staticmethod
     @tf.function(input_signature=[])
-    def get_time_reduction_factor(self):
+    def get_time_reduction_factor():
         """Keep for compatibility with other models"""
         return 1
 
     # ==============================================================================================
 
-    def summary(self, line_length=100, **kwargs):
+    def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
         self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
@@ -102,7 +105,7 @@ class MyModel(Model):
     # with a variable sequence length, instead of using the one of the first input.
     # The channel value could be fixed, but I didn't find a way to set it to the channels variable.
     @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
-    def call(self, x):
+    def call(self, x):  # pylint: disable=arguments-differ
         """Call with input shape: [batch_size, steps_a, n_input],
         outputs tensor of shape: [batch_size, steps_b, n_output]"""
 

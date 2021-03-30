@@ -9,9 +9,9 @@ import tflite_tools
 # ==================================================================================================
 
 
-class MyModel(Model):
+class MyModel(Model):  # pylint: disable=abstract-method
     def __init__(self, nn_model, metadata, specmode):
-        super(MyModel, self).__init__()
+        super().__init__()
 
         # Spectrogram normalization constants. Taken from:
         # https://github.com/NVIDIA/NeMo/blob/main/tutorials/asr/02_Online_ASR_Microphone_Demo.ipynb
@@ -295,7 +295,7 @@ class MyModel(Model):
 
     # ==============================================================================================
 
-    def summary(self, line_length=100, **kwargs):
+    def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
         self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
@@ -303,7 +303,7 @@ class MyModel(Model):
     # This input signature is required that we can export and load the model in ".pb" format
     # with a variable sequence length, instead of using the one of the first input.
     @tf.function(input_signature=[tf.TensorSpec([None, None], tf.float32)])
-    def call(self, x):
+    def call(self, x):  # pylint: disable=arguments-differ
         """Call with input shape: [1, len_signal], output shape: [len_steps, 1, n_alphabet]"""
 
         x = self.model(x)
