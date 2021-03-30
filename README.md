@@ -152,6 +152,10 @@ You can contribute to this project in multiple ways:
   - Add speech datasets
   - Find text corpora for the language model
 
+#### Tests
+
+See [readme](tests/README.md) in `tests` directory for testing instructions.
+
 <br/>
 
 ## Results
