@@ -1,0 +1,55 @@
+FROM docker.io/ubuntu:20.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
+
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get update && apt-get install -y wget curl git
+
+# Install python
+RUN apt-get update && apt-get install -y python3 python3-pip
+RUN pip3 install --upgrade --no-cache-dir pip
+RUN python3 -V && pip3 --version
+
+# Install node and npm
+RUN apt-get update && apt-get install -y tzdata
+RUN apt-get update && apt-get install -y libnode-dev npm
+RUN npm install n -g && n stable
+RUN node -v && /usr/local/bin/npm -v
+
+# Install bash command checker
+RUN apt-get update && apt-get install -y shellcheck
+
+# Install prettier formatter
+RUN mkdir /usr/app/ && cd /usr/app/ \
+  && /usr/local/bin/npm install --save-dev --save-exact prettier prettylint
+RUN cd /usr/app/ && npx prettier -v && npx prettylint -v
+
+# Install python testing tools
+RUN pip3 install --upgrade --no-cache-dir \
+  anybadge \
+  black \
+  flake8 \
+  flake8_polyfill \
+  isort \
+  mypy \
+  pygount \
+  pylint \
+  pytest \
+  pytest-cov \
+  radon
+RUN pip3 freeze
+
+# Preinstall Scribosermo's python dependencies
+COPY training/ /Scribosermo/training/
+RUN pip3 install --no-cache-dir -e /Scribosermo/training/
+RUN pip3 freeze
+
+# Clear cache to save space, only has an effect if image is squashed
+RUN apt-get autoremove -y \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /
+CMD ["/bin/bash"]
