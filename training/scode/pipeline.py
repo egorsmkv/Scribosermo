@@ -56,7 +56,6 @@ def text_to_ids(sample):
 
 def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = False):
     """Checks which augmentations are selected and applies them"""
-    global audio_sample_rate
 
     if datatype == "signal":
         augs = config["augmentations"]["signal"]
@@ -217,22 +216,6 @@ def audio_to_spect(sample, config: dict, train_mode: bool = False):
         magnitude_squared=True,
     )
 
-    # pcm = tf.squeeze(sample["raw_audio"], axis=-1)
-    # n_fft = 2 ** math.ceil(math.log2(audio_window_samples))
-    # # pad_size = int(n_fft // 2)
-    # # pcm = tf.pad(pcm, [[pad_size, pad_size]], "REFLECT")
-    # # sample["pcm"] = pcm
-    # stfts = tf.signal.stft(
-    #     pcm,
-    #     frame_length=int(audio_window_samples),
-    #     frame_step=int(audio_step_samples),
-    #     fft_length=n_fft,
-    #     pad_end=False,
-    # )
-    # spectrogram = tf.abs(stfts)
-    # spectrogram = tf.math.pow(spectrogram, 2)
-    # spectrogram = tf.expand_dims(spectrogram, axis=0)
-
     spectrogram = apply_augmentations(spectrogram, "spectrogram", config, train_mode)
     sample["spectrogram"] = spectrogram
     return sample
@@ -321,10 +304,7 @@ def post_process(sample):
 
 
 def create_pipeline(
-    csv_path: str,
-    batch_size: int,
-    config: dict,
-    train_mode: bool = False,
+    csv_path: str, batch_size: int, config: dict, train_mode: bool = False
 ):
     """Create data-iterator from tab separated csv file"""
     global num_features

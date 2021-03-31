@@ -17,9 +17,6 @@ python3 /Scribosermo/extras/exporting/export.py
 # Test exported models
 python3 /Scribosermo/extras/exporting/testing_pb.py
 python3 /Scribosermo/extras/exporting/testing_tflite.py
-
-# Disable gpus for performance tests
-export CUDA_VISIBLE_DEVICES=""
 ```
 
 Performance test options: \

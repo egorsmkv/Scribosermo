@@ -88,7 +88,7 @@ def train_step(samples):
 
     gradients = tape.gradient(loss, trainable_variables)
     # gradients = optimizer.get_unscaled_gradients(scaled_gradients)
-    gradients, global_norm = tf.clip_by_global_norm(gradients, 1.0)
+    gradients, _ = tf.clip_by_global_norm(gradients, 1.0)
     optimizer.apply_gradients(zip(gradients, trainable_variables))
 
     return loss
@@ -237,7 +237,7 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
                 last_save_time = time.time()
 
         # Evaluate
-        eval_loss = eval(dataset_eval)
+        eval_loss = evaluate(dataset_eval)
 
         # Count epochs without improvement for early stopping and reducing learning rate on plateaus
         if eval_loss > best_eval_loss - config["esrp_min_delta"]:
@@ -291,7 +291,7 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
 # ==================================================================================================
 
 
-def eval(dataset_eval):
+def evaluate(dataset_eval):
     print("\nEvaluating ...")
     loss = 0
     step = 0

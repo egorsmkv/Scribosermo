@@ -7,9 +7,9 @@ from tensorflow.keras import layers as tfl
 # ==================================================================================================
 
 
-class BaseModule(Model):
+class BaseModule(Model):  # pylint: disable=abstract-method
     def __init__(self, filters, kernel_size, has_relu=True):
-        super(BaseModule, self).__init__()
+        super().__init__()
 
         pad = int(math.floor(kernel_size / 2))
         self.pad1d = tf.keras.layers.ZeroPadding1D(padding=(pad, pad))
@@ -35,7 +35,7 @@ class BaseModule(Model):
 
     # ==============================================================================================
 
-    def call(self, x):
+    def call(self, x):  # pylint: disable=arguments-differ
         x = self.model(x)
         return x
 
@@ -43,12 +43,12 @@ class BaseModule(Model):
 # ==================================================================================================
 
 
-class BaseBlock(Model):
+class BaseBlock(Model):  # pylint: disable=abstract-method
     def __init__(self, filters, kernel_size, repeat):
-        super(BaseBlock, self).__init__()
+        super().__init__()
 
         self.partial_block = tf.keras.Sequential()
-        for i in range(repeat - 1):
+        for _ in range(repeat - 1):
             layer = BaseModule(filters=filters, kernel_size=kernel_size)
             self.partial_block.add(layer)
         layer = BaseModule(filters=filters, kernel_size=kernel_size, has_relu=False)
@@ -67,7 +67,7 @@ class BaseBlock(Model):
     # ==============================================================================================
 
     @tf.function()
-    def call(self, x):
+    def call(self, x):  # pylint: disable=arguments-differ
         a = self.partial_block(x)
         b = self.convpt(x)
         b = self.bnorm(b)
@@ -79,12 +79,12 @@ class BaseBlock(Model):
 # ==================================================================================================
 
 
-class MyModel(Model):
+class MyModel(Model):  # pylint: disable=abstract-method
     """See Quartznet example config at:
     https://github.com/NVIDIA/OpenSeq2Seq/blob/master/example_configs/speech2text/"""
 
     def __init__(self, c_input, c_output, blocks, module_repeat):
-        super(MyModel, self).__init__()
+        super().__init__()
 
         block_params = [
             [256, 33],
@@ -130,9 +130,9 @@ class MyModel(Model):
         x = tfl.ReLU()(x)
         x = tfl.Dropout(0.1)(x)
 
-        for i in range(len(block_params)):
-            for j in range(block_repeat):
-                filters, kernel_size = block_params[i]
+        for bparams in block_params:
+            for _ in range(block_repeat):
+                filters, kernel_size = bparams
                 x = BaseBlock(filters, kernel_size, module_repeat)(x)
 
         x = tf.keras.layers.ZeroPadding1D(padding=(86, 86))(x)
@@ -186,7 +186,7 @@ class MyModel(Model):
 
     # ==============================================================================================
 
-    def summary(self, line_length=100, **kwargs):
+    def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
         self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
@@ -195,7 +195,7 @@ class MyModel(Model):
     # with a variable sequence length, instead of using the one of the first input.
     # The channel value could be fixed, but I didn't find a way to set it to the channels variable.
     @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
-    def call(self, x):
+    def call(self, x):  # pylint: disable=arguments-differ
         """Call with input shape: [batch_size, steps_a, n_input]. Note that this is different to
         nemo's reference implementation which uses a "channels_first" approach.
         Outputs a tensor of shape: [batch_size, steps_b, n_output]"""

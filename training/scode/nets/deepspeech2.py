@@ -1,4 +1,3 @@
-import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
@@ -6,9 +5,9 @@ from tensorflow.keras import layers as tfl
 # ==================================================================================================
 
 
-class MyModel(Model):
+class MyModel(Model):  # pylint: disable=abstract-method
     def __init__(self, c_input, c_output):
-        super(MyModel, self).__init__()
+        super().__init__()
 
         self.n_input = c_input
         self.n_output = c_output
@@ -45,7 +44,7 @@ class MyModel(Model):
 
         # Paper uses 7 bidirectional LSTMs here. Using unidirectional like in Mozilla's DS1 project
         # would result in about 2x speed up of the training
-        for i in range(self.n_lstms - 1):
+        for _ in range(self.n_lstms - 1):
             model.add(
                 tfl.Bidirectional(
                     tfl.LSTM(self.n_hidden, return_sequences=True, stateful=False)
@@ -81,7 +80,7 @@ class MyModel(Model):
 
     # ==============================================================================================
 
-    def summary(self, line_length=100, **kwargs):
+    def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
         self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
@@ -89,7 +88,7 @@ class MyModel(Model):
     # This input signature is required that we can export and load the model in ".pb" format
     # with a variable sequence length, instead of using the one of the first input.
     @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
-    def call(self, x):
+    def call(self, x):  # pylint: disable=arguments-differ
         """Call with input shape: [batch_size, steps_a, n_input],
         outputs tensor of shape: [batch_size, steps_b, n_output]"""
 

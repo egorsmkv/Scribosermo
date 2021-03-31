@@ -42,6 +42,11 @@ RUN pip3 install --upgrade --no-cache-dir \
 RUN pip3 freeze
 
 # Preinstall Scribosermo's python dependencies
+RUN pip3 install --no-cache-dir \
+  librosa \
+  pydub \
+  ds_ctcdecoder \
+  git+https://gitlab.com/Jaco-Assistant/corcua
 COPY training/ /Scribosermo/training/
 RUN pip3 install --no-cache-dir -e /Scribosermo/training/
 RUN pip3 freeze

@@ -5,9 +5,9 @@ from tensorflow.keras import layers as tfl
 # ==================================================================================================
 
 
-class BaseModule(Model):
+class BaseModule(Model):  # pylint: disable=abstract-method
     def __init__(self, filters, kernel_size, dropout, is_last_module=False):
-        super(BaseModule, self).__init__()
+        super().__init__()
 
         self.model = tf.keras.Sequential()
         self.model.add(
@@ -22,7 +22,7 @@ class BaseModule(Model):
 
     # ==============================================================================================
 
-    def call(self, x):
+    def call(self, x):  # pylint: disable=arguments-differ
         x = self.model(x)
         return x
 
@@ -30,13 +30,13 @@ class BaseModule(Model):
 # ==================================================================================================
 
 
-class PartialBlock(Model):
+class PartialBlock(Model):  # pylint: disable=abstract-method
     def __init__(self, filters, kernel_size, dropout, repeat):
-        super(PartialBlock, self).__init__()
+        super().__init__()
 
         # Build block until residual connection
         self.model = tf.keras.Sequential()
-        for i in range(repeat - 1):
+        for _ in range(repeat - 1):
             layer = BaseModule(
                 filters=filters, kernel_size=kernel_size, dropout=dropout
             )
@@ -46,7 +46,7 @@ class PartialBlock(Model):
 
     # ==============================================================================================
 
-    def call(self, x):
+    def call(self, x):  # pylint: disable=arguments-differ
         x = self.model(x)
         return x
 
@@ -54,9 +54,9 @@ class PartialBlock(Model):
 # ==================================================================================================
 
 
-class MyModel(Model):
+class MyModel(Model):  # pylint: disable=abstract-method
     def __init__(self, c_input, c_output, blocks, module_repeat, dense_residuals):
-        super(MyModel, self).__init__()
+        super().__init__()
 
         # Params: output_filters, kernel_size, dropout
         block_params = [
@@ -89,9 +89,9 @@ class MyModel(Model):
         x = tfl.Dropout(0.2)(x)
 
         residuals = []
-        for i in range(len(block_params)):
-            for j in range(block_repeat):
-                filters, kernel_size, dropout = block_params[i]
+        for bparams in block_params:
+            for _ in range(block_repeat):
+                filters, kernel_size, dropout = bparams
 
                 if not dense_residuals:
                     # Only one residual connection from block to block,
@@ -142,7 +142,7 @@ class MyModel(Model):
 
     # ==============================================================================================
 
-    def summary(self, line_length=100, **kwargs):
+    def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
         self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
@@ -150,7 +150,7 @@ class MyModel(Model):
     # This input signature is required that we can export and load the model in ".pb" format
     # with a variable sequence length, instead of using the one of the first input.
     @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
-    def call(self, x):
+    def call(self, x):  # pylint: disable=arguments-differ
         """Call with input shape: [batch_size, steps_a, n_input],
         outputs tensor of shape: [batch_size, steps_b, n_output]"""
 

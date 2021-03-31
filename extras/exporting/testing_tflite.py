@@ -21,6 +21,7 @@ test_wav_path = "/Scribosermo/extras/exporting/data/test.wav"
 alphabet_path = "/Scribosermo/data/en/alphabet.json"
 ds_alphabet_path = "/Scribosermo/data/en/alphabet.txt"
 ds_scorer_path = "/data_prepared/texts/en/kenlm_en.scorer"
+beam_size = 256
 
 with open(alphabet_path, "r", encoding="utf-8") as file:
     alphabet = json.load(file)
@@ -55,11 +56,12 @@ def predict(interpreter, audio):
 
 
 def print_prediction_scorer(prediction, print_text=True):
+    global beam_size, ds_alphabet, ds_scorer
 
     ldecoded = ctc_beam_search_decoder(
         prediction.tolist(),
         ds_alphabet,
-        beam_size=256,
+        beam_size=beam_size,
         cutoff_prob=1.0,
         cutoff_top_n=512,
         scorer=ds_scorer,

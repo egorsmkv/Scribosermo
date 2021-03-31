@@ -68,7 +68,7 @@ linting:
     - black --check .
     - npx /usr/app/node_modules/prettylint/bin/cli.js \
       $(find . -type f \( -name '*.json' -o -name '*.md' -o -name '*.yml' -o -name '*.yaml' \) ! -path './.*/*')
-    - pylint --disable=import-error --disable=parse-error .
+    - pylint $(find . -type f -name "*.py" -not -path "./extras/*")
     - flake8 .
     - shellcheck $(find . -type f \( -name '*.sh' -o -name '*.bash' \) ! -path './.*/*')
 
@@ -78,7 +78,7 @@ analysis:
   # The following pipe allows using a ':' in the 'sed' command, also remove the '-' list indicator
   script: |
     mkdir ./badges/
-    radon cc -e "extras/*" . | tee ./badges/radon.log
+    radon cc -a -e "extras/*" . | tee ./badges/radon.log
     RCC_SCORE=$(sed -n 's/^Average complexity: \([A-F]\) .*/\1/p' ./badges/radon.log)
     anybadge --label=complexity --file=badges/rcc.svg --overwrite --value=$RCC_SCORE A=green B=yellow C=orange D=red E=red F=red
     echo "Radon cyclomatic complexity score is: $RCC_SCORE"

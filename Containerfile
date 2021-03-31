@@ -23,9 +23,6 @@ RUN cd /DeepSpeech/native_client/ && \
   cd kenlm/build && \
   cmake .. && \
   make -j $(nproc)
-## Graph converter
-#RUN python3 /DeepSpeech/util/taskcluster.py --source tensorflow --branch r1.15 \
-#  --artifact convert_graphdef_memmapped_format  --target /DeepSpeech/
 
 # Get prebuilt scorer generator script
 RUN cd /DeepSpeech/data/lm/ \
@@ -37,11 +34,10 @@ RUN python3 -m pip install --upgrade pip
 
 # Dependencies for noise normalization
 RUN apt-get update && apt-get install -y ffmpeg
-RUN pip install --no-cache-dir --upgrade pydub
+RUN pip install --no-cache-dir --upgrade pydub librosa
 
 # Pre-install some libraries for faster installation time of training package
 RUN pip3 install --no-cache-dir pandas
-RUN pip3 install --no-cache-dir librosa
 RUN pip3 install --no-cache-dir "tensorflow<2.4,>=2.3"
 RUN pip3 install --no-cache-dir "tensorflow-addons<0.12"
 RUN pip3 install --no-cache-dir "tensorflow-io<0.17"
@@ -61,10 +57,6 @@ RUN pip3 install --no-cache-dir --extra-index-url https://google-coral.github.io
 # Install corcua
 RUN git clone --depth 1 https://gitlab.com/Jaco-Assistant/corcua.git
 RUN pip3 install --no-cache-dir -e corcua/
-
-# Testing requirements
-COPY requirements_test.txt /Scribosermo/requirements_test.txt
-RUN pip3 install --no-cache-dir -r /Scribosermo/requirements_test.txt
 
 # Training package
 COPY training/ /Scribosermo/training/
