@@ -23,9 +23,6 @@ RUN cd /DeepSpeech/native_client/ && \
   cd kenlm/build && \
   cmake .. && \
   make -j $(nproc)
-## Graph converter
-#RUN python3 /DeepSpeech/util/taskcluster.py --source tensorflow --branch r1.15 \
-#  --artifact convert_graphdef_memmapped_format  --target /DeepSpeech/
 
 # Get prebuilt scorer generator script
 RUN cd /DeepSpeech/data/lm/ \
@@ -61,10 +58,6 @@ RUN pip3 install --no-cache-dir --extra-index-url https://google-coral.github.io
 # Install corcua
 RUN git clone --depth 1 https://gitlab.com/Jaco-Assistant/corcua.git
 RUN pip3 install --no-cache-dir -e corcua/
-
-# Testing requirements
-COPY requirements_test.txt /Scribosermo/requirements_test.txt
-RUN pip3 install --no-cache-dir -r /Scribosermo/requirements_test.txt
 
 # Training package
 COPY training/ /Scribosermo/training/
