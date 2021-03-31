@@ -68,7 +68,7 @@ linting:
     - black --check .
     - npx /usr/app/node_modules/prettylint/bin/cli.js \
       $(find . -type f \( -name '*.json' -o -name '*.md' -o -name '*.yml' -o -name '*.yaml' \) ! -path './.*/*')
-    - pylint --disable=import-error --disable=parse-error $(find . -type f -name "*.py" -not -path "./extras/*")
+    - pylint $(find . -type f -name "*.py" -not -path "./extras/*")
     - flake8 .
     - shellcheck $(find . -type f \( -name '*.sh' -o -name '*.bash' \) ! -path './.*/*')
 

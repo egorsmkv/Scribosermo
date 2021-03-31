@@ -34,11 +34,10 @@ RUN python3 -m pip install --upgrade pip
 
 # Dependencies for noise normalization
 RUN apt-get update && apt-get install -y ffmpeg
-RUN pip install --no-cache-dir --upgrade pydub
+RUN pip install --no-cache-dir --upgrade pydub librosa
 
 # Pre-install some libraries for faster installation time of training package
 RUN pip3 install --no-cache-dir pandas
-RUN pip3 install --no-cache-dir librosa
 RUN pip3 install --no-cache-dir "tensorflow<2.4,>=2.3"
 RUN pip3 install --no-cache-dir "tensorflow-addons<0.12"
 RUN pip3 install --no-cache-dir "tensorflow-io<0.17"
