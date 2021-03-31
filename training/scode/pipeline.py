@@ -56,7 +56,6 @@ def text_to_ids(sample):
 
 def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = False):
     """Checks which augmentations are selected and applies them"""
-    global audio_sample_rate
 
     if datatype == "signal":
         augs = config["augmentations"]["signal"]
