@@ -20,8 +20,8 @@ _Train fast Speech-to-Text networks in different languages._
 ## Usage
 
 Note: This repository is focused on training STT-networks.
-You can find a short and experimental inference example [here](extras/exporting/testing_pb.py),
-but please solve any problems you have with it yourself.
+You can find a short and experimental inference example [here](extras/exporting/testing_tflite.py),
+but please try to solve any problems that occur while using the models outside of this repository yourself.
 
 Requirements are:
 
@@ -115,21 +115,28 @@ Please check this yourself for the models you want to use.
 
 **German**:
 
-Coming soon ...
+- Quartznet15x5, CV only (WER: 7.7%): [Link](https://www.mediafire.com/folder/rrse5ydtgdpvs/cv-wer0077)
+- Quartznet15x5, D37CV (WER: 7.2%): [Link](https://www.mediafire.com/folder/at87olk5x6j01/d37cv-wer0072)
+- Scorer: [TCV](https://www.mediafire.com/file/xb2dq2roh8ckawf/kenlm_de_tcv.scorer/file),
+  [D37CV](https://www.mediafire.com/file/pzj8prgv2h0c8ue/kenlm_de_all.scorer/file)
 
 **English**:
 
-- Quartznet5x5 (WER: 4.5%): [Link](https://www.mediafire.com/file/tooxkchx6mmp13k/qnet5.zip/file)
-- Quartznet15x5 (WER: 3.7%): [Link](https://www.mediafire.com/file/8izmtnpjlwdcfye/qnet15.zip/file)
+- Quartznet5x5 (WER: 4.5%): [Link](https://www.mediafire.com/folder/3c0a353nlppkv/qnet5)
+- Quartznet15x5 (WER: 3.7%): [Link](https://www.mediafire.com/folder/eb340s2ab4sv0/qnet15)
 - Scorer: [Link](https://github.com/mozilla/DeepSpeech/releases/tag/v0.9.3) (to DeepSpeech)
 
 **Spanish**:
 
-Coming soon ...
+- Quartznet15x5, CV only (WER: 10.5%): [Link](https://www.mediafire.com/folder/1peahr4b17t8i/cv-wer0105)
+- Quartznet15x5, D8CV (WER: 10.0%): [Link](https://www.mediafire.com/folder/2x2kdq3wlbg0h/d8cv-wer0100)
+- Scorer: [Link](https://www.mediafire.com/file/h38hmax7wnkxqfd/kenlm_es_n12.scorer/file)
 
 **French**:
 
-Coming soon ...
+- Quartznet15x5, CV only (WER: 12.1%): [Link](https://www.mediafire.com/folder/bee6yoirkcoui/cv-wer0121)
+- Quartznet15x5, D7CV (WER: 11.7%): [Link](https://www.mediafire.com/folder/wwudrwn56iimc/d7cv-wer0117)
+- Scorer: [Link](https://www.mediafire.com/file/pcj322gp5ddpfhd/kenlm_fr_n12.scorer/file)
 
 **Mozilla's DeepSpeech**:
 
@@ -171,6 +178,46 @@ See [readme](tests/README.md) in `tests` directory for testing instructions.
 | EN       | Quartznet15x5 | Converted model from Nvidia-Nemo, using LS-dev-clean as test dataset                                            | Loss: 5.8044 <br> CER greedy: 0.0160 <br> CER with lm: 0.0130 <br> WER greedy: 0.0515 <br> WER with lm: 0.0355 |
 | EN       | Quartznet15x5 | Pretrained model from Nvidia-Nemo, four extra epochs on LibriSpeech to reduce the different spectrogram problem | Loss: 5.3074 <br> CER greedy: 0.0141 <br> CER with lm: 0.0128 <br> WER greedy: 0.0456 <br> WER with lm: 0.0374 |
 | EN       | Quartznet15x5 | above, using LS-dev-clean as test dataset (for better comparison with results from Nemo)                        | Loss: 5.1035 <br> CER greedy: 0.0132 <br> CER with lm: 0.0108 <br> WER greedy: 0.0435 <br> WER with lm: 0.0308 |
+
+Next trainings were all done with above pretrained _Quartznet15x5_ network.
+
+| Language | Datasets          | Additional Infos                                                                                                | Results                                                                                                                                      |
+| -------- | ----------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| DE       | Tuda              | Learning rate 0.0001; Training time on 2x1080Ti was about 16h                                                   | Loss: 61.3615 <br> CER greedy: 0.1481 <br> CER with lm: 0.0914 <br> WER greedy: 0.5502 <br> WER with lm: 0.2381                              |
+| DE       | Tuda              | Learning rate 0.001                                                                                             | Loss: 59.3143 <br> CER greedy: 0.1329 <br> CER with lm: 0.0917 <br> WER greedy: 0.4956 <br> WER with lm: 0.2448                              |
+| DE       | CommonVoice       | Training time on 2x1080Ti was about 70h; Reusing scorer from DeepSpeech-Polyglot trainings                      | Loss: 11.6188 <br> CER greedy: 0.0528 <br> CER with lm: 0.0319 <br> WER greedy: 0.1853 <br> WER with lm: 0.0774                              |
+| DE       | CommonVoice       | Above network; tested on Tuda dataset                                                                           | Loss: 25.5442 <br> CER greedy: 0.0473 <br> CER with lm: 0.0340 <br> WER greedy: 0.1865 <br> WER with lm: 0.1199                              |
+| DE       | MLS               | Learning rate 0.0001; Test on CommonVoice                                                                       | Loss: 38.5387 <br> CER greedy: 0.1967 <br> CER with lm: 0.1616 <br> WER greedy: 0.5894 <br> WER with lm: 0.2584                              |
+| DE       | MLS + CommonVoice | Above network, continuing training with CommonVoice; Learning rate 0.001; Test on CommonVoice                   | Loss: 12.3243 <br> CER greedy: 0.0574 <br> CER with lm: 0.0314 <br> WER greedy: 0.2122 <br> WER with lm: 0.0788                              |
+| DE       | D37               | Continued training from CV-checkpoint with 0.077 WER; Learning rate 0.001; Test on CommonVoice                  | Loss: 10.4031 <br> CER greedy: 0.0491 <br> CER with lm: 0.0369 <br> WER greedy: 0.1710 <br> WER with lm: 0.0824                              |
+| DE       | D37               | Above network; Test on Tuda                                                                                     | Loss: 16.6407 <br> CER greedy: 0.0355 <br> CER with lm: 0.0309 <br> WER greedy: 0.1530 <br> WER with lm: 0.1113                              |
+| DE       | D37 + CommonVoice | Fine-tuned above network on CommonVoice again; Learning rate 0.001; Test on CommonVoice                         | Loss: 9.9733 <br> CER greedy: 0.0456 <br> CER with lm: 0.0323 <br> WER greedy: 0.1601 <br> WER with lm: 0.0760                               |
+| DE       | D37 + CommonVoice | Above network; Scorer build with all new training transcriptions; Beam size 1024; Test on CommonVoice           | CER with lm: 0.0279 <br> WER with lm: 0.0718                                                                                                 |
+| DE       | D37 + CommonVoice | Like above; Test on Tuda                                                                                        | Loss: 17.3551 <br> CER greedy: 0.0346 <br> CER with lm: 0.0262 <br> WER greedy: 0.1432 <br> WER with lm: 0.1070                              |
+| -------- | ----------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| ES       | CommonVoice       | Frozen with 4 epochs, then full training                                                                        | Eval-Loss: 29.0722 <br> Test-Loss: 31.2095 <br> CER greedy: 0.1568 <br> CER with lm: 0.1461 <br> WER greedy: 0.5289 <br> WER with lm: 0.3446 |
+| ES       | CommonVoice       | Additional Dropout layers after each block and end convolutions; Continuing above frozen checkpoint             | Eval-Loss: 30.5518 <br> Test-Loss: 32.7240 <br> CER greedy: 0.1643 <br> CER with lm: 0.1519 <br> WER greedy: 0.5523 <br> WER with lm: 0.3538 |
+| FR       | CommonVoice       | Frozen with 4 epochs, then full training                                                                        | Eval-Loss: 26.9454 <br> Test-Loss: 30.6238 <br> CER greedy: 0.1585 <br> CER with lm: 0.1821 <br> WER greedy: 0.4570 <br> WER with lm: 0.4220 |
+| -------- | ----------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| ES       | CommonVoice       | Updated augmentations; Continuing above frozen checkpoint                                                       | Eval-Loss: 28.0187                                                                                                                           |
+| ES       | CommonVoice       | Like above, but lower augmentation strength                                                                     | Eval-Loss: 26.5313                                                                                                                           |
+| ES       | CommonVoice       | Like above, but higher augmentation strength                                                                    | Eval-Loss: 34.6475                                                                                                                           |
+| ES       | CommonVoice       | Only spectrogram cut/mask augmentations                                                                         | Eval-Loss: 27.2635                                                                                                                           |
+| ES       | CommonVoice       | Random speed and pitch augmentation, only spectrogram cutout                                                    | Eval-Loss: 25.9359                                                                                                                           |
+| -------- | ----------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| ES       | CommonVoice       | Improved transfer-learning with alphabet extension                                                              | Eval-Loss: 13.0415 <br> Test-Loss: 14.8321 <br> CER greedy: 0.0742 <br> CER with lm: 0.0579 <br> WER greedy: 0.2568 <br> WER with lm: 0.1410 |
+| ES       | CommonVoice       | Like above, with esrp-delta=0.1 and lr=0.002; Training for 29 epochs                                            | Eval-Loss: 10.3032 <br> Test-Loss: 12.1623 <br> CER greedy: 0.0533 <br> CER with lm: 0.0460 <br> WER greedy: 0.1713 <br> WER with lm: 0.1149 |
+| ES       | CommonVoice       | Above model; Extended scorer with Europarl+News dataset                                                         | CER with lm: 0.0439 <br> WER with lm: 0.1074                                                                                                 |
+| ES       | CommonVoice       | Like above; Beam size 1024 instead of 256                                                                       | CER with lm: 0.0422 <br> WER with lm: 0.1053                                                                                                 |
+| ES       | D8                | Continued training from above CV-checkpoint; Learning rate reduced to 0.0002; Test on CommonVoice               | Eval-Loss: 9.3886 <br> Test-Loss: 11.1205 <br> CER greedy: 0.0529 <br> CER with lm: 0.0456 <br> WER greedy: 0.1690 <br> WER with lm: 0.1075  |
+| ES       | D8 + CommonVoice  | Fine-tuned above network on CommonVoice again; Learning rate 0.0002; Test on CommonVoice                        | Eval-Loss: 9.6201 <br> Test-Loss: 11.3245 <br> CER greedy: 0.0507 <br> CER with lm: 0.0421 <br> WER greedy: 0.1632 <br> WER with lm: 0.1025  |
+| ES       | D8 + CommonVoice  | Like above; Beam size 1024 instead of 256                                                                       | CER with lm: 0.0404 <br> WER with lm: 0.1003                                                                                                 |
+| -------- | ----------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR       | CommonVoice       | Similar to Spanish CV training above; Training for 26 epochs                                                    | Eval-Loss: 10.4081 <br> Test-Loss: 13.6226 <br> CER greedy: 0.0642 <br> CER with lm: 0.0544 <br> WER greedy: 0.1907 <br> WER with lm: 0.1248 |
+| FR       | CommonVoice       | Like above; Beam size 1024 instead of 256                                                                       | CER with lm: 0.0511 <br> WER with lm: 0.1209                                                                                                 |
+| FR       | D7                | Continued training from above CV-checkpoint                                                                     | Eval-Loss: 9.8695 <br> Test-Loss: 12.7798 <br> CER greedy: 0.0604 <br> CER with lm: 0.0528 <br> WER greedy: 0.1790 <br> WER with lm: 0.1208  |
+| FR       | D7 + CommonVoice  | Fine-tuned above network on CommonVoice again                                                                   | Eval-Loss: 9.8874 <br> Test-Loss: 12.9053 <br> CER greedy: 0.0613 <br> CER with lm: 0.0536 <br> WER greedy: 0.1811 <br> WER with lm: 0.1208  |
+| FR       | D7 + CommonVoice  | Like above; Beam size 1024 instead of 256                                                                       | CER with lm: 0.0501 <br> WER with lm: 0.1167                                                                                                 |
 
 <br/>
 

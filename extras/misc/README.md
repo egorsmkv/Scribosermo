@@ -65,7 +65,7 @@ Run script: \
 (For performance tests, restart the pi every time, to prevent caching speedups)
 
 ```bash
-sudo podman run --privileged --rm --network host -it \
+podman run --privileged --rm --network host -it \
   --volume "$(pwd)"/Scribosermo/extras/exporting/:/Scribosermo/extras/exporting/:ro \
   --volume "$(pwd)"/Scribosermo/data/:/Scribosermo/data/:ro \
   --volume "$(pwd)"/checkpoints/:/checkpoints/:ro \

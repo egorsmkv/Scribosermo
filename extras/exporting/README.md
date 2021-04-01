@@ -7,6 +7,8 @@ Notes:
 - Using fixed normalization (required for streaming) slightly reduces WER from 3.7% to 4.4%
 - Enabling tflite optimization reduces performance too
 - Models containing a LSTM layer don't work in quantized tflite format (might be fixed after a tensorflow update)
+- For production use, the tflite runtime is recommended for single-board computers, as well as for desktop computers.
+  Installation and initialization is much faster, while the speed difference on desktop computers is only minimal.
 
 Edit the files to your needs:
 
