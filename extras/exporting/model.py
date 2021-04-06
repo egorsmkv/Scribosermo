@@ -304,7 +304,7 @@ class MyModel(Model):  # pylint: disable=abstract-method
     # with a variable sequence length, instead of using the one of the first input.
     @tf.function(input_signature=[tf.TensorSpec([None, None], tf.float32)])
     def call(self, x):  # pylint: disable=arguments-differ
-        """Call with input shape: [1, len_signal], output shape: [len_steps, 1, n_alphabet]"""
+        """Call with input shape: [1, len_signal], output shape: [1, len_steps, n_alphabet]"""
 
         x = self.model(x)
         return x
