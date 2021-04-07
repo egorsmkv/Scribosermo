@@ -233,6 +233,17 @@ def main():
         train_mode=False,
     )
 
+    # dataset_test = mirrored_strategy.experimental_distribute_dataset(dataset_test)
+
+    # # Disable AutoShard
+    # options = tf.data.Options()
+    # options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.OFF
+    # dataset_test = dataset_test.with_options(options)
+
+    # options = tf.data.Options()
+    # options.experimental_distribute.auto_shard_policy = tf.data.experimental.AutoShardPolicy.DATA
+    # dataset_test = dataset_test.with_options(options)
+
     # Build model and print network summary
     with mirrored_strategy.scope():
         model = tf.keras.models.load_model(checkpoint_dir)
