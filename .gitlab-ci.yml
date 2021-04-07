@@ -39,6 +39,12 @@ testing_image:
     # Push images only from master branch to reduce space usage
     - if [[ "${CI_COMMIT_REF_SLUG}" == "master" ]]; then buildah push ${FULL_IMAGE_NAME}; fi
   only:
+    refs:
+      # Run only for important branches or if the branch name contains the 'containerbuild' keyword,
+      # else every new branch would start to build this container
+      - master
+      - develop
+      - /containerbuild/
     changes:
       - tests/Containerfile
       - .gitlab-ci.yml
