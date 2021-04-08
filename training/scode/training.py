@@ -398,7 +398,13 @@ def load_model():
     # Build the network
     print("Creating new {} model ...".format(network_type))
     with strategy.scope():
-        if network_type == "deepspeech1":
+        if network_type == "contextnetsimple":
+            new_model = nets.contextnetsimple.MyModel(
+                c_input,
+                c_output,
+                alpha=config["network"]["alpha"],
+            )
+        elif network_type == "deepspeech1":
             new_model = nets.deepspeech1.MyModel(c_input, c_output)
         elif network_type == "deepspeech2":
             new_model = nets.deepspeech2.MyModel(c_input, c_output)
