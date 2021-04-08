@@ -73,7 +73,7 @@ def read_and_validate(cfiles):
             try:
                 audio_binary = tf.io.read_file(fpath)
                 _ = tf.audio.decode_wav(audio_binary)
-            except tf.python.framework.errors_impl.InvalidArgumentError:
+            except tf.errors.InvalidArgumentError:
                 print("ERROR: Couldn't read file: {}".format(fpath))
 
     return csvs
