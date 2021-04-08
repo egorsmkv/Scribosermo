@@ -10,9 +10,11 @@ Go to `config/`, edit the `train_config.template.yaml` file and save as `train_c
 Run training or tests:
 
 ```bash
+# By default all gpus are used automatically
 python3 /Scribosermo/training/run_train.py
 
 # Besides the normal network test, there are also some debugging tests you can uncomment
+# Testing always uses a sinlge gpu only
 python3 /Scribosermo/training/run_tests.py
 ```
 

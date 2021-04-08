@@ -136,7 +136,7 @@ def distributed_eval_step(dist_inputs):
 # ==================================================================================================
 
 
-def log_greedy_text(samples):
+def log_greedy_text(samples, trainmode=True):
     """Run a prediction and log the predicted text"""
     global idx2char
 
@@ -145,7 +145,10 @@ def log_greedy_text(samples):
     logit_lengths = logit_lengths / model.get_time_reduction_factor()
     logit_lengths = tf.cast(tf.math.ceil(logit_lengths), tf.int32)
 
-    with tf.device("/CPU:0"):
+    if trainmode:
+        # Using model.predict() instead didn't work here
+        prediction = model(features, training=False)
+    else:
         prediction = model.predict(features)
 
     # Switch batch_size and time_steps before decoding
@@ -336,6 +339,15 @@ def build_pipelines():
         train_mode=False,
     )
 
+    # Solve "Found an unshardable source dataset" warning, run before distribution
+    options = tf.data.Options()
+    options.experimental_distribute.auto_shard_policy = (
+        tf.data.experimental.AutoShardPolicy.DATA
+    )
+    dataset_train = dataset_train.with_options(options)
+    dataset_eval = dataset_eval.with_options(options)
+
+    # Distribute datasets
     dataset_train = strategy.experimental_distribute_dataset(dataset_train)
     dataset_eval = strategy.experimental_distribute_dataset(dataset_eval)
 

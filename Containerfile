@@ -1,4 +1,4 @@
-FROM nvcr.io/nvidia/tensorflow:20.12-tf2-py3
+FROM nvcr.io/nvidia/tensorflow:21.03-tf2-py3
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV LANG C.UTF-8
@@ -38,9 +38,9 @@ RUN pip install --no-cache-dir --upgrade pydub librosa
 
 # Pre-install some libraries for faster installation time of training package
 RUN pip3 install --no-cache-dir pandas
-RUN pip3 install --no-cache-dir "tensorflow<2.4,>=2.3"
-RUN pip3 install --no-cache-dir "tensorflow-addons<0.12"
-RUN pip3 install --no-cache-dir "tensorflow-io<0.17"
+RUN pip3 install --no-cache-dir "tensorflow<2.5,>=2.4"
+RUN pip3 install --no-cache-dir "tensorflow-addons<0.13"
+RUN pip3 install --no-cache-dir "tensorflow-io<0.18"
 
 # Install audiomate, with some fixes
 RUN apt-get update && apt-get install -y sox libsox-fmt-mp3
