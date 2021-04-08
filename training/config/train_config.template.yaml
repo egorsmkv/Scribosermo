@@ -24,7 +24,7 @@ scorer:
   alphabet: "/Scribosermo/data/{LANGUAGE}/alphabet.txt"
   alpha: 0.931289039105002
   beta: 1.1834137581510284
-  beam_size: 256
+  beam_size: 1024
 
 # Depends on your gpu memory. If using multiple gpus, the value will be automatically multiplied.
 # In most cases a higher value is better, but if it's too high, you will get an Out-Of-Memory error.
@@ -83,7 +83,7 @@ log_prediction_steps: 25
 
 # Profile given training steps in each epoch. Use to find performance bottlenecks.
 # Viewable in tensorboard under "profile" tab.
-profile_steps: [35, 125]
+profile_steps: [125]
 
 # Print files with worst predictions. Sort either by "loss" or "greedy_cer". Usable for debugging.
 log_worst_test_predictions: 3
