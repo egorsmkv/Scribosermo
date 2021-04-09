@@ -321,10 +321,8 @@ def create_pipeline(csv_path: str, batch_size: int, config: dict, mode: str):
     df = df[["filepath", "text"]]
     ds = tf.data.Dataset.from_tensor_slices(dict(df))
 
-    if mode in ["eval", "test"]:
-        train_mode = False
-    else:
-        train_mode = True
+    # Apply augmentations only in training
+    train_mode = bool(mode in ["eval", "test"])
 
     la_func = lambda x: load_audio(x, config, train_mode)
     ds = ds.map(map_func=la_func, num_parallel_calls=AUTOTUNE)
@@ -344,12 +342,9 @@ def create_pipeline(csv_path: str, batch_size: int, config: dict, mode: str):
     ds = ds.map(text_to_ids, num_parallel_calls=AUTOTUNE)
     ds = ds.map(post_process, num_parallel_calls=AUTOTUNE)
 
-    if mode in ["train", "eval"]:
-        # LSTM networks seem to have problems with half filled batches
-        drop_remainder = True
-    else:
-        # Don't drop test samples
-        drop_remainder = False
+    # LSTM networks seem to have problems with half filled batches
+    # Drop them in training and evaluation, but keep them while testing
+    drop_remainder = bool(mode in ["train", "eval"])
 
     if batch_size == 1:
         # No need for padding here
