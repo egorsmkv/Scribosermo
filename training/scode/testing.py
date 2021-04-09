@@ -228,7 +228,7 @@ def main():
         csv_path=config["data_paths"]["test"],
         batch_size=config["batch_sizes"]["test"],
         config=exported_config,
-        train_mode=False,
+        mode="test",
     )
 
     model = tf.keras.models.load_model(checkpoint_dir, compile=False)

@@ -330,13 +330,13 @@ def build_pipelines():
         csv_path=config["data_paths"]["train"],
         batch_size=global_train_batch_size,
         config=config,
-        train_mode=True,
+        mode="train",
     )
     dataset_eval = pipeline.create_pipeline(
         csv_path=config["data_paths"]["eval"],
         batch_size=global_eval_batch_size,
         config=config,
-        train_mode=False,
+        mode="eval",
     )
 
     # Solve "Found an unshardable source dataset" warning, run before distribution
