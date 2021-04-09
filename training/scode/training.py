@@ -423,6 +423,14 @@ def load_model():
                 blocks=config["network"]["blocks"],
                 module_repeat=config["network"]["module_repeat"],
             )
+        elif network_type == "simpleconformer":
+            new_model = nets.simpleconformer.MyModel(
+                c_input,
+                c_output,
+                nlayers=config["network"]["nlayers"],
+                dimension=config["network"]["dimension"],
+                att_heads=config["network"]["attention_heads"],
+            )
 
     # Copy weights. Compared to loading the model directly, this has the benefit that parts of the
     # model code can be changed as long the layers are kept.
