@@ -1,5 +1,4 @@
 import tensorflow as tf
-from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
 
 # ==================================================================================================
@@ -26,10 +25,9 @@ class ConvModule(tfl.Layer):
 
     # ==============================================================================================
 
-    @tf.function()
-    def call(self, x):  # pylint: disable=arguments-differ
-        x = self.sconv1d(x)
-        x = self.bnorm(x)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
+        x = self.sconv1d(x, training=training)
+        x = self.bnorm(x, training=training)
         x = self.act(x)
         return x
 
@@ -47,15 +45,17 @@ class SqueezeExiteModule(tfl.Layer):
 
     # ==============================================================================================
 
-    @tf.function()
-    def call(self, x):  # pylint: disable=arguments-differ
-        a = self.conv(x)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
+        a = self.conv(x, training=training)
+
         b = tfl.GlobalAveragePooling1D()(a)
-        b = self.fc1(b)
+        b = self.fc1(b, training=training)
         b = tf.keras.activations.swish(b)
-        b = self.fc2(b)
+
+        b = self.fc2(b, training=training)
         b = tf.keras.activations.swish(b)
         b = tf.keras.activations.sigmoid(b)
+
         # Use broadcasting in multiplication instead of tiling beforehand
         b = tf.expand_dims(b, axis=1)
         x = tf.multiply(a, b)
@@ -89,17 +89,16 @@ class ConvBlock(tfl.Layer):
 
     # ==============================================================================================
 
-    @tf.function()
-    def call(self, x):  # pylint: disable=arguments-differ
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
         b = tf.identity(x)
 
         for conv in self.convs_main:
-            x = conv(x)
+            x = conv(x, training=training)
 
-        x = self.se(x)
+        x = self.se(x, training=training)
 
         if self.residual:
-            b = self.conv_skip(b)
+            b = self.conv_skip(b, training=training)
             x = tf.add(x, b)
 
         x = tf.keras.activations.swish(x)
@@ -109,30 +108,18 @@ class ConvBlock(tfl.Layer):
 # ==================================================================================================
 
 
-class Encoder(Model):  # pylint: disable=abstract-method
+class Encoder(tf.keras.Model):  # pylint: disable=abstract-method
     def __init__(self, alpha: float):
         super().__init__()
 
         self.feature_time_reduction_factor = 4
-        self.model = self.make_model(alpha)
-
-    # ==============================================================================================
-
-    def get_time_reduction_factor(self):
-        return self.feature_time_reduction_factor
-
-    # ==============================================================================================
-
-    @staticmethod
-    def make_model(alpha):
-
-        model = tf.keras.Sequential(name="Encoder")
+        self.conv_blocks = []
 
         # C0
         cb = ConvBlock(
             nlayers=1, filters=int(256 * alpha), kernel_size=5, stride=1, residual=False
         )
-        model.add(cb)
+        self.conv_blocks.append(cb)
 
         # C1-21
         for i in range(1, 22):
@@ -154,32 +141,32 @@ class Encoder(Model):  # pylint: disable=abstract-method
                 stride=stride,
                 residual=True,
             )
-            model.add(cb)
+            self.conv_blocks.append(cb)
 
         # C22
         cb = ConvBlock(
             nlayers=1, filters=int(640 * alpha), kernel_size=5, stride=1, residual=False
         )
-        model.add(cb)
-
-        return model
+        self.conv_blocks.append(cb)
 
     # ==============================================================================================
 
-    def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
-        self.model.summary(line_length=line_length, **kwargs)
+    def get_time_reduction_factor(self):
+        return self.feature_time_reduction_factor
 
     # ==============================================================================================
 
-    def call(self, x):  # pylint: disable=arguments-differ
-        x = self.model(x)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
+
+        for cb in self.conv_blocks:
+            x = cb(x, training=training)
         return x
 
 
 # ==================================================================================================
 
 
-class MyModel(Model):  # pylint: disable=abstract-method
+class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
     def __init__(self, c_input: int, c_output: int, alpha: float):
         super().__init__()
 
@@ -214,13 +201,11 @@ class MyModel(Model):  # pylint: disable=abstract-method
         x = tf.nn.log_softmax(x)
         output_tensor = tf.identity(x, name="output")
 
-        model = Model(input_tensor, output_tensor, name="ContextNetSimple")
+        model = tf.keras.Model(input_tensor, output_tensor, name="ContextNetSimple")
         return model
 
     # ==============================================================================================
 
-    # Input signature is required to export this method into ".pb" format and use it while testing
-    @tf.function(input_signature=[])
     def get_time_reduction_factor(self):
         """Some models reduce the time dimension of the features, for example with striding.
         When the inputs are padded for better batching, it's complicated to get the original length
@@ -230,19 +215,17 @@ class MyModel(Model):  # pylint: disable=abstract-method
     # ==============================================================================================
 
     def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
+        print("")
         self.encoder.summary(line_length=line_length, **kwargs)
         print("")
         self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
 
-    # This input signature is required that we can export and load the model in ".pb" format
-    # with a variable sequence length, instead of using the one of the first input.
-    # The channel value could be fixed, but I didn't find a way to set it to the channels variable.
-    @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
-    def call(self, x):  # pylint: disable=arguments-differ
+    @tf.function(experimental_relax_shapes=True)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
         """Call with input shape: [batch_size, steps_a, n_input].
         Outputs a tensor of shape: [batch_size, steps_b, n_output]"""
 
-        x = self.model(x)
+        x = self.model(x, training=training)
         return x

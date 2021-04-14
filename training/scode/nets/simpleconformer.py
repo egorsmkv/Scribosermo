@@ -1,5 +1,4 @@
 import tensorflow as tf
-from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
 
 # ==================================================================================================
@@ -19,22 +18,23 @@ class ConvModule(tfl.Layer):
 
     # ==============================================================================================
 
-    @tf.function()
-    def call(self, x):  # pylint: disable=arguments-differ
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
         b = tf.identity(x)
 
-        a = self.lnorm(x)
-        a = self.convp1(a)
+        a = self.lnorm(x, training=training)
+        a = self.convp1(a, training=training)
         a = tf.keras.activations.gelu(a)
 
         a = tf.expand_dims(a, axis=1)
-        a = self.convd1(a)
+        a = self.convd1(a, training=training)
         a = tf.squeeze(a, axis=1)
 
-        a = self.bnorm(a)
+        a = self.bnorm(a, training=training)
         a = tf.keras.activations.swish(a)
-        a = self.convp2(a)
-        a = tf.nn.dropout(a, rate=0.1)
+        a = self.convp2(a, training=training)
+
+        if training:
+            a = tf.nn.dropout(a, rate=0.1)
 
         x = tf.add(a, b)
         return x
@@ -52,13 +52,14 @@ class AttentionModule(tfl.Layer):
 
     # ==============================================================================================
 
-    # @tf.function()
-    def call(self, x):  # pylint: disable=arguments-differ
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
         b = tf.identity(x)
 
-        a = self.lnorm(x)
-        a = self.mharpe(a, a, return_attention_scores=False)
-        a = tf.nn.dropout(a, rate=0.1)
+        a = self.lnorm(x, training=training)
+        a = self.mharpe(a, a, return_attention_scores=False, training=training)
+
+        if training:
+            a = tf.nn.dropout(a, rate=0.1)
 
         x = tf.add(a, b)
         return x
@@ -77,16 +78,19 @@ class FeedForwardModule(tfl.Layer):
 
     # ==============================================================================================
 
-    # @tf.function()
-    def call(self, x):  # pylint: disable=arguments-differ
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
         b = tf.identity(x)
 
-        a = self.lnorm(x)
-        a = self.dense1(x)
+        a = self.lnorm(x, training=training)
+        a = self.dense1(x, training=training)
         a = tf.keras.activations.swish(a)
-        a = tf.nn.dropout(a, rate=0.1)
-        a = self.dense2(x)
-        a = tf.nn.dropout(a, rate=0.1)
+
+        if training:
+            a = tf.nn.dropout(a, rate=0.1)
+
+        a = self.dense2(x, training=training)
+        if training:
+            a = tf.nn.dropout(a, rate=0.1)
 
         x = tf.add(a, b)
         return x
@@ -107,39 +111,56 @@ class ConformerBlock(tfl.Layer):
 
     # ==============================================================================================
 
-    # @tf.function()
-    def call(self, x):  # pylint: disable=arguments-differ
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
 
         b = tf.identity(x)
-        a = self.ff1(x)
+        a = self.ff1(x, training=training)
         x = tf.add(0.5 * a, b)
 
         b = tf.identity(x)
-        a = self.mha(x)
+        a = self.mha(x, training=training)
         x = tf.add(a, b)
 
         b = tf.identity(x)
-        a = self.conv(x)
+        a = self.conv(x, training=training)
         x = tf.add(a, b)
 
         b = tf.identity(x)
-        a = self.ff2(x)
+        a = self.ff2(x, training=training)
         x = tf.add(0.5 * a, b)
 
-        x = self.lnorm(x)
+        x = self.lnorm(x, training=training)
         return x
 
 
 # ==================================================================================================
 
 
-class Encoder(Model):  # pylint: disable=abstract-method
+class Encoder(tf.keras.Model):  # pylint: disable=abstract-method
     def __init__(self, nlayers: int, dimension: int, att_heads: int):
         super().__init__()
 
         self.kernel_size = 32
-        self.feature_time_reduction_factor = 2
-        self.model = self.make_model(nlayers, dimension, att_heads)
+        self.feature_time_reduction_factor = 4
+
+        # Subsampling layers
+        self.conv1 = tfl.SeparableConv1D(
+            filters=dimension, kernel_size=self.kernel_size, strides=2, padding="same"
+        )
+        self.conv2 = tfl.SeparableConv1D(
+            filters=dimension, kernel_size=self.kernel_size, strides=2, padding="same"
+        )
+
+        # Linear
+        self.lin = tfl.TimeDistributed(tfl.Dense(dimension))
+
+        # Conformer Blocks
+        self.conf_blocks = []
+        for _ in range(nlayers):
+            cb = ConformerBlock(
+                filters=dimension, kernel_size=self.kernel_size, att_heads=att_heads
+            )
+            self.conf_blocks.append(cb)
 
     # ==============================================================================================
 
@@ -148,49 +169,24 @@ class Encoder(Model):  # pylint: disable=abstract-method
 
     # ==============================================================================================
 
-    def make_model(self, nlayers: int, dimension: int, att_heads: int):
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
+        x = self.conv1(x, training=training)
+        x = self.conv2(x, training=training)
+        x = self.lin(x, training=training)
 
-        model = tf.keras.Sequential(name="Encoder")
+        if training:
+            x = tf.nn.dropout(x, rate=0.1)
 
-        # Convolution subsampling
-        conv = tfl.Conv1D(
-            filters=dimension, kernel_size=self.kernel_size, strides=2, padding="same"
-        )
-        model.add(conv)
+        for conf_block in self.conf_blocks:
+            x = conf_block(x, training=training)
 
-        # Linear
-        dn = tfl.TimeDistributed(tfl.Dense(dimension))
-        model.add(dn)
-
-        # Dropout
-        dp = tfl.Dropout(rate=0.1)
-        model.add(dp)
-
-        # Conformer Blocks
-        for _ in range(nlayers):
-            cb = ConformerBlock(
-                filters=dimension, kernel_size=self.kernel_size, att_heads=att_heads
-            )
-            model.add(cb)
-
-        return model
-
-    # ==============================================================================================
-
-    def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
-        self.model.summary(line_length=line_length, **kwargs)
-
-    # ==============================================================================================
-
-    def call(self, x):  # pylint: disable=arguments-differ
-        x = self.model(x)
         return x
 
 
 # ==================================================================================================
 
 
-class MyModel(Model):  # pylint: disable=abstract-method
+class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
     def __init__(
         self, c_input: int, c_output: int, nlayers: int, dimension: int, att_heads: int
     ):
@@ -227,13 +223,11 @@ class MyModel(Model):  # pylint: disable=abstract-method
         x = tf.nn.log_softmax(x)
         output_tensor = tf.identity(x, name="output")
 
-        model = Model(input_tensor, output_tensor, name="SimpleConformer")
+        model = tf.keras.Model(input_tensor, output_tensor, name="SimpleConformer")
         return model
 
     # ==============================================================================================
 
-    # Input signature is required to export this method into ".pb" format and use it while testing
-    @tf.function(input_signature=[])
     def get_time_reduction_factor(self):
         """Some models reduce the time dimension of the features, for example with striding.
         When the inputs are padded for better batching, it's complicated to get the original length
@@ -243,19 +237,17 @@ class MyModel(Model):  # pylint: disable=abstract-method
     # ==============================================================================================
 
     def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
+        print("")
         self.encoder.summary(line_length=line_length, **kwargs)
         print("")
         self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
 
-    # This input signature is required that we can export and load the model in ".pb" format
-    # with a variable sequence length, instead of using the one of the first input.
-    # The channel value could be fixed, but I didn't find a way to set it to the channels variable.
-    @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
-    def call(self, x):  # pylint: disable=arguments-differ
+    @tf.function(experimental_relax_shapes=True)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
         """Call with input shape: [batch_size, steps_a, n_input].
         Outputs a tensor of shape: [batch_size, steps_b, n_output]"""
 
-        x = self.model(x)
+        x = self.model(x, training=training)
         return x

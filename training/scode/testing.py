@@ -2,6 +2,7 @@ import json
 import os
 from typing import List
 
+import numpy as np
 import tensorflow as tf
 import tqdm
 from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
@@ -114,7 +115,7 @@ def get_texts(predictions, samples):
         samp = {
             "label": [samples["label"][i]],
             "label_length": [samples["label_length"][i]],
-            "feature_length": [samples["feature_length"][i]],
+            "feature_length": np.array([samples["feature_length"][i]]),
         }
         bpred = tf.expand_dims(pred, axis=0)
         loss = training.get_loss(bpred, samp)[0].numpy()
@@ -231,11 +232,9 @@ def main():
         mode="test",
     )
 
-    model = tf.keras.models.load_model(checkpoint_dir, compile=False)
-    feature_type = exported_config["audio_features"]["use_type"]
-    c_input = exported_config["audio_features"][feature_type]["num_features"]
-    model.build(input_shape=(None, None, c_input))
-    model.compile()
+    model = training.build_new_model(exported_config)
+    print("Loading weights ...")
+    model.load_weights(checkpoint_dir)
     model.summary()
 
     training.model = model
