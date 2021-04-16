@@ -116,9 +116,10 @@ Please check this yourself for the models you want to use.
 **German**:
 
 - Quartznet15x5, CV only (WER: 7.7%): [Link](https://www.mediafire.com/folder/rrse5ydtgdpvs/cv-wer0077)
-- Quartznet15x5, D37CV (WER: 7.2%): [Link](https://www.mediafire.com/folder/at87olk5x6j01/d37cv-wer0072)
+- Quartznet15x5, D37CV (WER: 6.7%): [Link](https://www.mediafire.com/folder/at87olk5x6j01/d37cv-wer0072)
 - Scorer: [TCV](https://www.mediafire.com/file/xb2dq2roh8ckawf/kenlm_de_tcv.scorer/file),
-  [D37CV](https://www.mediafire.com/file/pzj8prgv2h0c8ue/kenlm_de_all.scorer/file)
+  [D37CV](https://www.mediafire.com/file/pzj8prgv2h0c8ue/kenlm_de_all.scorer/file),
+  [PocoLg](https://www.mediafire.com/file/b64k0uqv69ehe9p/de_pocolm_large.scorer/file)
 
 **English**:
 
@@ -231,6 +232,14 @@ Running some experiments with different language models:
 | DE       | D37 + CommonVoice | Like above; Test on Tuda                                                                                            | CER with lm: 0.0265 <br> WER with lm: 0.1037 |
 | DE       | D37 + CommonVoice | Use unpruned language model (1.5GB instead of 250MB); Rest similar to above; Test on CommonVoice                    | CER with lm: 0.0276 <br> WER with lm: 0.0673 |
 | DE       | D37 + CommonVoice | Like above; Test on Tuda                                                                                            | CER with lm: 0.0261 <br> WER with lm: 0.1026 |
+| DE       | D37 + CommonVoice | Use pruned language model with similar size to English model (850MB); Rest similar to above; Test on CommonVoice    | CER with lm: 0.0277 <br> WER with lm: 0.0672 |
+| DE       | D37 + CommonVoice | Like above; Test on Tuda                                                                                            | CER with lm: 0.0260 <br> WER with lm: 0.1024 |
+| DE       | D37 + CommonVoice | Checkpoint from D37+CV training with WER=0.0741; with large (850MB) scorer; Test on CommonVoice                     | CER with lm: 0.0299 <br> WER with lm: 0.0712 |
+| DE       | D37 + CommonVoice | Like above; Test on Tuda; Small and full scorers were behind above model with both testsets, too                    | CER with lm: 0.0280 <br> WER with lm: 0.1066 |
+|          |                   |                                                                                                                     |                                              |
+| ES       | D8 + CommonVoice  | Use PocoLM instead of KenLM (similar LM size); Checkpoint from D8+CV training with WER=0.1003; Test on CommonVoice  | CER with lm: 0.0407 <br> WER with lm: 0.1011 |
+| ES       | D8 + CommonVoice  | Like above; Large scorer (790MB)                                                                                    | CER with lm: 0.0402 <br> WER with lm: 0.1002 |
+| ES       | D8 + CommonVoice  | Like above; Full scorer (1.2GB)                                                                                     | CER with lm: 0.0403 <br> WER with lm: 0.1000 |
 
 <br/>
 
