@@ -225,6 +225,7 @@ def clean_sentence(sentence):
         cleaned_words.append(cleaned_word)
         bad_chars_sen.extend(bad_chars)
     sentence = " ".join(cleaned_words)
+    sentence = sentence.lower()
 
     # Remove duplicate whitespaces again, we may have added some with the above steps
     sentence = re.sub(multi_space_pattern, " ", sentence)

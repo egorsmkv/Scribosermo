@@ -20,7 +20,7 @@ audio_sample_rate: 16000
 
 # Improve predictions with n-gram language model, only used for testing and inference
 scorer:
-  path: "/data_prepared/texts/{LANGUAGE}/kenlm_{LANGUAGE}.scorer"
+  path: "/data_prepared/langmodel/{LANGUAGE}.scorer"
   alphabet: "/Scribosermo/data/{LANGUAGE}/alphabet.txt"
   alpha: 0.931289039105002
   beta: 1.1834137581510284

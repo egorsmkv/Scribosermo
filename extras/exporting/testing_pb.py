@@ -18,7 +18,7 @@ checkpoint_dir = "/checkpoints/en/qnetp15/exported/pb/"
 test_wav_path = "/Scribosermo/extras/exporting/data/test.wav"
 alphabet_path = "/Scribosermo/data/en/alphabet.json"
 ds_alphabet_path = "/Scribosermo/data/en/alphabet.txt"
-ds_scorer_path = "/data_prepared/texts/en/kenlm_en.scorer"
+ds_scorer_path = "/data_prepared/langmodel/en.scorer"
 beam_size = 1024
 
 with open(alphabet_path, "r", encoding="utf-8") as file:

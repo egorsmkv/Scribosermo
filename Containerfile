@@ -5,7 +5,22 @@ ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 WORKDIR /
 
+RUN apt-get update && apt-get upgrade -y
 RUN apt-get update && apt-get install -y libsndfile1
+
+# KenLM
+RUN apt-get update && apt-get install -y libboost-all-dev
+RUN git clone --depth 1  https://github.com/kpu/kenlm.git
+RUN mkdir -p kenlm/build \
+  && cd kenlm/build \
+  && cmake .. \
+  && make -j $(nproc)
+
+# PocoLM
+RUN apt-get update && apt-get install -y subversion
+RUN git clone --depth 1 https://github.com/danpovey/pocolm.git
+RUN cd pocolm/ \
+  && make -j $(nproc)
 
 # Use some tools from DeepSpeech project
 RUN git clone --depth 1 https://github.com/mozilla/DeepSpeech.git
@@ -14,15 +29,6 @@ RUN sed -i 's/git describe --long --tags/git describe --long --tags --always/g' 
 RUN apt-get update && apt-get install -y libmagic-dev
 RUN cd /DeepSpeech/native_client/ctcdecode && make NUM_PROCESSES=$(nproc) bindings
 RUN pip3 install --upgrade /DeepSpeech/native_client/ctcdecode/dist/*.whl
-# KenLM
-RUN apt-get update && apt-get install -y libboost-all-dev
-RUN cd /DeepSpeech/native_client/ && \
-  rm -rf kenlm && \
-  git clone --depth 1  https://github.com/kpu/kenlm && \
-  mkdir -p kenlm/build && \
-  cd kenlm/build && \
-  cmake .. && \
-  make -j $(nproc)
 
 # Get prebuilt scorer generator script
 RUN cd /DeepSpeech/data/lm/ \
