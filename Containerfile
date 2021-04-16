@@ -51,6 +51,9 @@ RUN sed -i 's/print "Resume is not applicable at this stage."/print("Resume is n
 # Training profiler
 RUN pip3 install --upgrade --no-cache-dir tensorboard-plugin-profile
 
+# Dependency to draw graph images
+RUN apt-get update && apt-get install -y graphviz
+
 # TfLite runtime
 RUN pip3 install --no-cache-dir --extra-index-url https://google-coral.github.io/py-repo/ tflite_runtime
 

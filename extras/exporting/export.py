@@ -1,8 +1,14 @@
+import argparse
 import os
 
 import tensorflow as tf
+from tensorflow.python.framework.ops import (
+    disable_eager_execution,
+    enable_eager_execution,
+)
 
 import model as exmodel
+from scode import training, utils
 
 # ==================================================================================================
 
@@ -17,9 +23,6 @@ metadata = {
     "use_fixed_norm": False,
     "use_volume_norm": False,
 }
-
-checkpoint_dir = "/checkpoints/en/qnetp15/"
-export_dir = os.path.join(checkpoint_dir, "exported/")
 
 # ==================================================================================================
 
@@ -41,20 +44,44 @@ def export_tflite(model, save_path, optimize):
 
 
 def main():
-    nn_model = tf.keras.models.load_model(checkpoint_dir)
-    model_pb = exmodel.MyModel(nn_model, metadata, specmode="pb")
-    model_tl = exmodel.MyModel(nn_model, metadata, specmode="tflite")
+    parser = argparse.ArgumentParser(description="Export model")
+    parser.add_argument("--checkpoint_dir", type=str, required=True)
+    parser.add_argument("--export_dir", type=str, required=True)
+    parser.add_argument("--mode", type=str, required=True)
+    args = parser.parse_args()
 
-    model_pb.build(input_shape=(None, None))
-    model_tl.build(input_shape=(None, None))
-    model_pb.summary()
+    if args.mode == "pb":
+        # Disabling eager execution solves a problem with AudioSpectrogram layer
+        disable_eager_execution()
+    elif args.mode == "tflite":
+        # Eager execution is required for tflite
+        enable_eager_execution()
+    else:
+        raise ValueError()
 
-    # Export as .pb model
-    tf.keras.models.save_model(model_pb, export_dir + "pb/", include_optimizer=False)
+    # Load exported model
+    nn_model = training.load_exported_model(args.checkpoint_dir)
 
-    # Export as .tflite model
-    export_tflite(model_tl, export_dir + "model_full.tflite", optimize=False)
-    export_tflite(model_tl, export_dir + "model_quantized.tflite", optimize=True)
+    if args.mode == "pb":
+        # Export as .pb model
+        model_pb = exmodel.MyModel(nn_model, metadata, specmode="pb")
+        model_pb.build(input_shape=(None, None))
+        model_pb.summary()
+
+        tf.keras.models.save_model(
+            model_pb, args.export_dir + "pb/", include_optimizer=False
+        )
+
+    elif args.mode == "tflite":
+        # Export as .tflite model
+        model_tl = exmodel.MyModel(nn_model, metadata, specmode="tflite")
+        model_tl.build(input_shape=(None, None))
+        model_tl.summary()
+
+        export_tflite(model_tl, args.export_dir + "model_full.tflite", optimize=False)
+        export_tflite(
+            model_tl, args.export_dir + "model_quantized.tflite", optimize=True
+        )
 
 
 # ==================================================================================================

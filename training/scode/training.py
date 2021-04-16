@@ -6,6 +6,9 @@ import time
 import tensorflow as tf
 import tensorflow_addons as tfa
 
+# Required for loading exported models with tf=2.3
+from tensorflow.python.framework.errors_impl import NotFoundError
+
 from . import nets, pipeline, utils
 
 # from tensorflow.keras.mixed_precision import experimental as mixed_precision
@@ -482,6 +485,27 @@ def copy_weights(exported_model, new_model) -> None:
 # ==================================================================================================
 
 
+def load_exported_model(exported_dir: str):
+    """Rebuild model and load weights, because exporting the full model and loading it again didn't
+    work for some models due to problems with the input-signature for @tf.function decorator"""
+
+    try:
+        print("Trying to load weights directly ...")
+        path = os.path.join(exported_dir, "config_export.json")
+        exported_config = utils.load_json_file(path)
+        exported_model = build_new_model(exported_config, print_log=False)
+        exported_model.load_weights(exported_dir)
+    except (OSError, NotFoundError):
+        # Load old or exported models where not only the weights were saved
+        print("Loading weights from exported model instead ...")
+        exported_model = tf.keras.models.load_model(exported_dir)
+
+    return exported_model
+
+
+# ==================================================================================================
+
+
 def main():
     global model, summary_writer, save_manager, optimizer, strategy
 
@@ -525,21 +549,7 @@ def main():
     # Optionally load exported weights
     if config["continue_pretrained"] or not config["empty_ckpt_dir"]:
         print("Copying model weights from existing checkpoint ...")
-
-        path = os.path.join(checkpoint_dir, "config_export.json")
-        exported_config = utils.load_json_file(path)
-
-        # Rebuild model and load weights, because exporting the full model and loading it again
-        # didn't work due to problems with defining the input-signature for @tf.function decorator
-        try:
-            print("Trying to load weights directly ...")
-            exported_model = build_new_model(exported_config, print_log=False)
-            exported_model.load_weights(checkpoint_dir)
-        except OSError:
-            # Load old or exported models where not only the weights were saved
-            print("Loading weights from exported model instead ...")
-            exported_model = tf.keras.models.load_model(checkpoint_dir)
-
+        exported_model = load_exported_model(checkpoint_dir)
         copy_weights(exported_model, model)
 
     # Select optimizer

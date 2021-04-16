@@ -28,11 +28,11 @@ class BaseModule(tfl.Layer):  # pylint: disable=abstract-method
 
     # ==============================================================================================
 
-    def call(self, x, training=False):  # pylint: disable=arguments-differ
+    def call(self, x):  # pylint: disable=arguments-differ
 
         x = self.pad1d(x)
-        x = self.sconv1d(x, training=training)
-        x = self.bnorm(x, training=training)
+        x = self.sconv1d(x)
+        x = self.bnorm(x)
 
         if self.has_relu:
             # Last base module in a block has the relu after the residual connection
@@ -195,5 +195,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         """Call with input shape: [batch_size, steps_a, n_input].
         Outputs a tensor of shape: [batch_size, steps_b, n_output]"""
 
-        x = self.model(x, training=training)
+        # Run model in eval mode, because the previous trainings have been run like this
+        # Enabling training flag would now result in a high loss if using pretrained models
+        x = self.model(x, training=False)
         return x
