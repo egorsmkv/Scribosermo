@@ -531,8 +531,15 @@ def main():
 
         # Rebuild model and load weights, because exporting the full model and loading it again
         # didn't work due to problems with defining the input-signature for @tf.function decorator
-        exported_model = build_new_model(exported_config, print_log=False)
-        exported_model.load_weights(checkpoint_dir)
+        try:
+            print("Trying to load weights directly ...")
+            exported_model = build_new_model(exported_config, print_log=False)
+            exported_model.load_weights(checkpoint_dir)
+        except OSError:
+            # Load old or exported models where not only the weights were saved
+            print("Loading weights from exported model instead ...")
+            exported_model = tf.keras.models.load_model(checkpoint_dir)
+
         copy_weights(exported_model, model)
 
     # Select optimizer
@@ -558,6 +565,10 @@ def main():
 
     # Print model summary
     model.summary()
+    img_path = os.path.join(config["checkpoint_dir"], "model.png")
+    tf.keras.utils.plot_model(
+        model.model, to_file=img_path, show_shapes=True, expand_nested=True
+    )
 
     # Optionally save model before doing any training updates
     if config["save_fresh_model"]:

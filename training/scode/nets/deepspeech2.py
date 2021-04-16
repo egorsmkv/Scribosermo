@@ -1,11 +1,10 @@
 import tensorflow as tf
-from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
 
 # ==================================================================================================
 
 
-class MyModel(Model):  # pylint: disable=abstract-method
+class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
     def __init__(self, c_input, c_output):
         super().__init__()
 
@@ -30,15 +29,15 @@ class MyModel(Model):  # pylint: disable=abstract-method
 
         # Paper did recommend 2D convolutions here, with frequency as first dimension,
         # but this was easier to implement for now
-        model.add(tfl.Conv1D(filters=512, kernel_size=5))
+        model.add(tfl.Conv1D(filters=512, kernel_size=5, padding="same"))
         model.add(tfl.BatchNormalization())
         model.add(tfl.ReLU(max_value=self.relu_clip))
 
-        model.add(tfl.Conv1D(filters=512, kernel_size=5))
+        model.add(tfl.Conv1D(filters=512, kernel_size=5, padding="same"))
         model.add(tfl.BatchNormalization())
         model.add(tfl.ReLU(max_value=self.relu_clip))
 
-        model.add(tfl.Conv1D(filters=512, kernel_size=5, strides=2))
+        model.add(tfl.Conv1D(filters=512, kernel_size=5, padding="same", strides=2))
         model.add(tfl.BatchNormalization())
         model.add(tfl.ReLU(max_value=self.relu_clip))
 
@@ -52,6 +51,7 @@ class MyModel(Model):  # pylint: disable=abstract-method
             )
             model.add(tfl.BatchNormalization())
             model.add(tfl.ReLU(max_value=self.relu_clip))
+
         model.add(
             tfl.Bidirectional(
                 tfl.LSTM(self.n_hidden, return_sequences=True, stateful=False)
@@ -70,8 +70,6 @@ class MyModel(Model):  # pylint: disable=abstract-method
 
     # ==============================================================================================
 
-    # Input signature is required to export this method into ".pb" format and use it while testing
-    @tf.function(input_signature=[])
     def get_time_reduction_factor(self):
         """Some models reduce the time dimension of the features, for example with striding.
         When the inputs are padded for better batching, it's complicated to get the original length
@@ -81,16 +79,15 @@ class MyModel(Model):  # pylint: disable=abstract-method
     # ==============================================================================================
 
     def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
+        print("")
         self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
 
-    # This input signature is required that we can export and load the model in ".pb" format
-    # with a variable sequence length, instead of using the one of the first input.
-    @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
-    def call(self, x):  # pylint: disable=arguments-differ
-        """Call with input shape: [batch_size, steps_a, n_input],
-        outputs tensor of shape: [batch_size, steps_b, n_output]"""
+    @tf.function(experimental_relax_shapes=True)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
+        """Call with input shape: [batch_size, steps_a, n_input].
+        Outputs a tensor of shape: [batch_size, steps_b, n_output]"""
 
-        x = self.model(x)
+        x = self.model(x, training=training)
         return x

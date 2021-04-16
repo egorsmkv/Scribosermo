@@ -1,13 +1,12 @@
 import math
 
 import tensorflow as tf
-from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
 
 # ==================================================================================================
 
 
-class BaseModule(Model):  # pylint: disable=abstract-method
+class BaseModule(tfl.Layer):  # pylint: disable=abstract-method
     def __init__(self, filters, kernel_size, has_relu=True):
         super().__init__()
 
@@ -24,26 +23,28 @@ class BaseModule(Model):  # pylint: disable=abstract-method
             use_bias=False,
         )
 
-        self.model = tf.keras.Sequential()
-        self.model.add(self.pad1d)
-        self.model.add(self.sconv1d)
-        self.model.add(tfl.BatchNormalization(momentum=0.9))
-
-        if has_relu:
-            # Last base module in a block has the relu after the residual connection
-            self.model.add(tfl.ReLU())
+        self.bnorm = tfl.BatchNormalization(momentum=0.9)
+        self.has_relu = has_relu
 
     # ==============================================================================================
 
-    def call(self, x):  # pylint: disable=arguments-differ
-        x = self.model(x)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
+
+        x = self.pad1d(x)
+        x = self.sconv1d(x, training=training)
+        x = self.bnorm(x, training=training)
+
+        if self.has_relu:
+            # Last base module in a block has the relu after the residual connection
+            x = tf.keras.activations.relu(x)
+
         return x
 
 
 # ==================================================================================================
 
 
-class BaseBlock(Model):  # pylint: disable=abstract-method
+class BaseBlock(tf.keras.Model):  # pylint: disable=abstract-method
     def __init__(self, filters, kernel_size, repeat):
         super().__init__()
 
@@ -66,7 +67,6 @@ class BaseBlock(Model):  # pylint: disable=abstract-method
 
     # ==============================================================================================
 
-    @tf.function()
     def call(self, x):  # pylint: disable=arguments-differ
         a = self.partial_block(x)
         b = self.convpt(x)
@@ -79,7 +79,7 @@ class BaseBlock(Model):  # pylint: disable=abstract-method
 # ==================================================================================================
 
 
-class MyModel(Model):  # pylint: disable=abstract-method
+class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
     """See Quartznet example config at:
     https://github.com/NVIDIA/OpenSeq2Seq/blob/master/example_configs/speech2text/"""
 
@@ -171,13 +171,11 @@ class MyModel(Model):  # pylint: disable=abstract-method
         x = tf.nn.log_softmax(x)
         output_tensor = tf.identity(x, name="output")
 
-        model = Model(input_tensor, output_tensor, name="Quartznet")
+        model = tf.keras.Model(input_tensor, output_tensor, name="Quartznet")
         return model
 
     # ==============================================================================================
 
-    # Input signature is required to export this method into ".pb" format and use it while testing
-    @tf.function(input_signature=[])
     def get_time_reduction_factor(self):
         """Some models reduce the time dimension of the features, for example with striding.
         When the inputs are padded for better batching, it's complicated to get the original length
@@ -187,18 +185,15 @@ class MyModel(Model):  # pylint: disable=abstract-method
     # ==============================================================================================
 
     def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
+        print("")
         self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
 
-    # This input signature is required that we can export and load the model in ".pb" format
-    # with a variable sequence length, instead of using the one of the first input.
-    # The channel value could be fixed, but I didn't find a way to set it to the channels variable.
-    @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
-    def call(self, x):  # pylint: disable=arguments-differ
-        """Call with input shape: [batch_size, steps_a, n_input]. Note that this is different to
-        nemo's reference implementation which uses a "channels_first" approach.
+    @tf.function(experimental_relax_shapes=True)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
+        """Call with input shape: [batch_size, steps_a, n_input].
         Outputs a tensor of shape: [batch_size, steps_b, n_output]"""
 
-        x = self.model(x)
+        x = self.model(x, training=training)
         return x
