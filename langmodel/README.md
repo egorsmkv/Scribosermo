@@ -104,7 +104,9 @@ python3 /pocolm/scripts/train_lm.py --num-words=500000 --num-splits=$(nproc) \
   --warm-start-ratio=20 --max-memory=$(expr $(free -g | awk '/^Mem:/{print $7}') \* 95 / 100)G \
   ./ 5 ./pocolm/
 
-# Prune model, 50M n-grams -> ~250MB, takes about 2h
+# Prune arpa model
+# 50M n-grams -> ~250MB scorer size (for faster inference), takes about 2h
+# 165M n-grams -> ~950MB scorer size (similar to DeepSpeech's scorer), did take about 6h
 python3 /pocolm/scripts/prune_lm_dir.py --target-num-ngrams 50000000 \
   ./pocolm/500000_5.pocolm/ ./pocolm/500000_5_pruned.pocolm/
 
