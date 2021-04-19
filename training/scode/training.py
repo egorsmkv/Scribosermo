@@ -6,8 +6,10 @@ import time
 import tensorflow as tf
 import tensorflow_addons as tfa
 
-# Required for loading exported models with tf=2.3
-from tensorflow.python.framework.errors_impl import NotFoundError
+# Required for loading exported models with tf=2.3, which is required for tflite exports
+from tensorflow.python.framework.errors_impl import (  # pylint: disable=no-name-in-module
+    NotFoundError,
+)
 
 from . import nets, pipeline, utils
 
@@ -420,11 +422,17 @@ def build_new_model(new_config: dict, print_log: bool = True):
             dense_residuals=new_config["network"]["dense_residuals"],
         )
     elif network_type == "quartznet":
+        if "extra_lstm" in new_config["network"]:
+            extra_lstm = new_config["network"]["extra_lstm"]
+        else:
+            extra_lstm = False
+
         new_model = nets.quartznet.MyModel(
             c_input,
             c_output,
             blocks=new_config["network"]["blocks"],
             module_repeat=new_config["network"]["module_repeat"],
+            extra_lstm=extra_lstm,
         )
     elif network_type == "simpleconformer":
         new_model = nets.simpleconformer.MyModel(

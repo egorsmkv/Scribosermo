@@ -82,13 +82,13 @@ class FeedForwardModule(tfl.Layer):
         b = tf.identity(x)
 
         a = self.lnorm(x, training=training)
-        a = self.dense1(x, training=training)
+        a = self.dense1(a, training=training)
         a = tf.keras.activations.swish(a)
 
         if training:
             a = tf.nn.dropout(a, rate=0.1)
 
-        a = self.dense2(x, training=training)
+        a = self.dense2(a, training=training)
         if training:
             a = tf.nn.dropout(a, rate=0.1)
 

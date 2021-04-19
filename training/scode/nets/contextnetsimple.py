@@ -9,6 +9,7 @@ class ConvModule(tfl.Layer):
         self, filters: int, kernel_size: int, stride: int = 1, has_act: bool = True
     ):
         super().__init__()
+        self.has_act = has_act
 
         self.sconv1d = tfl.SeparableConv1D(
             filters=filters,
@@ -18,17 +19,17 @@ class ConvModule(tfl.Layer):
         )
         self.bnorm = tfl.BatchNormalization()
 
-        if has_act:
-            self.act = tf.keras.activations.swish
-        else:
-            self.act = tf.identity
-
     # ==============================================================================================
 
     def call(self, x, training=False):  # pylint: disable=arguments-differ
         x = self.sconv1d(x, training=training)
+
+        # This BatchNorm will break learning if only a single audio file is trained (debug mode)
         x = self.bnorm(x, training=training)
-        x = self.act(x)
+
+        if self.has_act:
+            x = tf.keras.activations.swish(x)
+
         return x
 
 
@@ -54,7 +55,7 @@ class SqueezeExiteModule(tfl.Layer):
 
         b = self.fc2(b, training=training)
         b = tf.keras.activations.swish(b)
-        b = tf.keras.activations.sigmoid(b)
+        b = tf.nn.sigmoid(b)
 
         # Use broadcasting in multiplication instead of tiling beforehand
         b = tf.expand_dims(b, axis=1)

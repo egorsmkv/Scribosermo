@@ -83,7 +83,9 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
     """See Quartznet example config at:
     https://github.com/NVIDIA/OpenSeq2Seq/blob/master/example_configs/speech2text/"""
 
-    def __init__(self, c_input, c_output, blocks, module_repeat):
+    def __init__(
+        self, c_input, c_output, blocks, module_repeat, extra_lstm: bool = False
+    ):
         super().__init__()
 
         block_params = [
@@ -101,11 +103,13 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         self.n_output = c_output
         self.feature_time_reduction_factor = 2
 
-        self.model = self.make_model(block_params, block_repeat, module_repeat)
+        self.model = self.make_model(
+            block_params, block_repeat, module_repeat, extra_lstm
+        )
 
     # ==============================================================================================
 
-    def make_model(self, block_params, block_repeat, module_repeat):
+    def make_model(self, block_params, block_repeat, module_repeat, extra_lstm):
         input_tensor = tfl.Input(shape=[None, self.n_input], name="input")
 
         # Used for easier debugging changes
@@ -159,6 +163,14 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         )(x)
         x = tfl.BatchNormalization(momentum=0.9)(x)
         x = tfl.ReLU()(x)
+
+        if extra_lstm:
+            # Not described in the paper, but added for an additional experiment
+            # To use the pretrained model, update the training code so that the last 5 instead
+            # of the last 2 layer weights are newly initialized. Do a frozen training first.
+            x = tfl.LSTM(
+                int(block_repeat * 150), return_sequences=True, stateful=False
+            )(x)
 
         x = tfl.Conv1D(
             filters=self.n_output,

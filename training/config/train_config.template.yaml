@@ -113,7 +113,7 @@ audio_features:
 augmentations:
   signal:
     dither:
-      # Add minimal random noise to data to prevent quantization artefacts
+      # Add minimal random noise to data to prevent quantization artifacts
       use_train: true
       use_test: true
       factor: 0.00001
