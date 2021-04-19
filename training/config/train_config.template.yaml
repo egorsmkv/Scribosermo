@@ -20,7 +20,7 @@ audio_sample_rate: 16000
 
 # Improve predictions with n-gram language model, only used for testing and inference
 scorer:
-  path: "/data_prepared/texts/{LANGUAGE}/kenlm_{LANGUAGE}.scorer"
+  path: "/data_prepared/langmodel/{LANGUAGE}.scorer"
   alphabet: "/Scribosermo/data/{LANGUAGE}/alphabet.txt"
   alpha: 0.931289039105002
   beta: 1.1834137581510284
@@ -83,7 +83,7 @@ log_prediction_steps: 25
 
 # Profile given training steps in each epoch. Use to find performance bottlenecks.
 # Viewable in tensorboard under "profile" tab.
-profile_steps: [125]
+profile_steps: [135]
 
 # Print files with worst predictions. Sort either by "loss" or "greedy_cer". Usable for debugging.
 log_worst_test_predictions: 3
@@ -98,7 +98,7 @@ optimizer:
   beta1: 0.8
   beta2: 0.5
 
-# Changing things here will break compatibility with the default production bindings.
+# After changing those values, also update the exporting script if you want to export the model.
 audio_features:
   use_type: "lfbank"
   mfcc:

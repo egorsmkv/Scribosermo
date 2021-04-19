@@ -3,9 +3,9 @@
 Build container with testing tools:
 
 ```bash
-podman build -f tests/Containerfile -t testing_scribosermo ./Scribosermo/
+docker build -f Scribosermo/tests/Containerfile -t testing_scribosermo ./Scribosermo/
 
-podman run --network host --rm \
+docker run --network host --rm \
   --volume `pwd`/Scribosermo/:/Scribosermo/ \
   -it testing_scribosermo
 ```
