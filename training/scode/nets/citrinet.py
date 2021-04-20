@@ -143,11 +143,12 @@ class BaseBlock(tfl.Layer):  # pylint: disable=abstract-method
 
 
 class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
-    """See Quartznet example config at:
-    https://github.com/NVIDIA/OpenSeq2Seq/blob/master/example_configs/speech2text/"""
-
-    def __init__(self, c_input, c_output, channels, extra_lstm: bool = False):
+    def __init__(self, c_input: int, c_output: int, netconfig: dict):
         super().__init__()
+
+        # Check that the netconfig includes all required keys
+        reqkeys = {"channels"}
+        assert reqkeys.issubset(set(netconfig.keys())), "Some network keys are missing"
 
         block_params = [
             [11, 13, 15, 17, 19, 21],
@@ -160,7 +161,12 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         self.n_output = c_output
         self.feature_time_reduction_factor = 4
 
-        self.model = self.make_model(channels, block_params, extra_lstm)
+        if "extra_lstm" in netconfig:
+            extra_lstm = netconfig["extra_lstm"]
+        else:
+            extra_lstm = False
+
+        self.model = self.make_model(netconfig["channels"], block_params, extra_lstm)
 
     # ==============================================================================================
 

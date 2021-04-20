@@ -5,7 +5,7 @@ from tensorflow.keras import layers as tfl
 
 
 class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
-    def __init__(self, c_input, c_output):
+    def __init__(self, c_input: int, c_output: int, netconfig: dict):
         super().__init__()
 
         self.n_input = c_input

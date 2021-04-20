@@ -187,18 +187,22 @@ class Encoder(tf.keras.Model):  # pylint: disable=abstract-method
 
 
 class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
-    def __init__(
-        self, c_input: int, c_output: int, nlayers: int, dimension: int, att_heads: int
-    ):
+    def __init__(self, c_input: int, c_output: int, netconfig: dict):
         super().__init__()
+
+        # Check that the netconfig includes all required keys
+        reqkeys = {"nlayers", "dimension", "attention_heads"}
+        assert reqkeys.issubset(set(netconfig.keys())), "Some network keys are missing"
 
         self.n_input = c_input
         self.n_output = c_output
 
-        self.encoder = Encoder(nlayers, dimension, att_heads)
+        self.encoder = Encoder(
+            netconfig["nlayers"], netconfig["dimension"], netconfig["attention_heads"]
+        )
         self.feature_time_reduction_factor = self.encoder.get_time_reduction_factor()
 
-        self.model = self.make_model(dimension)
+        self.model = self.make_model(netconfig["dimension"])
 
     # ==============================================================================================
 

@@ -69,8 +69,12 @@ class PartialBlock(tfl.Layer):  # pylint: disable=abstract-method
 
 
 class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
-    def __init__(self, c_input, c_output, blocks, module_repeat, dense_residuals):
+    def __init__(self, c_input: int, c_output: int, netconfig: dict):
         super().__init__()
+
+        # Check that the netconfig includes all required keys
+        reqkeys = {"blocks", "module_repeat", "dense_residuals"}
+        assert reqkeys.issubset(set(netconfig.keys())), "Some network keys are missing"
 
         # Params: output_filters, kernel_size, dropout
         block_params = [
@@ -80,7 +84,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
             [640, 21, 0.3],
             [768, 25, 0.4],
         ]
-        block_repeat = blocks / len(block_params)
+        block_repeat = netconfig["blocks"] / len(block_params)
         assert block_repeat == int(block_repeat)
         block_repeat = int(block_repeat)
 
@@ -89,7 +93,10 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         self.feature_time_reduction_factor = 2
 
         self.model = self.make_model(
-            block_params, block_repeat, module_repeat, dense_residuals
+            block_params,
+            block_repeat,
+            netconfig["module_repeat"],
+            netconfig["dense_residuals"],
         )
 
     # ==============================================================================================

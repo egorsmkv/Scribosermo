@@ -403,57 +403,10 @@ def build_new_model(new_config: dict, print_log: bool = True):
         print("Creating new {} model ...".format(network_type))
 
     # Create the network
-    if network_type == "citrinet":
-        if "extra_lstm" in new_config["network"]:
-            extra_lstm = new_config["network"]["extra_lstm"]
-        else:
-            extra_lstm = False
-
-        new_model = nets.citrinet.MyModel(
-            c_input,
-            c_output,
-            channels=new_config["network"]["channels"],
-            extra_lstm=extra_lstm,
-        )
-    elif network_type == "contextnetsimple":
-        new_model = nets.contextnetsimple.MyModel(
-            c_input,
-            c_output,
-            alpha=new_config["network"]["alpha"],
-        )
-    elif network_type == "deepspeech1":
-        new_model = nets.deepspeech1.MyModel(c_input, c_output)
-    elif network_type == "deepspeech2":
-        new_model = nets.deepspeech2.MyModel(c_input, c_output)
-    elif network_type == "jasper":
-        new_model = nets.jasper.MyModel(
-            c_input,
-            c_output,
-            blocks=new_config["network"]["blocks"],
-            module_repeat=new_config["network"]["module_repeat"],
-            dense_residuals=new_config["network"]["dense_residuals"],
-        )
-    elif network_type == "quartznet":
-        if "extra_lstm" in new_config["network"]:
-            extra_lstm = new_config["network"]["extra_lstm"]
-        else:
-            extra_lstm = False
-
-        new_model = nets.quartznet.MyModel(
-            c_input,
-            c_output,
-            blocks=new_config["network"]["blocks"],
-            module_repeat=new_config["network"]["module_repeat"],
-            extra_lstm=extra_lstm,
-        )
-    elif network_type == "simpleconformer":
-        new_model = nets.simpleconformer.MyModel(
-            c_input,
-            c_output,
-            nlayers=new_config["network"]["nlayers"],
-            dimension=new_config["network"]["dimension"],
-            att_heads=new_config["network"]["attention_heads"],
-        )
+    mynet = getattr(nets, network_type)
+    new_model = mynet.MyModel(
+        c_input=c_input, c_output=c_output, netconfig=new_config["network"]
+    )
 
     new_model.build(input_shape=(None, None, c_input))
     new_model.compile()

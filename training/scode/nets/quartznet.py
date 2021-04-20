@@ -83,10 +83,12 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
     """See Quartznet example config at:
     https://github.com/NVIDIA/OpenSeq2Seq/blob/master/example_configs/speech2text/"""
 
-    def __init__(
-        self, c_input, c_output, blocks, module_repeat, extra_lstm: bool = False
-    ):
+    def __init__(self, c_input: int, c_output: int, netconfig: dict):
         super().__init__()
+
+        # Check that the netconfig includes all required keys
+        reqkeys = {"blocks", "module_repeat"}
+        assert reqkeys.issubset(set(netconfig.keys())), "Some network keys are missing"
 
         block_params = [
             [256, 33],
@@ -95,7 +97,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
             [512, 63],
             [512, 75],
         ]
-        block_repeat = blocks / len(block_params)
+        block_repeat = netconfig["blocks"] / len(block_params)
         assert block_repeat == int(block_repeat)
         block_repeat = int(block_repeat)
 
@@ -103,8 +105,13 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         self.n_output = c_output
         self.feature_time_reduction_factor = 2
 
+        if "extra_lstm" in netconfig:
+            extra_lstm = netconfig["extra_lstm"]
+        else:
+            extra_lstm = False
+
         self.model = self.make_model(
-            block_params, block_repeat, module_repeat, extra_lstm
+            block_params, block_repeat, netconfig["module_repeat"], extra_lstm
         )
 
     # ==============================================================================================
