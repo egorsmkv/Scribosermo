@@ -403,7 +403,19 @@ def build_new_model(new_config: dict, print_log: bool = True):
         print("Creating new {} model ...".format(network_type))
 
     # Create the network
-    if network_type == "contextnetsimple":
+    if network_type == "citrinet":
+        if "extra_lstm" in new_config["network"]:
+            extra_lstm = new_config["network"]["extra_lstm"]
+        else:
+            extra_lstm = False
+
+        new_model = nets.citrinet.MyModel(
+            c_input,
+            c_output,
+            channels=new_config["network"]["channels"],
+            extra_lstm=extra_lstm,
+        )
+    elif network_type == "contextnetsimple":
         new_model = nets.contextnetsimple.MyModel(
             c_input,
             c_output,

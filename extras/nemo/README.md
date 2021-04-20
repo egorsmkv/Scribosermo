@@ -18,7 +18,7 @@ The goal here is to use the pretrained NeMo models from Nvidia with our tensorfl
     --device=/dev/snd dsp_nemo
 
   # Convert pretrained model
-  python3 /NeMo/scripts/convasr_to_single_onnx.py \
+  python3 /NeMo/scripts/export/convasr_to_single_onnx.py \
     --nemo_file /dsp_nemo/models/QuartzNet15x5Base-En.nemo --onnx_file /dsp_nemo/models/QuartzNet15x5Base-En.onnx
 
   # Test model and some debugging for our pipeline
