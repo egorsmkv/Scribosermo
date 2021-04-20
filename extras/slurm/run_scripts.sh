@@ -14,5 +14,5 @@ singularity exec \
   --bind /cfs/share/cache/db_xds/data_prepared/:/data_prepared/ \
   --bind ~/Scribosermo/:/Scribosermo/ \
   --bind ~/corcua/:/corcua/ \
-  /cfs/share/cache/db_xds/images/scribosermo.sif \
+  ~/images/scribosermo.sif \
   /bin/bash -c 'python3 /Scribosermo/preprocessing/noise_to_csv.py'

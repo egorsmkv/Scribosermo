@@ -89,8 +89,11 @@ You can find more details about the currently used datasets [here](preprocessing
 Implemented networks:
 [DeepSpeech1](https://arxiv.org/pdf/1412.5567.pdf),
 [DeepSpeech2](https://arxiv.org/pdf/1512.02595.pdf),
+[QuartzNet](https://arxiv.org/pdf/1910.10261.pdf),
 [Jasper](https://arxiv.org/pdf/1904.03288.pdf),
-[Quartznet](https://arxiv.org/pdf/1910.10261.pdf)
+[ContextNet](https://arxiv.org/pdf/2005.03191.pdf)(simplified),
+[Conformer](https://arxiv.org/pdf/2005.08100.pdf)(simplified),
+[CitriNet](https://arxiv.org/pdf/2104.01721.pdf)
 
 Notes on the networks:
 
@@ -99,10 +102,11 @@ Notes on the networks:
 
 Supported networks with their trainable parameter count (using English alphabet):
 
-|         |             |             |        |              |               |
-| ------- | ----------- | ----------- | ------ | ------------ | ------------- |
-| Network | DeepSpeech1 | DeepSpeech2 | Jasper | Quartznet5x5 | Quartznet15x5 |
-| Params  | 48.7M       | 120M        | 323M   | 6.7M         | 18.9M         |
+|         |             |             |              |        |                  |                 |               |
+| ------- | ----------- | ----------- | ------------ | ------ | ---------------- | --------------- | ------------- |
+| Network | DeepSpeech1 | DeepSpeech2 | QuartzNet    | Jasper | ContextNetSimple | SimpleConformer | CitriNet      |
+| Config  |             |             | 5x5 / 15x5   |        | 0.8              | 16x240x4        | 256 / 384     |
+| Params  | 48.7M       | 120M        | 6.7M / 18.9M | 323M   | 21.6M            | 21.7M           | 10.9M / 24.0M |
 
 <br>
 
