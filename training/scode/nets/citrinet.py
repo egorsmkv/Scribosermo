@@ -216,7 +216,9 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
 
         if extra_lstm:
             # Not described in the paper, but added for an additional experiment
-            x = tfl.LSTM(int(filters * 1.5), return_sequences=True, stateful=False)(x)
+            x = tfl.LSTM(
+                int((filters * 1.5) / 8) * 8, return_sequences=True, stateful=False
+            )(x)
 
         x = tfl.Conv1D(
             filters=self.n_output,
@@ -224,6 +226,8 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
             padding="valid",
             use_bias=True,
         )(x)
+
+        x = tf.cast(x, dtype="float32")
         x = tf.nn.log_softmax(x)
         output_tensor = tf.identity(x, name="output")
 

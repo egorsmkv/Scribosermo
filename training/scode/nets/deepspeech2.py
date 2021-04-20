@@ -22,50 +22,51 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
     # ==============================================================================================
 
     def make_model(self):
-        """Build sequential model. This did run faster than autograph conversion."""
+        input_tensor = tfl.Input(shape=[None, self.n_input], name="input")
 
-        model = tf.keras.Sequential(name="DeepSpeech2")
-        model.add(tfl.Input(shape=[None, self.n_input], name="input"))
+        # Used for easier debugging changes
+        x = tf.identity(input_tensor)
 
         # Paper did recommend 2D convolutions here, with frequency as first dimension,
         # but this was easier to implement for now
-        model.add(tfl.Conv1D(filters=512, kernel_size=5, padding="same"))
-        model.add(tfl.BatchNormalization())
-        model.add(tfl.ReLU(max_value=self.relu_clip))
+        x = tfl.Conv1D(filters=512, kernel_size=5, padding="same")(x)
+        x = tfl.BatchNormalization()(x)
+        x = tfl.ReLU(max_value=self.relu_clip)(x)
 
-        model.add(tfl.Conv1D(filters=512, kernel_size=5, padding="same"))
-        model.add(tfl.BatchNormalization())
-        model.add(tfl.ReLU(max_value=self.relu_clip))
+        x = tfl.Conv1D(filters=512, kernel_size=5, padding="same")(x)
+        x = tfl.BatchNormalization()(x)
+        x = tfl.ReLU(max_value=self.relu_clip)(x)
 
-        model.add(tfl.Conv1D(filters=512, kernel_size=5, padding="same", strides=2))
-        model.add(tfl.BatchNormalization())
-        model.add(tfl.ReLU(max_value=self.relu_clip))
+        x = tfl.Conv1D(filters=512, kernel_size=5, padding="same", strides=2)(x)
+        x = tfl.BatchNormalization()(x)
+        x = tfl.ReLU(max_value=self.relu_clip)(x)
 
         # Paper uses 7 bidirectional LSTMs here. Using unidirectional like in Mozilla's DS1 project
         # would result in about 2x speed up of the training
         for _ in range(self.n_lstms - 1):
-            model.add(
-                tfl.Bidirectional(
-                    tfl.LSTM(self.n_hidden, return_sequences=True, stateful=False)
-                )
-            )
-            model.add(tfl.BatchNormalization())
-            model.add(tfl.ReLU(max_value=self.relu_clip))
-
-        model.add(
-            tfl.Bidirectional(
+            x = tfl.Bidirectional(
                 tfl.LSTM(self.n_hidden, return_sequences=True, stateful=False)
-            )
-        )
+            )(x)
 
-        model.add(tfl.TimeDistributed(tfl.Dense(self.n_hidden * 2)))
-        model.add(tfl.BatchNormalization())
-        model.add(tfl.ReLU(max_value=self.relu_clip))
+            x = tfl.BatchNormalization()(x)
+            x = tfl.ReLU(max_value=self.relu_clip)(x)
 
-        # Predict propabilities over our alphabet
-        model.add(tfl.TimeDistributed(tfl.Dense(self.n_output)))
+        x = tfl.Bidirectional(
+            tfl.LSTM(self.n_hidden, return_sequences=True, stateful=False)
+        )(x)
 
-        model.add(tfl.Lambda(lambda x: x, name="output"))
+        x = tfl.TimeDistributed(tfl.Dense(self.n_hidden * 2))(x)
+        x = tfl.BatchNormalization()(x)
+        x = tfl.ReLU(max_value=self.relu_clip)(x)
+
+        # Predict propabilities over the alphabet
+        x = tfl.TimeDistributed(tfl.Dense(self.n_output))(x)
+
+        x = tf.cast(x, dtype="float32")
+        x = tf.nn.log_softmax(x)
+        output_tensor = tf.identity(x, name="output")
+
+        model = tf.keras.Model(input_tensor, output_tensor, name="DeepSpeech2")
         return model
 
     # ==============================================================================================

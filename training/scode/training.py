@@ -5,6 +5,7 @@ import time
 
 import tensorflow as tf
 import tensorflow_addons as tfa
+from tensorflow.keras import mixed_precision
 
 # Required for loading exported models with tf=2.3, which is required for tflite exports
 from tensorflow.python.framework.errors_impl import (  # pylint: disable=no-name-in-module
@@ -12,9 +13,6 @@ from tensorflow.python.framework.errors_impl import (  # pylint: disable=no-name
 )
 
 from . import nets, pipeline, utils
-
-# from tensorflow.keras.mixed_precision import experimental as mixed_precision
-
 
 # ==================================================================================================
 
@@ -86,14 +84,21 @@ def train_step(samples):
         loss = get_loss(predictions, samples)
         loss = tf.reduce_mean(loss)
 
+        if config["mixed_precision"]:
+            scaled_loss = optimizer.get_scaled_loss(loss)
+
     trainable_variables = model.trainable_variables
     if config["freeze_base_net"]:
         trainable_variables = model.trainable_variables[-2:]
         print("Training only last layer")
 
-    gradients = tape.gradient(loss, trainable_variables)
-    # gradients = optimizer.get_unscaled_gradients(scaled_gradients)
-    gradients, _ = tf.clip_by_global_norm(gradients, 1.0)
+    if config["mixed_precision"]:
+        gradients = tape.gradient(scaled_loss, trainable_variables)
+        gradients = optimizer.get_unscaled_gradients(gradients)
+    else:
+        gradients = tape.gradient(loss, trainable_variables)
+
+    gradients, _ = tf.clip_by_global_norm(gradients, 5.0)
     optimizer.apply_gradients(zip(gradients, trainable_variables))
 
     return loss
@@ -378,7 +383,9 @@ def create_optimizer():
                 beta_1=config["optimizer"]["beta1"],
                 beta_2=config["optimizer"]["beta2"],
             )
-        # optim = mixed_precision.LossScaleOptimizer(optim, loss_scale='dynamic')
+
+        if config["mixed_precision"]:
+            optim = mixed_precision.LossScaleOptimizer(optim)
 
     return optim
 
@@ -490,8 +497,10 @@ def main():
     for gpu in gpus:
         tf.config.experimental.set_memory_growth(gpu, True)
 
-    # policy = mixed_precision.Policy('mixed_float16')
-    # mixed_precision.set_policy(policy)
+    if config["mixed_precision"]:
+        # Enable mixed precision training
+        mixed_precision.set_global_policy("mixed_float16")
+        print("Training with mixed precision ...")
 
     # Build this after setting the gpu config, else it will raise an initialization error
     create_idx2char()

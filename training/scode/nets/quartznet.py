@@ -176,7 +176,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
             # To use the pretrained model, update the training code so that the last 5 instead
             # of the last 2 layer weights are newly initialized. Do a frozen training first.
             x = tfl.LSTM(
-                int(block_repeat * 150), return_sequences=True, stateful=False
+                int((block_repeat * 150) / 8) * 8, return_sequences=True, stateful=False
             )(x)
 
         x = tfl.Conv1D(
@@ -187,6 +187,8 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
             kernel_regularizer=None,
             use_bias=True,
         )(x)
+
+        x = tf.cast(x, dtype="float32")
         x = tf.nn.log_softmax(x)
         output_tensor = tf.identity(x, name="output")
 

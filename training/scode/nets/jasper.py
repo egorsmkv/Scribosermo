@@ -148,6 +148,9 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         x = tfl.Dropout(0.4)(x)
 
         x = tfl.Conv1D(filters=self.n_output, kernel_size=1, padding="valid")(x)
+
+        x = tf.cast(x, dtype="float32")
+        x = tf.nn.log_softmax(x)
         output_tensor = tf.identity(x, name="output")
 
         model = tf.keras.Model(input_tensor, output_tensor, name="Jasper")

@@ -218,12 +218,15 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         x = self.encoder(x)
 
         # As Decoder only a single LSTM layer is used instead of Conformer's RNNT approach
-        x = tfl.LSTM(int(dimension * 4), return_sequences=True, stateful=False)(x)
+        x = tfl.LSTM(
+            int((dimension * 4) / 8) * 8, return_sequences=True, stateful=False
+        )(x)
         x = tfl.LayerNormalization()(x)
 
         # Map to characters
         x = tfl.TimeDistributed(tfl.Dense(self.n_output))(x)
 
+        x = tf.cast(x, dtype="float32")
         x = tf.nn.log_softmax(x)
         output_tensor = tf.identity(x, name="output")
 

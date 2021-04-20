@@ -40,48 +40,51 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
     # ==============================================================================================
 
     def make_model(self):
-        """Build sequential model. This runs as fast as autograph conversion."""
+        input_tensor = tfl.Input(shape=[None, self.n_input], name="input")
 
-        model = tf.keras.Sequential(name="DeepSpeech1")
-        model.add(tfl.Input(shape=[None, self.n_input], name="input"))
+        # Used for easier debugging changes
+        x = tf.identity(input_tensor)
 
         # Create overlapping windows, returns shape [batch_size, steps, window_width * n_input]
-        window_conv = tfl.Conv1D(
+        x = tfl.Conv1D(
             self.window_size,
             [self.window_width],
             kernel_initializer=self.window_kernel_init,
             padding="same",
             trainable=False,
-        )
-        model.add(window_conv)
+        )(x)
 
         # Dense 1
-        model.add(tfl.TimeDistributed(tfl.Dense(self.n_hidden)))
-        model.add(tfl.ReLU(max_value=self.relu_clip))
-        model.add(tfl.Dropout(rate=self.dropout_rate))
+        x = tfl.TimeDistributed(tfl.Dense(self.n_hidden))(x)
+        x = tfl.ReLU(max_value=self.relu_clip)(x)
+        x = tfl.Dropout(rate=self.dropout_rate)(x)
 
         # Dense 2
-        model.add(tfl.TimeDistributed(tfl.Dense(self.n_hidden)))
-        model.add(tfl.ReLU(max_value=self.relu_clip))
-        model.add(tfl.Dropout(rate=self.dropout_rate))
+        x = tfl.TimeDistributed(tfl.Dense(self.n_hidden))(x)
+        x = tfl.ReLU(max_value=self.relu_clip)(x)
+        x = tfl.Dropout(rate=self.dropout_rate)(x)
 
         # Dense 3
-        model.add(tfl.TimeDistributed(tfl.Dense(self.n_hidden)))
-        model.add(tfl.ReLU(max_value=self.relu_clip))
-        model.add(tfl.Dropout(rate=self.dropout_rate))
+        x = tfl.TimeDistributed(tfl.Dense(self.n_hidden))(x)
+        x = tfl.ReLU(max_value=self.relu_clip)(x)
+        x = tfl.Dropout(rate=self.dropout_rate)(x)
 
         # LSTM 4
-        model.add(tfl.LSTM(self.n_hidden, return_sequences=True, stateful=False))
+        x = tfl.LSTM(self.n_hidden, return_sequences=True, stateful=False)(x)
 
         # Dense 5
-        model.add(tfl.TimeDistributed(tfl.Dense(self.n_hidden)))
-        model.add(tfl.ReLU(max_value=self.relu_clip))
-        model.add(tfl.Dropout(rate=self.dropout_rate))
+        x = tfl.TimeDistributed(tfl.Dense(self.n_hidden))(x)
+        x = tfl.ReLU(max_value=self.relu_clip)(x)
+        x = tfl.Dropout(rate=self.dropout_rate)(x)
 
         # Dense 6
-        model.add(tfl.TimeDistributed(tfl.Dense(self.n_output)))
+        x = tfl.TimeDistributed(tfl.Dense(self.n_output))(x)
 
-        model.add(tfl.Lambda(lambda x: x, name="output"))
+        x = tf.cast(x, dtype="float32")
+        x = tf.nn.log_softmax(x)
+        output_tensor = tf.identity(x, name="output")
+
+        model = tf.keras.Model(input_tensor, output_tensor, name="DeepSpeech1")
         return model
 
     # ==============================================================================================
