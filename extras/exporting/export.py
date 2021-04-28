@@ -14,7 +14,6 @@ metadata = {
     "audio_sample_rate": 16000,
     "audio_window_samples": int(16000 * 0.02),
     "audio_step_samples": int(16000 * 0.01),
-    "use_fixed_norm": False,
     "use_volume_norm": False,
 }
 

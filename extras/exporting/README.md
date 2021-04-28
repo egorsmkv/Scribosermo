@@ -38,10 +38,8 @@ export CUDA_VISIBLE_DEVICES=""
 
 <br>
 
-Enable streaming feature:
-
-- Rebuild the model with fixed normalization flag (this slightly increases WER, in English from 3.7% to 4.4%)
-- Currently only models without LSTM layers are usable
+Run streaming inference: \
+(If an audio file is already existing, or for very short audio streams, the file-based transcription approach is recommended)
 
 ```bash
 # Test streaming

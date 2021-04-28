@@ -18,7 +18,6 @@ from ds_ctcdecoder import Alphabet, Scorer, swigwrapper
 
 # ==================================================================================================
 
-# checkpoint_file = "/checkpoints/en/qnetp15/exported/model_streaming.tflite"
 checkpoint_file = "/checkpoints/en/qnetp15/exported/model_quantized.tflite"
 test_wav_path = "/Scribosermo/extras/exporting/data/test.wav"
 alphabet_path = "/Scribosermo/data/en/alphabet.json"
