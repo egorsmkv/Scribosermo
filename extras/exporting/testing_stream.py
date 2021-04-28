@@ -1,4 +1,4 @@
-# Most of the streaming concept is taken from Nvidia's reverence implementation:
+# Most of the streaming concept is taken from Nvidia's reference implementation:
 # https://github.com/NVIDIA/NeMo/blob/main/tutorials/asr/02_Online_ASR_Microphone_Demo.ipynb
 
 import json
@@ -55,25 +55,9 @@ ds_decoder.init(
 # ==================================================================================================
 
 
-def predict(interpreter, audio):
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
-
-    # Enable dynamic shape inputs
-    interpreter.resize_tensor_input(input_details[0]["index"], audio.shape)
-    interpreter.allocate_tensors()
-
-    interpreter.set_tensor(input_details[0]["index"], audio)
-    interpreter.invoke()
-
-    output_data = interpreter.get_tensor(output_details[0]["index"])
-    return output_data
-
-
-# ==================================================================================================
-
-
 def load_audio(wav_path):
+    """Load wav file with the required format"""
+
     audio, _ = sf.read(wav_path, dtype="int16")
     audio = audio / np.iinfo(np.int16).max
     audio = np.expand_dims(audio, axis=0)
@@ -84,19 +68,77 @@ def load_audio(wav_path):
 # ==================================================================================================
 
 
+def predict(interpreter, audio):
+    """Feed an audio signal with shape [1, len_signal] into the network and get the predictions"""
+
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+
+    # Enable dynamic shape inputs
+    interpreter.resize_tensor_input(input_details[0]["index"], audio.shape)
+    interpreter.allocate_tensors()
+
+    # Feed audio
+    interpreter.set_tensor(input_details[0]["index"], audio)
+    interpreter.invoke()
+
+    output_data = interpreter.get_tensor(output_details[0]["index"])
+    return output_data
+
+
+# ==================================================================================================
+
+
+def feed_chunk(
+    chunk: np.array, overlap: int, offset: int, interpreter, decoder
+) -> None:
+    """Feed an audio chunk with shape [1, len_chunk] into the decoding process"""
+
+    # Get network prediction for chunk
+    prediction = predict(interpreter, chunk)
+    prediction = prediction[0]
+
+    # Extract the interesting part in the middle of the prediction
+    timesteps_overlap = int(len(prediction) / (chunk.shape[1] / overlap)) - 2
+    prediction = prediction[timesteps_overlap:-timesteps_overlap]
+
+    # Apply some offset for improved results
+    prediction = prediction[: len(prediction) - offset]
+
+    # Feed into decoder
+    decoder.next(prediction.tolist())
+
+
+# ==================================================================================================
+
+
+def decode(decoder):
+    """Get decoded prediction and convert to text"""
+    results = decoder.decode(num_results=1)
+    results = [(res.confidence, ds_alphabet.Decode(res.tokens)) for res in results]
+
+    lm_text = results[0][1]
+    return lm_text
+
+
+# ==================================================================================================
+
+
 def streamed_transcription(interpreter, wav_path):
     """Transcribe an audio file chunk by chunk"""
 
+    # For reasons of simplicity, a wav-file is used instead of a microphone stream
     audio = load_audio(wav_path)
     audio = audio[0]
-
-    start = 0
-    buffer = np.zeros(shape=2 * frame_overlap + chunk_size, dtype=np.float32)
 
     # Add some empty padding that the last words are not cut from the transcription
     audio = np.concatenate([audio, np.zeros(shape=frame_overlap, dtype=np.float32)])
 
+    start = 0
+    buffer = np.zeros(shape=2 * frame_overlap + chunk_size, dtype=np.float32)
     while start < len(audio):
+
+        # Cut a chunk from the complete audio signal
         stop = min(len(audio), start + chunk_size)
         chunk = audio[start:stop]
         start = stop
@@ -105,24 +147,13 @@ def streamed_transcription(interpreter, wav_path):
         buffer = buffer[chunk_size:]
         buffer = np.concatenate([buffer, chunk])
 
-        # Get prediction for buffer
+        # Now feed this frame into the decoding process
         ibuffer = np.expand_dims(buffer, axis=0)
-        prediction = predict(interpreter, ibuffer)
-        prediction = prediction[0]
+        feed_chunk(ibuffer, frame_overlap, char_offset, interpreter, ds_decoder)
 
-        # Extract the interesting part in the middle of the prediction
-        timesteps_overlap = int(len(prediction) / (len(buffer) / frame_overlap)) - 2
-        prediction = prediction[timesteps_overlap:-timesteps_overlap]
-        prediction = prediction[: len(prediction) - char_offset]
-
-        # Feed into decoder
-        ds_decoder.next(prediction.tolist())
-
-    # Get decoded prediction and convert to text
-    results = ds_decoder.decode(num_results=1)
-    results = [(res.confidence, ds_alphabet.Decode(res.tokens)) for res in results]
-    lm_text = results[0][1]
-    print("Prediction scorer: {}".format(lm_text))
+    # Get the text after the stream is finished
+    text = decode(ds_decoder)
+    print("Prediction scorer: {}".format(text))
 
 
 # ==================================================================================================

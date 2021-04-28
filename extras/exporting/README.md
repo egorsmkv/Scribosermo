@@ -39,8 +39,9 @@ export CUDA_VISIBLE_DEVICES=""
 <br>
 
 Enable streaming feature:
- - Rebuild the model with fixed normalization flag (this slightly increases WER, in English from 3.7% to 4.4%)
- - Currently only models without LSTM layers are usable
+
+- Rebuild the model with fixed normalization flag (this slightly increases WER, in English from 3.7% to 4.4%)
+- Currently only models without LSTM layers are usable
 
 ```bash
 # Test streaming
