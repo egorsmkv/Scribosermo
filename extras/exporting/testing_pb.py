@@ -42,7 +42,21 @@ ds_scorer = Scorer(
 # ==================================================================================================
 
 
+def load_audio(wav_path):
+    """Load wav file with the required format"""
+
+    audio, _ = sf.read(wav_path, dtype="int16")
+    audio = audio / np.iinfo(np.int16).max
+    audio = np.expand_dims(audio, axis=0)
+    audio = audio.astype(np.float32)
+    return audio
+
+
+# ==================================================================================================
+
+
 def print_prediction_greedy(prediction):
+    """Simple greedy decoding of the network's prediction"""
 
     tpred = tf.transpose(prediction, perm=[1, 0, 2])
     logit_lengths = tf.constant(tf.shape(tpred)[0], shape=(1,))
@@ -58,11 +72,12 @@ def print_prediction_greedy(prediction):
 
 
 def print_prediction_scorer(prediction, print_text=True):
+    """Decode the network's prediction with an additional language model"""
     global beam_size, ds_alphabet, ds_scorer
 
     ldecoded = ctc_beam_search_decoder(
         prediction.tolist(),
-        ds_alphabet,
+        alphabet=ds_alphabet,
         beam_size=beam_size,
         cutoff_prob=1.0,
         cutoff_top_n=512,
@@ -74,17 +89,6 @@ def print_prediction_scorer(prediction, print_text=True):
 
     if print_text:
         print("Prediction scorer: {}".format(lm_text))
-
-
-# ==================================================================================================
-
-
-def load_audio(wav_path):
-    audio, _ = sf.read(wav_path, dtype="int16")
-    audio = audio / np.iinfo(np.int16).max
-    audio = np.expand_dims(audio, axis=0)
-    audio = audio.astype(np.float32)
-    return audio
 
 
 # ==================================================================================================
