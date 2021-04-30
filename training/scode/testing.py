@@ -232,9 +232,7 @@ def main():
         mode="test",
     )
 
-    model = training.build_new_model(exported_config)
-    print("Loading weights ...")
-    model.load_weights(checkpoint_dir)
+    model = training.load_exported_model(checkpoint_dir)
     model.summary()
 
     training.model = model

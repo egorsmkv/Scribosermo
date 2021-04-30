@@ -159,7 +159,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
 
         self.n_input = c_input
         self.n_output = c_output
-        self.feature_time_reduction_factor = 4
+        self.feature_time_reduction_factor = 2
 
         if "extra_lstm" in netconfig:
             extra_lstm = netconfig["extra_lstm"]
@@ -190,7 +190,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         # For some reason this model has more params than the model described in CitriNet paper,
         # which is also different to the released NeMo models
         for i in range(self.megablocks):
-            if i in [0, 1]:
+            if i in [0]:
                 # In the original paper all mega-blocks would have stride=2, but this doesn't work
                 # with a character-based CTC decoder
                 stride_first = 2

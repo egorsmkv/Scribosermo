@@ -34,7 +34,7 @@ batch_sizes:
   test: 1
 
 # Performance advantage is depending on the hardware platform
-# If enabled also increase (double) the batch-size, and make sure that it is dividable by 8
+# If enabled also increase the batch-size, and make sure that it is dividable by 8
 mixed_precision: false
 
 # Sort the datasets. You can use a descending sort to estimate the maximal batch size you can use.

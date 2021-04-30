@@ -141,14 +141,14 @@ class Encoder(tf.keras.Model):  # pylint: disable=abstract-method
         super().__init__()
 
         self.kernel_size = 32
-        self.feature_time_reduction_factor = 4
+        self.feature_time_reduction_factor = 2
 
-        # Subsampling layers
+        # Subsampling layers (both would have stride=2 normally)
         self.conv1 = tfl.SeparableConv1D(
             filters=dimension, kernel_size=self.kernel_size, strides=2, padding="same"
         )
         self.conv2 = tfl.SeparableConv1D(
-            filters=dimension, kernel_size=self.kernel_size, strides=2, padding="same"
+            filters=dimension, kernel_size=self.kernel_size, strides=1, padding="same"
         )
 
         # Linear
@@ -219,7 +219,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
 
         # As Decoder only a single LSTM layer is used instead of Conformer's RNNT approach
         x = tfl.LSTM(
-            int((dimension * 4) / 8) * 8, return_sequences=True, stateful=False
+            int((dimension * 4.0) / 8) * 8, return_sequences=True, stateful=False
         )(x)
         x = tfl.LayerNormalization()(x)
 

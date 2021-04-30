@@ -113,19 +113,23 @@ class Encoder(tf.keras.Model):  # pylint: disable=abstract-method
     def __init__(self, alpha: float):
         super().__init__()
 
-        self.feature_time_reduction_factor = 4
+        self.feature_time_reduction_factor = 2
         self.conv_blocks = []
 
         # C0
         cb = ConvBlock(
-            nlayers=1, filters=int(256 * alpha), kernel_size=5, stride=1, residual=False
+            nlayers=1,
+            filters=int(256 * alpha / 8) * 8,
+            kernel_size=5,
+            stride=1,
+            residual=False,
         )
         self.conv_blocks.append(cb)
 
         # C1-21
         for i in range(1, 22):
-            if i in [3, 7]:
-                # In the original paper Block14 would have stride=2, too
+            if i in [3]:
+                # In the original paper Block7 and Block14 would have stride=2, too
                 stride = 2
             else:
                 stride = 1
@@ -137,7 +141,7 @@ class Encoder(tf.keras.Model):  # pylint: disable=abstract-method
 
             cb = ConvBlock(
                 nlayers=5,
-                filters=int(filters * alpha),
+                filters=int(filters * alpha / 8) * 8,
                 kernel_size=5,
                 stride=stride,
                 residual=True,
@@ -146,7 +150,11 @@ class Encoder(tf.keras.Model):  # pylint: disable=abstract-method
 
         # C22
         cb = ConvBlock(
-            nlayers=1, filters=int(640 * alpha), kernel_size=5, stride=1, residual=False
+            nlayers=1,
+            filters=int(640 * alpha / 8) * 8,
+            kernel_size=5,
+            stride=1,
+            residual=False,
         )
         self.conv_blocks.append(cb)
 
@@ -192,8 +200,8 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         x = tf.identity(input_tensor)
 
         # Encoder as described in ContextNet paper (https://arxiv.org/pdf/2005.03191.pdf)
-        # Only the ConvBlock14 has stride=1 instead of stride=2, else the predictions would have
-        # less time steps than the labels, which doesn't work for CTC models
+        # Only ConvBlock7 and ConvBlock14 has stride=1 instead of stride=2, else the predictions 
+        # wouldn't have enough time steps compared to the labels, which doesn't work for CTC models
         x = self.encoder(x)
 
         # As Decoder only a single LSTM layer is used instead of ContextNet's RNNT approach
