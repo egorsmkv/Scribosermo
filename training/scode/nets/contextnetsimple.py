@@ -200,7 +200,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         x = tf.identity(input_tensor)
 
         # Encoder as described in ContextNet paper (https://arxiv.org/pdf/2005.03191.pdf)
-        # Only ConvBlock7 and ConvBlock14 has stride=1 instead of stride=2, else the predictions 
+        # Only ConvBlock7 and ConvBlock14 has stride=1 instead of stride=2, else the predictions
         # wouldn't have enough time steps compared to the labels, which doesn't work for CTC models
         x = self.encoder(x)
 

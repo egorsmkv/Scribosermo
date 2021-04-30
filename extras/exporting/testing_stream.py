@@ -1,3 +1,6 @@
+# Most of the streaming concept is taken from Nvidia's reference implementation:
+# https://github.com/NVIDIA/NeMo/blob/main/tutorials/asr/02_Online_ASR_Microphone_Demo.ipynb
+
 import json
 import multiprocessing as mp
 import random
@@ -11,17 +14,22 @@ import tflite_runtime.interpreter as tflite
 # training container, you can find a prebuilt pip-package in the published assets here:
 # https://github.com/mozilla/DeepSpeech/releases/tag/v0.9.3
 # or for use on a Raspberry Pi you can use the one from extras/misc directory
-from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
+from ds_ctcdecoder import Alphabet, Scorer, swigwrapper
 
 # ==================================================================================================
 
 checkpoint_file = "/checkpoints/en/qnetp15/exported/model_quantized.tflite"
-# checkpoint_file = "/checkpoints/en/qnetp15/exported/model_full.tflite"
 test_wav_path = "/Scribosermo/extras/exporting/data/test.wav"
 alphabet_path = "/Scribosermo/data/en/alphabet.json"
 ds_alphabet_path = "/Scribosermo/data/en/alphabet.txt"
 ds_scorer_path = "/data_prepared/langmodel/en.scorer"
-beam_size = 256
+beam_size = 1024
+sample_rate = 16000
+
+# Experiment a little with those values to optimize inference
+chunk_size = int(1.0 * sample_rate)
+frame_overlap = int(2.0 * sample_rate)
+char_offset = 4
 
 with open(alphabet_path, "r", encoding="utf-8") as file:
     alphabet = json.load(file)
@@ -32,6 +40,15 @@ ds_scorer = Scorer(
     beta=1.1834137581510284,
     scorer_path=ds_scorer_path,
     alphabet=ds_alphabet,
+)
+ds_decoder = swigwrapper.DecoderState()
+ds_decoder.init(
+    alphabet=ds_alphabet,
+    beam_size=beam_size,
+    cutoff_prob=1.0,
+    cutoff_top_n=512,
+    ext_scorer=ds_scorer,
+    hot_words=dict(),
 )
 
 # ==================================================================================================
@@ -71,58 +88,71 @@ def predict(interpreter, audio):
 # ==================================================================================================
 
 
-def print_prediction_scorer(prediction, print_text=True):
-    """Decode the network's prediction with an additional language model"""
-    global beam_size, ds_alphabet, ds_scorer
+def feed_chunk(
+    chunk: np.array, overlap: int, offset: int, interpreter, decoder
+) -> None:
+    """Feed an audio chunk with shape [1, len_chunk] into the decoding process"""
 
-    ldecoded = ctc_beam_search_decoder(
-        prediction.tolist(),
-        alphabet=ds_alphabet,
-        beam_size=beam_size,
-        cutoff_prob=1.0,
-        cutoff_top_n=512,
-        scorer=ds_scorer,
-        hot_words=dict(),
-        num_results=1,
-    )
-    lm_text = ldecoded[0][1]
+    # Get network prediction for chunk
+    prediction = predict(interpreter, chunk)
+    prediction = prediction[0]
 
-    if print_text:
-        print("Prediction scorer: {}".format(lm_text))
+    # Extract the interesting part in the middle of the prediction
+    timesteps_overlap = int(len(prediction) / (chunk.shape[1] / overlap)) - 2
+    prediction = prediction[timesteps_overlap:-timesteps_overlap]
+
+    # Apply some offset for improved results
+    prediction = prediction[: len(prediction) - offset]
+
+    # Feed into decoder
+    decoder.next(prediction.tolist())
 
 
 # ==================================================================================================
 
 
-def timed_transcription(interpreter, wav_path):
-    """Transcribe an audio file and measure times for intermediate steps"""
+def decode(decoder):
+    """Get decoded prediction and convert to text"""
+    results = decoder.decode(num_results=1)
+    results = [(res.confidence, ds_alphabet.Decode(res.tokens)) for res in results]
 
-    time_start = time.time()
+    lm_text = results[0][1]
+    return lm_text
 
+
+# ==================================================================================================
+
+
+def streamed_transcription(interpreter, wav_path):
+    """Transcribe an audio file chunk by chunk"""
+
+    # For reasons of simplicity, a wav-file is used instead of a microphone stream
     audio = load_audio(wav_path)
-    time_audio = time.time()
+    audio = audio[0]
 
-    prediction = predict(interpreter, audio)
-    time_model = time.time()
+    # Add some empty padding that the last words are not cut from the transcription
+    audio = np.concatenate([audio, np.zeros(shape=frame_overlap, dtype=np.float32)])
 
-    print_prediction_scorer(prediction[0])
-    time_scorer = time.time()
+    start = 0
+    buffer = np.zeros(shape=2 * frame_overlap + chunk_size, dtype=np.float32)
+    while start < len(audio):
 
-    dur_audio = time_audio - time_start
-    dur_model = time_model - time_audio
-    dur_scorer = time_scorer - time_model
+        # Cut a chunk from the complete audio signal
+        stop = min(len(audio), start + chunk_size)
+        chunk = audio[start:stop]
+        start = stop
 
-    len_audio = float(sf.info(wav_path).duration)
-    msg = "\nLength of audio was {:.3f}s, loading it took {:.3f}s."
-    print(msg.format(len_audio, dur_audio))
+        # Add new frames to the end of the buffer
+        buffer = buffer[chunk_size:]
+        buffer = np.concatenate([buffer, chunk])
 
-    msg = "Calculating the predictions did take {:.3f}s "
-    msg += "and decoding with a scorer {:.3f}s."
-    print(msg.format(dur_model, dur_scorer))
+        # Now feed this frame into the decoding process
+        ibuffer = np.expand_dims(buffer, axis=0)
+        feed_chunk(ibuffer, frame_overlap, char_offset, interpreter, ds_decoder)
 
-    rtf_scorer = (dur_model + dur_scorer) / len_audio
-    msg = "The Real-Time-Factor for scorer decoding is {:.3f}."
-    print(msg.format(rtf_scorer))
+    # Get the text after the stream is finished
+    text = decode(ds_decoder)
+    print("Prediction scorer: {}".format(text))
 
 
 # ==================================================================================================
@@ -134,28 +164,9 @@ def main():
     interpreter = tflite.Interpreter(
         model_path=checkpoint_file, num_threads=mp.cpu_count()
     )
-    print("Input details:", interpreter.get_input_details())
 
-    print("Running some initialization steps ...")
-    # Run some random predictions to initialize the model
-    for _ in range(5):
-        st = time.time()
-        length = random.randint(1234, 123456)
-        data = np.random.uniform(-1, 1, [1, length]).astype(np.float32)
-        _ = predict(interpreter, data)
-        print("TM:", time.time() - st)
-
-    # Run random decoding steps to initialize the scorer
-    for _ in range(15):
-        st = time.time()
-        length = random.randint(123, 657)
-        data = np.random.uniform(0, 1, [length, len(alphabet) + 1])
-        print_prediction_scorer(data, print_text=False)
-        print("TD:", time.time() - st)
-
-    # Now run the transcription
-    print("")
-    timed_transcription(interpreter, test_wav_path)
+    print("Running transcription ...\n")
+    streamed_transcription(interpreter, test_wav_path)
 
 
 # ==================================================================================================
