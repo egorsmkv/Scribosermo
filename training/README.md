@@ -10,6 +10,9 @@ Go to `config/`, edit the `train_config.template.yaml` file and save as `train_c
 Run training or tests:
 
 ```bash
+# Recommendation of TensorBoardProfiler to reduce KernelLaunchTime and speed up training.
+export TF_GPU_THREAD_MODE=gpu_private
+
 # By default all gpus are used automatically
 python3 /Scribosermo/training/run_train.py
 
