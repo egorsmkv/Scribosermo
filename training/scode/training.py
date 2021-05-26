@@ -325,7 +325,7 @@ def evaluate(dataset_eval):
 
 
 def build_pipelines():
-    """ Initialize train/eval data pipelines """
+    """Initialize train/eval data pipelines"""
 
     global_train_batch_size = (
         config["batch_sizes"]["train"] * strategy.num_replicas_in_sync
@@ -367,7 +367,7 @@ def build_pipelines():
 
 
 def create_optimizer():
-    """ Initialize training optimizer """
+    """Initialize training optimizer"""
 
     with strategy.scope():
         optimizer_type = config["optimizer"]["name"]

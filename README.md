@@ -117,6 +117,11 @@ datasets have extra conditions (for example non-commercial use only) which also 
 The QuartzNet models are double licenced withs Nvidia's NGC, because they use their pretrained weights.
 Please check this yourself for the models you want to use.
 
+**Mozilla's DeepSpeech**:
+
+You can find the old models later on this page, in the `old experiments` [section](#old-experiments). \
+Below models are not compatible to the DeepSpeech client anymore!
+
 **German**:
 
 - Quartznet15x5, CV only (WER: 7.7%): [Link](https://www.mediafire.com/folder/rrse5ydtgdpvs/cv-wer0077)
@@ -142,10 +147,6 @@ Please check this yourself for the models you want to use.
 - Quartznet15x5, CV only (WER: 12.1%): [Link](https://www.mediafire.com/folder/bee6yoirkcoui/cv-wer0121)
 - Quartznet15x5, D7CV (WER: 11.7%): [Link](https://www.mediafire.com/folder/wwudrwn56iimc/d7cv-wer0117)
 - Scorer: [Link](https://www.mediafire.com/file/pcj322gp5ddpfhd/kenlm_fr_n12.scorer/file)
-
-**Mozilla's DeepSpeech**:
-
-You can find the old models later on this page, in the `old experiments` [section](#old-experiments).
 
 <br/>
 

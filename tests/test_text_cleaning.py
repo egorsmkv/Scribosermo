@@ -9,7 +9,7 @@ import text_cleaning  # noqa: E402 pylint: disable=wrong-import-position
 
 
 def test_clean_sentence():
-    """ Only single sentence needed for output format test and coverage """
+    """Only single sentence needed for output format test and coverage"""
 
     os.environ["LANGUAGE"] = "de"
     text_cleaning.load_language()

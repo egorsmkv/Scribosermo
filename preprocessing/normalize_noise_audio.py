@@ -23,7 +23,7 @@ from dataset_operations import seconds_to_hours
 
 
 def get_duration(filename):
-    """ Get duration of the wav file """
+    """Get duration of the wav file"""
     length = librosa.get_duration(filename=filename)
     return length
 
