@@ -325,9 +325,8 @@ def create_pipeline(csv_path: str, batch_size: int, config: dict, mode: str):
     df = df[["filepath", "text"]]
     ds = tf.data.Dataset.from_tensor_slices(dict(df))
 
-    # Load audio from files and cache them in memory
+    # Load audio from files
     ds = ds.map(map_func=load_audio, num_parallel_calls=AUTOTUNE)
-    ds = ds.cache()
 
     # Apply augmentations only in training
     train_mode = bool(mode in ["train"])

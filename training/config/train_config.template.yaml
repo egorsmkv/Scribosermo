@@ -166,13 +166,13 @@ augmentations:
       cut_max: 1.5
     freq_mask:
       # Zeros out one or multiple random frequency ranges
-      use_train: false
+      use_train: true
       use_test: false
       n: 1
       max_size: 6
     time_mask:
       # Zeros out one or multiple random time ranges
-      use_train: false
+      use_train: true
       use_test: false
       n: 1
       max_size: 25
@@ -185,9 +185,9 @@ augmentations:
       max_time_size: 25
     spec_dropout:
       # Drops random values
-      use_train: false
+      use_train: true
       use_test: false
-      max_rate: 0.05
+      max_rate: 0.01
   features:
     random_multiply:
       # Add multiplicative random noise to features

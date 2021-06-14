@@ -217,7 +217,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         if extra_lstm:
             # Not described in the paper, but added for an additional experiment
             x = tfl.LSTM(
-                int((filters * 1.5) / 8) * 8, return_sequences=True, stateful=False
+                int((filters * 1.75) / 8) * 8, return_sequences=True, stateful=False
             )(x)
 
         x = tfl.Conv1D(
