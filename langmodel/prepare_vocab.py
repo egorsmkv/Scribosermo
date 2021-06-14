@@ -10,7 +10,7 @@ import text_cleaning  # noqa: E402 pylint: disable=wrong-import-position
 
 
 def handle_file_content(sentences, save_path):
-    """ Normalize list of sentences and append them to the output file """
+    """Normalize list of sentences and append them to the output file"""
 
     csl = text_cleaning.clean_sentence_list(sentences)
     text = "\n".join(csl) + "\n"

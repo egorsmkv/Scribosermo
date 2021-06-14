@@ -12,8 +12,12 @@ Notes:
 Edit the files to your needs:
 
 ```bash
-# Export
-python3 /Scribosermo/extras/exporting/export.py
+# Export with either mode=pb or mode=tflite
+# For some reason exporting to tflite doesn't work with tf=2.4, use version 2.3 instead
+python3 /Scribosermo/extras/exporting/export.py \
+  --checkpoint_dir "/checkpoints/en/qnetp5/" \
+  --export_dir "checkpoints/en/qnetp5/exported/" \
+  --mode "tflite"
 
 # Test exported models
 python3 /Scribosermo/extras/exporting/testing_pb.py

@@ -18,6 +18,7 @@ setuptools.setup(
         "num2words",
         "pandarallel",
         "pandas",
+        "pydot",
         "pyyaml",
         "tensorflow<2.5,>=2.4",
         "tensorflow-io<0.18",

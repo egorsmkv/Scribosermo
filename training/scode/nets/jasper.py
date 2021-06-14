@@ -1,62 +1,80 @@
 import tensorflow as tf
-from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
 
 # ==================================================================================================
 
 
-class BaseModule(Model):  # pylint: disable=abstract-method
+class BaseModule(tfl.Layer):  # pylint: disable=abstract-method
     def __init__(self, filters, kernel_size, dropout, is_last_module=False):
         super().__init__()
 
-        self.model = tf.keras.Sequential()
-        self.model.add(
-            tfl.Conv1D(filters=filters, kernel_size=kernel_size, padding="same")
-        )
-        self.model.add(tfl.BatchNormalization())
+        self.is_last_module = is_last_module
+        self.dropout = dropout
 
-        if not is_last_module:
-            # Last base module in a block has relu and dropout after the residual connection
-            self.model.add(tfl.ReLU())
-            self.model.add(tfl.Dropout(rate=dropout))
+        self.conv = tfl.Conv1D(
+            filters=filters,
+            kernel_size=kernel_size,
+            padding="same",
+        )
+        self.bnorm = tfl.BatchNormalization()
 
     # ==============================================================================================
 
-    def call(self, x):  # pylint: disable=arguments-differ
-        x = self.model(x)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
+        x = self.conv(x, training=training)
+        x = self.bnorm(x, training=training)
+
+        if not self.is_last_module:
+            # Last base module in a block has relu and dropout after the residual connection
+            x = tf.keras.activations.relu(x)
+
+            if training:
+                x = tf.nn.dropout(x, rate=self.dropout)
+
         return x
 
 
 # ==================================================================================================
 
 
-class PartialBlock(Model):  # pylint: disable=abstract-method
+class PartialBlock(tfl.Layer):  # pylint: disable=abstract-method
     def __init__(self, filters, kernel_size, dropout, repeat):
+
         super().__init__()
+        self.pblocks = []
 
         # Build block until residual connection
-        self.model = tf.keras.Sequential()
         for _ in range(repeat - 1):
-            layer = BaseModule(
-                filters=filters, kernel_size=kernel_size, dropout=dropout
-            )
-            self.model.add(layer)
-        layer = BaseModule(filters, kernel_size, dropout, is_last_module=True)
-        self.model.add(layer)
+            bm = BaseModule(filters=filters, kernel_size=kernel_size, dropout=dropout)
+            self.pblocks.append(bm)
+
+        bm = BaseModule(
+            filters=filters,
+            kernel_size=kernel_size,
+            dropout=dropout,
+            is_last_module=True,
+        )
+        self.pblocks.append(bm)
 
     # ==============================================================================================
 
-    def call(self, x):  # pylint: disable=arguments-differ
-        x = self.model(x)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
+
+        for pblock in self.pblocks:
+            x = pblock(x, training=training)
         return x
 
 
 # ==================================================================================================
 
 
-class MyModel(Model):  # pylint: disable=abstract-method
-    def __init__(self, c_input, c_output, blocks, module_repeat, dense_residuals):
+class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
+    def __init__(self, c_input: int, c_output: int, netconfig: dict):
         super().__init__()
+
+        # Check that the netconfig includes all required keys
+        reqkeys = {"blocks", "module_repeat", "dense_residuals"}
+        assert reqkeys.issubset(set(netconfig.keys())), "Some network keys are missing"
 
         # Params: output_filters, kernel_size, dropout
         block_params = [
@@ -66,7 +84,7 @@ class MyModel(Model):  # pylint: disable=abstract-method
             [640, 21, 0.3],
             [768, 25, 0.4],
         ]
-        block_repeat = blocks / len(block_params)
+        block_repeat = netconfig["blocks"] / len(block_params)
         assert block_repeat == int(block_repeat)
         block_repeat = int(block_repeat)
 
@@ -75,7 +93,10 @@ class MyModel(Model):  # pylint: disable=abstract-method
         self.feature_time_reduction_factor = 2
 
         self.model = self.make_model(
-            block_params, block_repeat, module_repeat, dense_residuals
+            block_params,
+            block_repeat,
+            netconfig["module_repeat"],
+            netconfig["dense_residuals"],
         )
 
     # ==============================================================================================
@@ -83,7 +104,9 @@ class MyModel(Model):  # pylint: disable=abstract-method
     def make_model(self, block_params, block_repeat, module_repeat, dense_residuals):
         input_tensor = tfl.Input(shape=[None, self.n_input], name="input")
 
-        x = tfl.Conv1D(filters=256, kernel_size=11, strides=2)(input_tensor)
+        x = tfl.Conv1D(filters=256, kernel_size=11, strides=2, padding="same")(
+            input_tensor
+        )
         x = tfl.BatchNormalization()(x)
         x = tfl.ReLU()(x)
         x = tfl.Dropout(0.2)(x)
@@ -114,26 +137,27 @@ class MyModel(Model):  # pylint: disable=abstract-method
                 x = tfl.ReLU()(x)
                 x = tfl.Dropout(dropout)(x)
 
-        x = tfl.Conv1D(filters=896, kernel_size=29, dilation_rate=2)(x)
+        x = tfl.Conv1D(filters=896, kernel_size=29, dilation_rate=2, padding="same")(x)
         x = tfl.BatchNormalization()(x)
         x = tfl.ReLU()(x)
         x = tfl.Dropout(0.4)(x)
 
-        x = tfl.Conv1D(filters=1024, kernel_size=1)(x)
+        x = tfl.Conv1D(filters=1024, kernel_size=1, padding="valid")(x)
         x = tfl.BatchNormalization()(x)
         x = tfl.ReLU()(x)
         x = tfl.Dropout(0.4)(x)
 
-        x = tfl.Conv1D(filters=self.n_output, kernel_size=1)(x)
+        x = tfl.Conv1D(filters=self.n_output, kernel_size=1, padding="valid")(x)
+
+        x = tf.cast(x, dtype="float32")
+        x = tf.nn.log_softmax(x)
         output_tensor = tf.identity(x, name="output")
 
-        model = Model(input_tensor, output_tensor, name="Jasper")
+        model = tf.keras.Model(input_tensor, output_tensor, name="Jasper")
         return model
 
     # ==============================================================================================
 
-    # Input signature is required to export this method into ".pb" format and use it while testing
-    @tf.function(input_signature=[])
     def get_time_reduction_factor(self):
         """Some models reduce the time dimension of the features, for example with striding.
         When the inputs are padded for better batching, it's complicated to get the original length
@@ -143,16 +167,15 @@ class MyModel(Model):  # pylint: disable=abstract-method
     # ==============================================================================================
 
     def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
+        print("")
         self.model.summary(line_length=line_length, **kwargs)
 
     # ==============================================================================================
 
-    # This input signature is required that we can export and load the model in ".pb" format
-    # with a variable sequence length, instead of using the one of the first input.
-    @tf.function(input_signature=[tf.TensorSpec([None, None, None], tf.float32)])
-    def call(self, x):  # pylint: disable=arguments-differ
-        """Call with input shape: [batch_size, steps_a, n_input],
-        outputs tensor of shape: [batch_size, steps_b, n_output]"""
+    @tf.function(experimental_relax_shapes=True)
+    def call(self, x, training=False):  # pylint: disable=arguments-differ
+        """Call with input shape: [batch_size, steps_a, n_input].
+        Outputs a tensor of shape: [batch_size, steps_b, n_output]"""
 
-        x = self.model(x)
+        x = self.model(x, training=training)
         return x

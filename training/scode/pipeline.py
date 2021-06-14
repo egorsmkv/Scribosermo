@@ -191,15 +191,23 @@ def apply_augmentations(tensor, datatype: str, config: dict, train_mode: bool = 
 # ==================================================================================================
 
 
-def load_audio(sample, config: dict, train_mode: bool = False):
+def load_audio(sample):
     audio_binary = tf.io.read_file(sample["filepath"])
     audio, _ = tf.audio.decode_wav(audio_binary)
 
-    audio = tf.squeeze(audio, axis=-1)
+    sample["raw_audio"] = audio
+    return sample
+
+
+# ==================================================================================================
+
+
+def augment_signal(sample, config: dict, train_mode: bool = False):
+    audio = tf.squeeze(sample["raw_audio"], axis=-1)
     audio = apply_augmentations(audio, "signal", config, train_mode)
 
     audio = tf.expand_dims(audio, axis=-1)
-    sample["raw_audio"] = audio
+    sample["signal"] = audio
     return sample
 
 
@@ -210,7 +218,7 @@ def audio_to_spect(sample, config: dict, train_mode: bool = False):
     global audio_window_samples, audio_step_samples
 
     spectrogram = tf.raw_ops.AudioSpectrogram(
-        input=sample["raw_audio"],
+        input=sample["signal"],
         window_size=audio_window_samples,
         stride=audio_step_samples,
         magnitude_squared=True,
@@ -283,19 +291,15 @@ def post_process(sample):
     sample["feature_length"] = tf.reduce_sum(mask, axis=0)[0]
 
     # Drop unused keys
-    cleaned_sample = {
-        k: sample[k]
-        for k in sample
-        if k
-        in [
-            "features",
-            "feature_length",
-            "label",
-            "label_length",
-            "text",
-            "filepath",
-        ]
-    }
+    keep_keys = [
+        "features",
+        "feature_length",
+        "label",
+        "label_length",
+        "text",
+        "filepath",
+    ]
+    cleaned_sample = {k: sample[k] for k in sample if k in keep_keys}
 
     return cleaned_sample
 
@@ -303,9 +307,7 @@ def post_process(sample):
 # ==================================================================================================
 
 
-def create_pipeline(
-    csv_path: str, batch_size: int, config: dict, train_mode: bool = False
-):
+def create_pipeline(csv_path: str, batch_size: int, config: dict, mode: str):
     """Create data-iterator from tab separated csv file"""
     global num_features
 
@@ -323,8 +325,14 @@ def create_pipeline(
     df = df[["filepath", "text"]]
     ds = tf.data.Dataset.from_tensor_slices(dict(df))
 
-    la_func = lambda x: load_audio(x, config, train_mode)
-    ds = ds.map(map_func=la_func, num_parallel_calls=AUTOTUNE)
+    # Load audio from files
+    ds = ds.map(map_func=load_audio, num_parallel_calls=AUTOTUNE)
+
+    # Apply augmentations only in training
+    train_mode = bool(mode in ["train"])
+
+    as_func = lambda x: augment_signal(x, config, train_mode)
+    ds = ds.map(map_func=as_func, num_parallel_calls=AUTOTUNE)
     a2s_func = lambda x: audio_to_spect(x, config, train_mode)
     ds = ds.map(map_func=a2s_func, num_parallel_calls=AUTOTUNE)
 
@@ -341,6 +349,10 @@ def create_pipeline(
     ds = ds.map(text_to_ids, num_parallel_calls=AUTOTUNE)
     ds = ds.map(post_process, num_parallel_calls=AUTOTUNE)
 
+    # LSTM networks seem to have problems with half filled batches
+    # Drop them in training and evaluation, but keep them while testing
+    drop_remainder = bool(mode in ["train", "eval"])
+
     if batch_size == 1:
         # No need for padding here
         # This also makes debugging easier if the key dropping is skipped
@@ -348,7 +360,7 @@ def create_pipeline(
     else:
         ds = ds.padded_batch(
             batch_size=batch_size,
-            drop_remainder=False,
+            drop_remainder=drop_remainder,
             padded_shapes=(
                 {
                     "features": [None, num_features],

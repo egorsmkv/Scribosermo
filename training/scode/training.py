@@ -5,11 +5,14 @@ import time
 
 import tensorflow as tf
 import tensorflow_addons as tfa
+from tensorflow.keras import mixed_precision
+
+# Required for loading exported models with tf=2.3, which is required for tflite exports
+from tensorflow.python.framework.errors_impl import (  # pylint: disable=no-name-in-module
+    NotFoundError,
+)
 
 from . import nets, pipeline, utils
-
-# from tensorflow.keras.mixed_precision import experimental as mixed_precision
-
 
 # ==================================================================================================
 
@@ -77,18 +80,25 @@ def train_step(samples):
     features = samples["features"]
 
     with tf.GradientTape() as tape:
-        predictions = model(features)
+        predictions = model(features, training=True)
         loss = get_loss(predictions, samples)
         loss = tf.reduce_mean(loss)
+
+        if config["mixed_precision"]:
+            scaled_loss = optimizer.get_scaled_loss(loss)
 
     trainable_variables = model.trainable_variables
     if config["freeze_base_net"]:
         trainable_variables = model.trainable_variables[-2:]
         print("Training only last layer")
 
-    gradients = tape.gradient(loss, trainable_variables)
-    # gradients = optimizer.get_unscaled_gradients(scaled_gradients)
-    gradients, _ = tf.clip_by_global_norm(gradients, 1.0)
+    if config["mixed_precision"]:
+        gradients = tape.gradient(scaled_loss, trainable_variables)
+        gradients = optimizer.get_unscaled_gradients(gradients)
+    else:
+        gradients = tape.gradient(loss, trainable_variables)
+
+    gradients, _ = tf.clip_by_global_norm(gradients, 5.0)
     optimizer.apply_gradients(zip(gradients, trainable_variables))
 
     return loss
@@ -251,7 +261,7 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
         # Save new best model
         if eval_loss < best_eval_loss:
             best_eval_loss = eval_loss
-            tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
+            model.save_weights(checkpoint_dir)
             print("Saved new best validating model")
 
         training_epochs += 1
@@ -283,8 +293,7 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
 
             # Reload checkpoint that we use the best_dev weights again
             print("Reloading model with best weights ...")
-            best_model = tf.keras.models.load_model(checkpoint_dir)
-            model.set_weights(best_model.get_weights())
+            model.load_weights(checkpoint_dir)
 
     msg = "\nCompleted training after {} epochs with best evaluation loss of {:.4f} after {} hours"
     duration = utils.seconds_to_hours(time.time() - training_start_time)
@@ -316,7 +325,7 @@ def evaluate(dataset_eval):
 
 
 def build_pipelines():
-    """ Initialize train/eval data pipelines """
+    """Initialize train/eval data pipelines"""
 
     global_train_batch_size = (
         config["batch_sizes"]["train"] * strategy.num_replicas_in_sync
@@ -330,13 +339,13 @@ def build_pipelines():
         csv_path=config["data_paths"]["train"],
         batch_size=global_train_batch_size,
         config=config,
-        train_mode=True,
+        mode="train",
     )
     dataset_eval = pipeline.create_pipeline(
         csv_path=config["data_paths"]["eval"],
         batch_size=global_eval_batch_size,
         config=config,
-        train_mode=False,
+        mode="eval",
     )
 
     # Solve "Found an unshardable source dataset" warning, run before distribution
@@ -358,7 +367,7 @@ def build_pipelines():
 
 
 def create_optimizer():
-    """ Initialize training optimizer """
+    """Initialize training optimizer"""
 
     with strategy.scope():
         optimizer_type = config["optimizer"]["name"]
@@ -374,7 +383,9 @@ def create_optimizer():
                 beta_1=config["optimizer"]["beta1"],
                 beta_2=config["optimizer"]["beta2"],
             )
-        # optim = mixed_precision.LossScaleOptimizer(optim, loss_scale='dynamic')
+
+        if config["mixed_precision"]:
+            optim = mixed_precision.LossScaleOptimizer(optim)
 
     return optim
 
@@ -382,84 +393,94 @@ def create_optimizer():
 # ==================================================================================================
 
 
-def load_model():
-    feature_type = config["audio_features"]["use_type"]
-    c_input = config["audio_features"][feature_type]["num_features"]
+def build_new_model(new_config: dict, print_log: bool = True):
+    feature_type = new_config["audio_features"]["use_type"]
+    c_input = new_config["audio_features"][feature_type]["num_features"]
     c_output = len(alphabet) + 1
 
     # Get the model type either from the config or the existing checkpoint
-    if config["continue_pretrained"] or not config["empty_ckpt_dir"]:
+    if new_config["continue_pretrained"] or not new_config["empty_ckpt_dir"]:
         path = os.path.join(checkpoint_dir, "config_export.json")
         exported_config = utils.load_json_file(path)
         network_type = exported_config["network"]["name"]
     else:
-        network_type = config["network"]["name"]
+        network_type = new_config["network"]["name"]
 
-    # Build the network
-    print("Creating new {} model ...".format(network_type))
-    with strategy.scope():
-        if network_type == "deepspeech1":
-            new_model = nets.deepspeech1.MyModel(c_input, c_output)
-        elif network_type == "deepspeech2":
-            new_model = nets.deepspeech2.MyModel(c_input, c_output)
-        elif network_type == "jasper":
-            new_model = nets.jasper.MyModel(
-                c_input,
-                c_output,
-                blocks=config["network"]["blocks"],
-                module_repeat=config["network"]["module_repeat"],
-                dense_residuals=config["network"]["dense_residuals"],
-            )
-        elif network_type == "quartznet":
-            new_model = nets.quartznet.MyModel(
-                c_input,
-                c_output,
-                blocks=config["network"]["blocks"],
-                module_repeat=config["network"]["module_repeat"],
-            )
+    if print_log:
+        print("Creating new {} model ...".format(network_type))
 
-    # Copy weights. Compared to loading the model directly, this has the benefit that parts of the
-    # model code can be changed as long the layers are kept.
-    if config["continue_pretrained"] or not config["empty_ckpt_dir"]:
-        print("Copying model weights from checkpoint ...")
-        exported_model = tf.keras.models.load_model(checkpoint_dir)
-
-        # Get shapes of last (decoding) layer
-        last_layer_shape_exp = [w.shape for w in exported_model.get_weights()][-2]
-        last_layer_shape_new = [w.shape for w in new_model.get_weights()][-2]
-
-        if last_layer_shape_new == last_layer_shape_exp:
-            # Copy all weights
-            new_model.set_weights(exported_model.get_weights())
-            print("Copied weights of all layers")
-        else:
-            # Copy exported weights from all but the last layer.
-            merged_weights = exported_model.get_weights()[:-2]
-
-            if not config["extend_old_alphabet"]:
-                # Keep the newly initialized weights for the missing layer.
-                print("Newly initializing last layer ...")
-                nll_weights = new_model.get_weights()[-2:]
-                merged_weights.extend(nll_weights)
-            else:
-                # Use some parts of the exported weights and some from the newly initialized
-                print("Extending last layer ...")
-                ell_weights = exported_model.get_weights()[-2:]
-                nll_weights = new_model.get_weights()[-2:]
-
-                for ell, nll in zip(ell_weights, nll_weights):
-                    # Insert the new character between the old ones and the ctc-symbol
-                    first_chars = ell[..., : ell.shape[-1] - 1]
-                    new_chars = nll[..., ell.shape[-1] - 1 : nll.shape[-1] - 1]
-                    ctc_char = ell[..., -1:]
-
-                    mixed = tf.concat([first_chars, new_chars, ctc_char], axis=-1)
-                    merged_weights.append(mixed)
-
-            new_model.set_weights(merged_weights)
+    # Create the network
+    mynet = getattr(nets, network_type)
+    new_model = mynet.MyModel(
+        c_input=c_input, c_output=c_output, netconfig=new_config["network"]
+    )
 
     new_model.build(input_shape=(None, None, c_input))
+    new_model.compile()
     return new_model
+
+
+# ==================================================================================================
+
+
+def copy_weights(exported_model, new_model) -> None:
+    """Copy model weights. Compared to loading the model directly, this has the benefit that parts
+    of the model code can be changed as long the layers are kept."""
+
+    # Get shapes of last (decoding) layer
+    last_layer_shape_exp = [w.shape for w in exported_model.get_weights()][-2]
+    last_layer_shape_new = [w.shape for w in new_model.get_weights()][-2]
+
+    if last_layer_shape_new == last_layer_shape_exp:
+        # Copy all weights
+        new_model.set_weights(exported_model.get_weights())
+        print("Copied weights of all layers")
+    else:
+        # Copy exported weights from all but the last layer.
+        merged_weights = exported_model.get_weights()[:-2]
+
+        if not config["extend_old_alphabet"]:
+            # Keep the newly initialized weights for the missing layer.
+            print("Newly initializing last layer ...")
+            nll_weights = new_model.get_weights()[-2:]
+            merged_weights.extend(nll_weights)
+        else:
+            # Use some parts of the exported weights and some from the newly initialized
+            print("Extending last layer ...")
+            ell_weights = exported_model.get_weights()[-2:]
+            nll_weights = new_model.get_weights()[-2:]
+
+            for ell, nll in zip(ell_weights, nll_weights):
+                # Insert the new character between the old ones and the ctc-symbol
+                first_chars = ell[..., : ell.shape[-1] - 1]
+                new_chars = nll[..., ell.shape[-1] - 1 : nll.shape[-1] - 1]
+                ctc_char = ell[..., -1:]
+
+                mixed = tf.concat([first_chars, new_chars, ctc_char], axis=-1)
+                merged_weights.append(mixed)
+
+        new_model.set_weights(merged_weights)
+
+
+# ==================================================================================================
+
+
+def load_exported_model(exported_dir: str):
+    """Rebuild model and load weights, because exporting the full model and loading it again didn't
+    work for some models due to problems with the input-signature for @tf.function decorator"""
+
+    try:
+        print("Trying to load weights directly ...")
+        path = os.path.join(exported_dir, "config_export.json")
+        exported_config = utils.load_json_file(path)
+        exported_model = build_new_model(exported_config, print_log=False)
+        exported_model.load_weights(exported_dir)
+    except (OSError, NotFoundError):
+        # Load old or exported models where not only the weights were saved
+        print("Loading weights from exported model instead ...")
+        exported_model = tf.keras.models.load_model(exported_dir)
+
+    return exported_model
 
 
 # ==================================================================================================
@@ -476,8 +497,10 @@ def main():
     for gpu in gpus:
         tf.config.experimental.set_memory_growth(gpu, True)
 
-    # policy = mixed_precision.Policy('mixed_float16')
-    # mixed_precision.set_policy(policy)
+    if config["mixed_precision"]:
+        # Enable mixed precision training
+        mixed_precision.set_global_policy("mixed_float16")
+        print("Training with mixed precision ...")
 
     # Build this after setting the gpu config, else it will raise an initialization error
     create_idx2char()
@@ -495,23 +518,31 @@ def main():
         # Create and empty directory
         os.makedirs(checkpoint_dir, exist_ok=True)
 
-    # Export current config next to the checkpoints
-    path = os.path.join(checkpoint_dir, "config_export.json")
-    with open(path, "w+", encoding="utf-8") as file:
-        json.dump(config, file, indent=2)
-
     # Enable training with multiple gpus
     strategy = tf.distribute.MirroredStrategy()
 
     # Initialize data pipelines
     dataset_train, dataset_eval = build_pipelines()
 
-    # Create and initialize the model, either from scratch or with loading exported weights
-    model = load_model()
+    # Create and initialize the model
+    with strategy.scope():
+        model = build_new_model(config)
+
+    # Optionally load exported weights
+    if config["continue_pretrained"] or not config["empty_ckpt_dir"]:
+        print("Copying model weights from existing checkpoint ...")
+        exported_model = load_exported_model(checkpoint_dir)
+        copy_weights(exported_model, model)
 
     # Select optimizer
     optimizer = create_optimizer()
 
+    # Export current config next to the checkpoints
+    path = os.path.join(checkpoint_dir, "config_export.json")
+    with open(path, "w+", encoding="utf-8") as file:
+        json.dump(config, file, indent=2)
+
+    # Initialize checkpoint manager for intermediate model backups
     summary_writer = tf.summary.create_file_writer(checkpoint_dir)
     checkpoint = tf.train.Checkpoint(model=model, optimizer=optimizer)
     save_manager = tf.train.CheckpointManager(
@@ -526,10 +557,15 @@ def main():
 
     # Print model summary
     model.summary()
+    img_path = os.path.join(config["checkpoint_dir"], "model.png")
+    tf.keras.utils.plot_model(
+        model.model, to_file=img_path, show_shapes=True, expand_nested=True
+    )
 
     # Optionally save model before doing any training updates
     if config["save_fresh_model"]:
-        tf.keras.models.save_model(model, checkpoint_dir, include_optimizer=False)
+        model.save_weights(checkpoint_dir)
+        print("Saved fresh model")
 
     # Finally the training can start
     start_epoch = 1

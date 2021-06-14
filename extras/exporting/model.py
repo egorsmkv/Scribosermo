@@ -1,7 +1,6 @@
 import math
 
 import tensorflow as tf
-from tensorflow.keras import Model
 from tensorflow.keras import layers as tfl
 
 import tflite_tools
@@ -9,7 +8,7 @@ import tflite_tools
 # ==================================================================================================
 
 
-class MyModel(Model):  # pylint: disable=abstract-method
+class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
     def __init__(self, nn_model, metadata, specmode):
         super().__init__()
 
@@ -121,7 +120,7 @@ class MyModel(Model):  # pylint: disable=abstract-method
 
         # Get predictions
         x = tf.expand_dims(x, axis=0)
-        x = self.nn_model(x)
+        x = self.nn_model(x, training=False)
 
         # Prepare for ctc decoding
         x = tf.nn.softmax(x)
@@ -129,7 +128,7 @@ class MyModel(Model):  # pylint: disable=abstract-method
         output_tensor = tf.identity(x, name="logits")
 
         name = "Exported{}".format(self.metadata["network"].title())
-        model = Model(input_tensor, output_tensor, name=name)
+        model = tf.keras.Model(input_tensor, output_tensor, name=name)
         return model
 
     # ==============================================================================================
@@ -150,8 +149,9 @@ class MyModel(Model):  # pylint: disable=abstract-method
 
     # ==============================================================================================
 
-    def summary(self, line_length=100, **kwargs):  # pylint: disable=arguments-differ
-        self.model.summary(line_length=line_length, **kwargs)
+    def summary(self):  # pylint: disable=arguments-differ
+        print("")
+        self.model.summary(line_length=100)
 
     # ==============================================================================================
 

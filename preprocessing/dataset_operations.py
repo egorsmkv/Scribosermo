@@ -24,7 +24,7 @@ def seconds_to_hours(secs):
 
 
 def add_statistics_columns(data):
-    """ Create some temporary columns """
+    """Create some temporary columns"""
 
     data["text_length"] = data.parallel_apply(lambda x: len(x.text), axis=1)
     data["avg_time_per_char"] = data["duration"] / data["text_length"]

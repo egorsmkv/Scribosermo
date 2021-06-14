@@ -1,10 +1,10 @@
-FROM nvcr.io/nvidia/nemo:1.0.0b3
+FROM nvcr.io/nvidia/nemo:1.0.0rc1
 
 WORKDIR /
 RUN git clone --depth 1 https://github.com/NVIDIA/NeMo.git
 
 # Build runtime ourself to be able to use more recent cuda version
-RUN git clone --depth 1 --branch v1.5.2 https://github.com/microsoft/onnxruntime.git
+RUN git clone --depth 1 --branch v1.7.2 https://github.com/microsoft/onnxruntime.git
 RUN cd onnxruntime && ./build.sh --skip_tests --config Release --build_shared_lib --parallel \
   --use_cuda --cuda_home /usr/local/cuda --cudnn_home /usr/lib/x86_64-linux-gnu --build_wheel
 RUN pip3 uninstall -y onnxruntime

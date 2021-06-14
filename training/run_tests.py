@@ -6,20 +6,19 @@ from scode import pipeline, testing, utils
 
 
 def test_pipeline(sample_csv_path):
-    train_mode = True
     bench_batch_size = 16
     config = utils.get_config()
 
     # Run pipeline for one epoch to check how long preprocessing takes
     print("\nGoing through dataset to check preprocessing duration...")
     tds = pipeline.create_pipeline(
-        sample_csv_path, bench_batch_size, config, train_mode
+        sample_csv_path, bench_batch_size, config, mode="train"
     )
     for _ in tqdm.tqdm(tds):
         pass
 
     # Print the first sample of the dataset
-    tds = pipeline.create_pipeline(sample_csv_path, 1, config, train_mode)
+    tds = pipeline.create_pipeline(sample_csv_path, 1, config, mode="train")
     for samples in tds:
         print(samples)
         break

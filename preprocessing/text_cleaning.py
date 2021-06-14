@@ -33,7 +33,7 @@ char_replacers = None
 
 
 def load_language():
-    """ Load language and replacers in extra function that they are reloadable for testing """
+    """Load language and replacers in extra function that they are reloadable for testing"""
 
     global language, langdicts
 
@@ -53,7 +53,7 @@ def load_language():
 
 
 def load_langdicts(lang: str) -> dict:
-    """ Load the langdicts """
+    """Load the langdicts"""
 
     path = file_path + "../data/{}/langdicts.json".format(lang)
     with open(path, "r", encoding="utf-8") as file:
@@ -103,7 +103,7 @@ load_language()
 
 
 def replace_specials(word):
-    """ Apply special replacement rules to the given word. """
+    """Apply special replacement rules to the given word."""
 
     for to_replace, replacement in special_replacers.items():
         word = word.replace(to_replace, " {} ".format(replacement))
@@ -115,7 +115,7 @@ def replace_specials(word):
 
 
 def replace_symbols(word):
-    """ Apply all replacement character rules to the given word. """
+    """Apply all replacement character rules to the given word."""
 
     for to_replace, replacement in umlaut_replacers.items():
         word = word.replace(to_replace, replacement)
@@ -130,7 +130,7 @@ def replace_symbols(word):
 
 
 def remove_symbols(word, bad_characters):
-    """ Remove all symbols that are not allowed. """
+    """Remove all symbols that are not allowed."""
 
     for c in set(bad_characters):
         word = word.replace(c, "")
@@ -142,7 +142,7 @@ def remove_symbols(word, bad_characters):
 
 
 def word_to_num(word):
-    """ Replace numbers with their written representation. """
+    """Replace numbers with their written representation."""
 
     matches = special_pattern.findall(word)
     for match in matches:
@@ -171,7 +171,7 @@ def word_to_num(word):
 
 
 def get_bad_characters(text):
-    """ Return all characters in the text that are not allowed. """
+    """Return all characters in the text that are not allowed."""
 
     bad_characters = []
 
@@ -211,7 +211,7 @@ def clean_word(word):
 
 
 def clean_sentence(sentence):
-    """ Clean the given sentence """
+    """Clean the given sentence"""
 
     sentence = re.sub(multi_space_pattern, " ", sentence)
     sentence = sentence.lower()

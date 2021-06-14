@@ -33,6 +33,10 @@ batch_sizes:
   eval: 8
   test: 1
 
+# Performance advantage is depending on the hardware platform
+# If enabled also increase the batch-size, and make sure that it is dividable by 8
+mixed_precision: false
+
 # Sort the datasets. You can use a descending sort to estimate the maximal batch size you can use.
 sort_datasets: true
 sort_ds_ascending: true
@@ -113,7 +117,7 @@ audio_features:
 augmentations:
   signal:
     dither:
-      # Add minimal random noise to data to prevent quantization artefacts
+      # Add minimal random noise to data to prevent quantization artifacts
       use_train: true
       use_test: true
       factor: 0.00001
@@ -162,13 +166,13 @@ augmentations:
       cut_max: 1.5
     freq_mask:
       # Zeros out one or multiple random frequency ranges
-      use_train: false
+      use_train: true
       use_test: false
       n: 1
       max_size: 6
     time_mask:
       # Zeros out one or multiple random time ranges
-      use_train: false
+      use_train: true
       use_test: false
       n: 1
       max_size: 25
@@ -181,9 +185,9 @@ augmentations:
       max_time_size: 25
     spec_dropout:
       # Drops random values
-      use_train: false
+      use_train: true
       use_test: false
-      max_rate: 0.05
+      max_rate: 0.01
   features:
     random_multiply:
       # Add multiplicative random noise to features

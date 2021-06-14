@@ -94,7 +94,7 @@ def test_csv_input(onnx_path: str, csv_path: str):
     onnx_model = onnx.load(onnx_path)
     onnxtf_model = prepare(onnx_model)
 
-    tds = pipeline.create_pipeline(csv_path, 1, pl_config, train_mode=True)
+    tds = pipeline.create_pipeline(csv_path, 1, pl_config, mode="train")
     for samples in tds:
         features = samples["features"]
         print(features)
@@ -177,7 +177,7 @@ def transfer_onnx_weights(onnx_path: str):
 def build_test_tfmodel(onnx_path: str, csv_path: str, checkpoint_dir: str):
 
     model = transfer_onnx_weights(onnx_path)
-    tds = pipeline.create_pipeline(csv_path, 1, pl_config, train_mode=True)
+    tds = pipeline.create_pipeline(csv_path, 1, pl_config, mode="train")
 
     for samples in tds:
         features = samples["features"]
@@ -250,7 +250,7 @@ def debug_models(onnx_path: str, csv_path: str):
     itfmodel.build(input_shape=(None, None, 64))
     itfmodel.summary()
 
-    tds = pipeline.create_pipeline(csv_path, 1, pl_config, train_mode=True)
+    tds = pipeline.create_pipeline(csv_path, 1, pl_config, mode="train")
     for samples in tds:
         features = samples["features"]
         # features = np.zeros(shape=(1, 456, 64), dtype=np.float32)
@@ -330,7 +330,7 @@ def lrs_features(audio_path):
 
 
 def debug_input(csv_path):
-    tds = pipeline.create_pipeline(csv_path, 1, pl_config, train_mode=True)
+    tds = pipeline.create_pipeline(csv_path, 1, pl_config, mode="train")
     np.set_printoptions(edgeitems=10)
 
     for samples in tds:

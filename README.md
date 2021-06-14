@@ -89,8 +89,11 @@ You can find more details about the currently used datasets [here](preprocessing
 Implemented networks:
 [DeepSpeech1](https://arxiv.org/pdf/1412.5567.pdf),
 [DeepSpeech2](https://arxiv.org/pdf/1512.02595.pdf),
+[QuartzNet](https://arxiv.org/pdf/1910.10261.pdf),
 [Jasper](https://arxiv.org/pdf/1904.03288.pdf),
-[Quartznet](https://arxiv.org/pdf/1910.10261.pdf)
+[ContextNet](https://arxiv.org/pdf/2005.03191.pdf)(simplified),
+[Conformer](https://arxiv.org/pdf/2005.08100.pdf)(simplified),
+[CitriNet](https://arxiv.org/pdf/2104.01721.pdf)
 
 Notes on the networks:
 
@@ -99,10 +102,11 @@ Notes on the networks:
 
 Supported networks with their trainable parameter count (using English alphabet):
 
-|         |             |             |        |              |               |
-| ------- | ----------- | ----------- | ------ | ------------ | ------------- |
-| Network | DeepSpeech1 | DeepSpeech2 | Jasper | Quartznet5x5 | Quartznet15x5 |
-| Params  | 48.7M       | 120M        | 323M   | 6.7M         | 18.9M         |
+|         |             |             |                                                                                                                                         |        |                  |                 |                                                                                                                                                                                        |
+| ------- | ----------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Network | DeepSpeech1 | DeepSpeech2 | QuartzNet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Jasper | ContextNetSimple | SimpleConformer | CitriNet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| Config  |             |             | 5x5&nbsp;&nbsp; / 15x5&nbsp;&nbsp; / +LSTM                                                                                              |        | 0.8              | 16x240x4        | 256&nbsp;&nbsp;&nbsp;&nbsp; / 344&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; / +LSTM                                                                                                                |
+| Params  | 48.7M       | 120M        | 6.7M / 18.9M / 21.5M                                                                                                                    | 323M   | 21.6M            | 21.7M           | 10.9M / 19.3M / 21.6M                                                                                                                                                                  |
 
 <br>
 
@@ -112,6 +116,11 @@ By default, the checkpoints are provided under the same licence as this reposito
 datasets have extra conditions (for example non-commercial use only) which also have to be applied.
 The QuartzNet models are double licenced withs Nvidia's NGC, because they use their pretrained weights.
 Please check this yourself for the models you want to use.
+
+**Mozilla's DeepSpeech**:
+
+You can find the old models later on this page, in the `old experiments` [section](#old-experiments). \
+Below models are not compatible to the DeepSpeech client anymore!
 
 **German**:
 
@@ -138,10 +147,6 @@ Please check this yourself for the models you want to use.
 - Quartznet15x5, CV only (WER: 12.1%): [Link](https://www.mediafire.com/folder/bee6yoirkcoui/cv-wer0121)
 - Quartznet15x5, D7CV (WER: 11.7%): [Link](https://www.mediafire.com/folder/wwudrwn56iimc/d7cv-wer0117)
 - Scorer: [Link](https://www.mediafire.com/file/pcj322gp5ddpfhd/kenlm_fr_n12.scorer/file)
-
-**Mozilla's DeepSpeech**:
-
-You can find the old models later on this page, in the `old experiments` [section](#old-experiments).
 
 <br/>
 
@@ -240,6 +245,16 @@ Running some experiments with different language models:
 | ES       | D8 + CommonVoice  | Use PocoLM instead of KenLM (similar LM size); Checkpoint from D8+CV training with WER=0.1003; Test on CommonVoice  | CER with lm: 0.0407 <br> WER with lm: 0.1011 |
 | ES       | D8 + CommonVoice  | Like above; Large scorer (790MB)                                                                                    | CER with lm: 0.0402 <br> WER with lm: 0.1002 |
 | ES       | D8 + CommonVoice  | Like above; Full scorer (1.2GB)                                                                                     | CER with lm: 0.0403 <br> WER with lm: 0.1000 |
+
+Experimenting with new architectures on LibriSpeech dataset:
+
+| Network                    | Additional Infos                                                             | Performance&nbsp;Results                                                                                                                   |
+| -------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| ContextNetSimple (0.8)     | Run with multiple full restarts, ~3:30h/epoch                                | Eval-Loss-1: 64.2793 <br> Eval-Loss-2: 24.5743 <br> Eval-Loss-3: 19.4896                                                                   |
+| SimpleConformer (16x240x4) | Completed training after 28 epochs (~3:20h/epoch), without any augmentations | Eval-Loss: 70.6178                                                                                                                         |
+| Citrinet (344)             | Completed training after 6 epochs (~4h/epoch), didn't learn anything         | Eval-Loss: 289.7605                                                                                                                        |
+| QuartzNet (15x5)           | Continued old checkpoint                                                     | Eval-Loss: 5.0922 <br> Test-Loss: 5.3353 <br> CER greedy: 0.0139 <br> CER with lm: 0.0124 <br> WER greedy: 0.0457 <br> WER with lm: 0.0368 |
+| QuartzNet (15x5+LSTM)      | Frozen+Full training onto old checkpoint                                     | Eval-Loss: 4.9105 <br> Test-Loss: 5.3112 <br> CER greedy: 0.0143 <br> CER with lm: 0.0125 <br> WER greedy: 0.0477 <br> WER with lm: 0.0370 |
 
 <br/>
 

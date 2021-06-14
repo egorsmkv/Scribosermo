@@ -40,7 +40,7 @@ scancel JOBID
 - Upload and decompress the singularity image
 
   ```bash
-  scp scribosermo.sif.gz user@ip:/cfs/share/cache/db_xds/images/
+  scp scribosermo.sif.gz user@ip:~/images/
   gzip -d scribosermo.sif.gz
   ```
 
