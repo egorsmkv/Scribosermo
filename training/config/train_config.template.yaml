@@ -67,6 +67,9 @@ restore_ckpt_insteadof_pb_file: false
 # for comparison runs, because following trainings can be started with the same initialization.
 save_fresh_model: false
 
+# Run evaluation before training. Interesting when doing transfer-learning on a different dataset.
+eval_before_start: false
+
 # Copy another checkpoint and continue from there.
 # If using this, make sure your config matches the one of the pretrained checkpoint.
 continue_pretrained: false

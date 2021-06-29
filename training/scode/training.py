@@ -215,6 +215,10 @@ def train(dataset_train, dataset_eval, start_epoch, stop_epoch):
     training_start_time = time.time()
     training_epochs = 0
 
+    if config["eval_before_start"]:
+        eval_loss = evaluate(dataset_eval)
+        best_eval_loss = eval_loss
+
     for epoch in range(start_epoch, stop_epoch):
         start_time = time.time()
         epoch_steps = 0
