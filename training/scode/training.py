@@ -396,7 +396,7 @@ def create_optimizer():
 def build_new_model(new_config: dict, print_log: bool = True):
     feature_type = new_config["audio_features"]["use_type"]
     c_input = new_config["audio_features"][feature_type]["num_features"]
-    c_output = len(alphabet) + 1
+    c_output = len(utils.load_alphabet(new_config)) + 1
 
     # Get the model type either from the config or the existing checkpoint
     if new_config["continue_pretrained"] or not new_config["empty_ckpt_dir"]:
@@ -439,12 +439,7 @@ def copy_weights(exported_model, new_model) -> None:
         # Copy exported weights from all but the last layer.
         merged_weights = exported_model.get_weights()[:-2]
 
-        if not config["extend_old_alphabet"]:
-            # Keep the newly initialized weights for the missing layer.
-            print("Newly initializing last layer ...")
-            nll_weights = new_model.get_weights()[-2:]
-            merged_weights.extend(nll_weights)
-        else:
+        if config["extend_old_alphabet"]:
             # Use some parts of the exported weights and some from the newly initialized
             print("Extending last layer ...")
             ell_weights = exported_model.get_weights()[-2:]
@@ -456,8 +451,28 @@ def copy_weights(exported_model, new_model) -> None:
                 new_chars = nll[..., ell.shape[-1] - 1 : nll.shape[-1] - 1]
                 ctc_char = ell[..., -1:]
 
-                mixed = tf.concat([first_chars, new_chars, ctc_char], axis=-1)
-                merged_weights.append(mixed)
+                expanded = tf.concat([first_chars, new_chars, ctc_char], axis=-1)
+                merged_weights.append(expanded)
+
+        elif config["shrink_old_alphabet"]:
+            # Drop a few alphabet characters at the end
+            print("Shrinking last layer ...")
+            ell_weights = exported_model.get_weights()[-2:]
+            nll_weights = new_model.get_weights()[-2:]
+
+            for ell, nll in zip(ell_weights, nll_weights):
+                # Drop characters directly before the ctc-symbol
+                first_chars = ell[..., : nll.shape[-1] - 1]
+                ctc_char = ell[..., -1:]
+
+                reduced = tf.concat([first_chars, ctc_char], axis=-1)
+                merged_weights.append(reduced)
+
+        else:
+            # Keep the newly initialized weights for the missing layer.
+            print("Newly initializing last layer ...")
+            nll_weights = new_model.get_weights()[-2:]
+            merged_weights.extend(nll_weights)
 
         new_model.set_weights(merged_weights)
 

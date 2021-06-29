@@ -73,10 +73,11 @@ continue_pretrained: false
 pretrained_checkpoint_dir: "/checkpoints/en/qnet5/"
 
 # Only for transfer-learning. Keep weights for alphabet characters from the exported model if the
-# alphabet size of the two languages is different. Only works if the new alphabet is bigger. New
-# letters have to be inserted at the end of the alphabet. If disabled, a training with a different
-# sized alphabet, will reinitialize the last layer automatically.
+# alphabet size of the two languages is different. New letters will be inserted or removed at 
+# the end of the alphabet. If disabled, a training with a different sized alphabet, will 
+# reinitialize the last layer automatically.
 extend_old_alphabet: false
+shrink_old_alphabet: false
 
 # Used for transfer-learning. Only the last layer will be trained.
 # After the frozen training, start a new training with the complete network.
