@@ -93,6 +93,8 @@ Building `.arpa` file with PocoLM:
 export LANGUAGE="de"
 cd /data_prepared/langmodel/${LANGUAGE}/
 
+# Make sure to delete all files except the all.txt in this directory
+
 # Use 5% as dev partition and the other 95% for training
 head -n $(expr $(cat all.txt | wc -l) / 100 \* 5) < all.txt > dev.txt
 tail -n +$(expr $(cat all.txt | wc -l) / 100 \* 5) < all.txt > train.txt

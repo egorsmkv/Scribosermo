@@ -13,7 +13,7 @@ Edit the files to your needs:
 
 ```bash
 # Export with either mode=pb or mode=tflite
-# For some reason exporting to tflite doesn't work with tf=2.4, use version 2.3 instead
+# For some reason exporting to tflite doesn't work with tf=2.4, use version 2.3 instead and also downgrade the tf-io package
 python3 /Scribosermo/extras/exporting/export.py \
   --checkpoint_dir "/checkpoints/en/qnetp5/" \
   --export_dir "checkpoints/en/qnetp5/exported/" \
