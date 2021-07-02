@@ -124,8 +124,8 @@ Below models are not compatible to the DeepSpeech client anymore!
 
 **German**:
 
-- Quartznet15x5, CV only (WER: 7.7%): [Link](https://www.mediafire.com/folder/rrse5ydtgdpvs/cv-wer0077)
-- Quartznet15x5, D37CV (WER: 6.7%): [Link](https://www.mediafire.com/folder/at87olk5x6j01/d37cv-wer0072)
+- Quartznet15x5, CV only (WER: 7.5%): [Link](https://www.mediafire.com/folder/rrse5ydtgdpvs/cv-wer0077)
+- Quartznet15x5, D37CV (WER: 6.6%): [Link](https://www.mediafire.com/folder/jh5unptizgzou/d37cv-wer0066)
 - Scorer: [TCV](https://www.mediafire.com/file/xb2dq2roh8ckawf/kenlm_de_tcv.scorer/file),
   [D37CV](https://www.mediafire.com/file/pzj8prgv2h0c8ue/kenlm_de_all.scorer/file),
   [PocoLg](https://www.mediafire.com/file/b64k0uqv69ehe9p/de_pocolm_large.scorer/file)
@@ -140,13 +140,20 @@ Below models are not compatible to the DeepSpeech client anymore!
 
 - Quartznet15x5, CV only (WER: 10.5%): [Link](https://www.mediafire.com/folder/1peahr4b17t8i/cv-wer0105)
 - Quartznet15x5, D8CV (WER: 10.0%): [Link](https://www.mediafire.com/folder/2x2kdq3wlbg0h/d8cv-wer0100)
-- Scorer: [Link](https://www.mediafire.com/file/h38hmax7wnkxqfd/kenlm_es_n12.scorer/file)
+- Scorer: [KenSm](https://www.mediafire.com/file/h38hmax7wnkxqfd/kenlm_es_n12.scorer/file),
+  [PocoLg](https://www.mediafire.com/file/pwt95u2wik8gr5s/es_pocolm_d8cv.scorer/file)
 
 **French**:
 
 - Quartznet15x5, CV only (WER: 12.1%): [Link](https://www.mediafire.com/folder/bee6yoirkcoui/cv-wer0121)
-- Quartznet15x5, D7CV (WER: 11.7%): [Link](https://www.mediafire.com/folder/wwudrwn56iimc/d7cv-wer0117)
-- Scorer: [Link](https://www.mediafire.com/file/pcj322gp5ddpfhd/kenlm_fr_n12.scorer/file)
+- Quartznet15x5, D7CV (WER: 11.0%): [Link](https://www.mediafire.com/folder/hesl65v0369b4/d7cv-wer0110)
+- Scorer: [KenSm](https://www.mediafire.com/file/pcj322gp5ddpfhd/kenlm_fr_n12.scorer/file),
+  [PocoLg](https://www.mediafire.com/file/55qv3bpu6z0m1p9/fr_pocolm_d7cv.scorer/file)
+
+**Italian**:
+
+- Quartznet15x5, D5CV (WER: 11.5%): [Link](https://www.mediafire.com/folder/atxlkc8xxzosq/d5cv-wer0115)
+- Scorer: [PocoLg](https://www.mediafire.com/file/cuf9adxqqxbqlbu/it_pocolm_d5cv.scorer/file)
 
 <br/>
 
@@ -231,30 +238,58 @@ Next trainings were all done with above pretrained _Quartznet15x5_ network.
 
 Running some experiments with different language models:
 
-| Language | Datasets          | Additional Infos                                                                                                    | Performance&nbsp;Results                     |
-| -------- | ----------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| DE       | D37 + CommonVoice | Use PocoLM instead of KenLM (similar LM size); Checkpoint from D37+CV training with WER=0.0718; Test on CommonVoice | CER with lm: 0.0285 <br> WER with lm: 0.0701 |
-| DE       | D37 + CommonVoice | Like above; Test on Tuda                                                                                            | CER with lm: 0.0265 <br> WER with lm: 0.1037 |
-| DE       | D37 + CommonVoice | Use unpruned language model (1.5GB instead of 250MB); Rest similar to above; Test on CommonVoice                    | CER with lm: 0.0276 <br> WER with lm: 0.0673 |
-| DE       | D37 + CommonVoice | Like above; Test on Tuda                                                                                            | CER with lm: 0.0261 <br> WER with lm: 0.1026 |
-| DE       | D37 + CommonVoice | Use pruned language model with similar size to English model (850MB); Rest similar to above; Test on CommonVoice    | CER with lm: 0.0277 <br> WER with lm: 0.0672 |
-| DE       | D37 + CommonVoice | Like above; Test on Tuda                                                                                            | CER with lm: 0.0260 <br> WER with lm: 0.1024 |
-| DE       | D37 + CommonVoice | Checkpoint from D37+CV training with WER=0.0741; with large (850MB) scorer; Test on CommonVoice                     | CER with lm: 0.0299 <br> WER with lm: 0.0712 |
-| DE       | D37 + CommonVoice | Like above; Test on Tuda; Small and full scorers were behind above model with both testsets, too                    | CER with lm: 0.0280 <br> WER with lm: 0.1066 |
-|          |                   |                                                                                                                     |                                              |
-| ES       | D8 + CommonVoice  | Use PocoLM instead of KenLM (similar LM size); Checkpoint from D8+CV training with WER=0.1003; Test on CommonVoice  | CER with lm: 0.0407 <br> WER with lm: 0.1011 |
-| ES       | D8 + CommonVoice  | Like above; Large scorer (790MB)                                                                                    | CER with lm: 0.0402 <br> WER with lm: 0.1002 |
-| ES       | D8 + CommonVoice  | Like above; Full scorer (1.2GB)                                                                                     | CER with lm: 0.0403 <br> WER with lm: 0.1000 |
+| Language | Datasets          | Additional Infos                                                                                                    | Performance&nbsp;Results                                                                                             |
+| -------- | ----------------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| DE       | D37 + CommonVoice | Use PocoLM instead of KenLM (similar LM size); Checkpoint from D37+CV training with WER=0.0718; Test on CommonVoice | CER with lm: 0.0285 <br> WER with lm: 0.0701                                                                         |
+| DE       | D37 + CommonVoice | Like above; Test on Tuda                                                                                            | CER with lm: 0.0265 <br> WER with lm: 0.1037                                                                         |
+| DE       | D37 + CommonVoice | Use unpruned language model (1.5GB instead of 250MB); Rest similar to above; Test on CommonVoice                    | CER with lm: 0.0276 <br> WER with lm: 0.0673                                                                         |
+| DE       | D37 + CommonVoice | Like above; Test on Tuda                                                                                            | CER with lm: 0.0261 <br> WER with lm: 0.1026                                                                         |
+| DE       | D37 + CommonVoice | Use pruned language model with similar size to English model (850MB); Rest similar to above; Test on CommonVoice    | CER with lm: 0.0277 <br> WER with lm: 0.0672                                                                         |
+| DE       | D37 + CommonVoice | Like above; Test on Tuda                                                                                            | CER with lm: 0.0260 <br> WER with lm: 0.1024                                                                         |
+| DE       | D37 + CommonVoice | Checkpoint from D37+CV training with WER=0.0741; with large (850MB) scorer; Test on CommonVoice                     | CER with lm: 0.0299 <br> WER with lm: 0.0712                                                                         |
+| DE       | D37 + CommonVoice | Like above; Test on Tuda; Small and full scorers were behind above model with both testsets, too                    | CER with lm: 0.0280 <br> WER with lm: 0.1066                                                                         |
+| DE       | CommonVoice       | Test above checkpoint from CV training with WER=0.0774 with PocoLM large                                            | Test-Loss: 11.6184 <br> CER greedy: 0.0528 <br> CER with lm: 0.0312 <br> WER greedy: 0.1853 <br> WER with lm: 0.0748 |
+|          |                   |                                                                                                                     |                                                                                                                      |
+| ES       | D8 + CommonVoice  | Use PocoLM instead of KenLM (similar LM size); Checkpoint from D8+CV training with WER=0.1003; Test on CommonVoice  | CER with lm: 0.0407 <br> WER with lm: 0.1011                                                                         |
+| ES       | D8 + CommonVoice  | Like above; Large scorer (790MB)                                                                                    | CER with lm: 0.0402 <br> WER with lm: 0.1002                                                                         |
+| ES       | D8 + CommonVoice  | Like above; Full scorer (1.2GB)                                                                                     | CER with lm: 0.0403 <br> WER with lm: 0.1000                                                                         |
 
 Experimenting with new architectures on LibriSpeech dataset:
 
-| Network                    | Additional Infos                                                             | Performance&nbsp;Results                                                                                                                   |
-| -------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| ContextNetSimple (0.8)     | Run with multiple full restarts, ~3:30h/epoch                                | Eval-Loss-1: 64.2793 <br> Eval-Loss-2: 24.5743 <br> Eval-Loss-3: 19.4896                                                                   |
-| SimpleConformer (16x240x4) | Completed training after 28 epochs (~3:20h/epoch), without any augmentations | Eval-Loss: 70.6178                                                                                                                         |
-| Citrinet (344)             | Completed training after 6 epochs (~4h/epoch), didn't learn anything         | Eval-Loss: 289.7605                                                                                                                        |
-| QuartzNet (15x5)           | Continued old checkpoint                                                     | Eval-Loss: 5.0922 <br> Test-Loss: 5.3353 <br> CER greedy: 0.0139 <br> CER with lm: 0.0124 <br> WER greedy: 0.0457 <br> WER with lm: 0.0368 |
-| QuartzNet (15x5+LSTM)      | Frozen+Full training onto old checkpoint                                     | Eval-Loss: 4.9105 <br> Test-Loss: 5.3112 <br> CER greedy: 0.0143 <br> CER with lm: 0.0125 <br> WER greedy: 0.0477 <br> WER with lm: 0.0370 |
+| Network                    | Additional Infos                                                                                 | Performance&nbsp;Results                                                                                                                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ContextNetSimple (0.8)     | Run with multiple full restarts, ~3:30h/epoch; increased LR from 0.001 to 0.01 since iteration 5 | Eval-Loss-1: 64.2793 <br> Eval-Loss-2: 24.5743 <br> Eval-Loss-3: 19.4896 <br> Eval-Loss-4: 18.4973 <br> Eval-Loss-4: 18.4973 <br> Eval-Loss-5: 9.3007 <br> Eval-Loss-6: 8.1340 <br> Eval-Loss-7: 7.5170 |
+| SimpleConformer (16x240x4) | Completed training after 28 epochs (~3:20h/epoch), without any augmentations                     | Eval-Loss: 70.6178                                                                                                                                                                                      |
+| Citrinet (344)             | Completed training after 6 epochs (~4h/epoch), didn't learn anything                             | Eval-Loss: 289.7605                                                                                                                                                                                     |
+| QuartzNet (15x5)           | Continued old checkpoint                                                                         | Eval-Loss: 5.0922 <br> Test-Loss: 5.3353 <br> CER greedy: 0.0139 <br> CER with lm: 0.0124 <br> WER greedy: 0.0457 <br> WER with lm: 0.0368                                                              |
+| QuartzNet (15x5+LSTM)      | Frozen+Full training onto old checkpoint                                                         | Eval-Loss: 4.9105 <br> Test-Loss: 5.3112 <br> CER greedy: 0.0143 <br> CER with lm: 0.0125 <br> WER greedy: 0.0477 <br> WER with lm: 0.0370                                                              |
+
+Tests with reduced dataset size and with multiple restarts:
+
+| Language | Datasets          | Additional Infos                                                                                                                                                                       | Performance&nbsp;Results                                                                                                                                                 |
+| -------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| DE       | CV short (314h)   | Test with PocoLM large; about 18h on 2xNvidia-V100; Iteration 1                                                                                                                        | Eval-Loss: 12.5308 <br> Test-Loss: 13.9343 <br> CER greedy: 0.0654 <br> CER with lm: 0.0347 <br> WER greedy: 0.2391 <br> WER with lm: 0.0834                             |
+| DE       | CV short (314h)   | Iteration 2; about 22h                                                                                                                                                                 | Eval-Loss: 11.3072 <br> Test-Loss: 12.6970 <br> CER greedy: 0.0556 <br> CER with lm: 0.0315 <br> WER greedy: 0.1986 <br> WER with lm:0.0776                              |
+| DE       | CV short (314h)   | Iteration 3; about 13h                                                                                                                                                                 | Eval-Loss: 11.2485 <br> Test-Loss: 12.5631 <br> CER greedy: 0.0532 <br> CER with lm: 0.0309 <br> WER greedy: 0.1885 <br> WER with lm: 0.0766                             |
+| DE       | CV short (314h)   | Test Iteration 3 on Tuda                                                                                                                                                               | Test-Loss: 27.5804 <br> CER greedy: 0.0478 <br> CER with lm: 0.0326 <br> WER greedy: 0.1913 <br> WER with lm: 0.1166                                                     |
+| DE       | D37 + CommonVoice | Additional training iteration on CV using checkpoint from D37+CV training with WER=0.0718                                                                                              | Eval-Loss: 8.7156 <br> Test-Loss: 9.8192 <br> CER greedy: 0.0443 <br> CER with lm: 0.0268 <br> WER greedy: 0.1544 <br> WER with lm:0.0664                                |
+| DE       | D37 + CommonVoice | Above, test on Tuda                                                                                                                                                                    | Test-Loss: 19.2681 <br> CER greedy: 0.0358 <br> CER with lm: 0.0270 <br> WER greedy: 0.1454 <br> WER with lm:0.1023                                                      |
+|          |                   |                                                                                                                                                                                        |                                                                                                                                                                          |
+| ES       | CV short (203h)   | A fifth iteration with lr=0.01 did not converge; about 19h on 2xNvidia-V100 for first iteration                                                                                        | Eval-Loss-1: 10.8212 <br> Eval-Loss-2: 10.7791 <br> Eval-Loss-3: 10.7649 <br> Eval-Loss-4: 10.7918                                                                       |
+| ES       | CV short (203h)   | Above, test of first iteration                                                                                                                                                         | Test-Loss: 12.5954 <br> CER greedy: 0.0591 <br> CER with lm: 0.0443 <br> WER greedy: 0.1959 <br> WER with lm: 0.1105                                                     |
+| ES       | CV short (203h)   | Above, test of third iteration                                                                                                                                                         | Test-Loss: 12.6006 <br> CER greedy: 0.0572 <br> CER with lm: 0.0436 <br> WER greedy: 0.1884 <br> WER with lm: 0.1093                                                     |
+| ES       | D8 + CommonVoice  | Additional training iterations on CV using checkpoint from D8+CV training with WER=0.1003; test of first iteration with PocoLM large; a second iteration with lr=0.01 did not converge | Eval-Loss-1: 9.5202 <br> Eval-Loss-2: 9.6056 <br> Test-Loss: 11.2326 <br> CER greedy: 0.0501 <br> CER with lm: 0.0398 <br> WER greedy: 0.1606 <br> WER with lm:0.0995    |
+| ES       | CV short (203h)   | Two step frozen training, about 13h+18h                                                                                                                                                | Eval-Loss-1: 61.5673 <br> Eval-Loss-2: 10.9956 <br> Test-Loss: 12.7028 <br> CER greedy: 0.0604 <br> CER with lm: 0.0451 <br> WER greedy: 0.2015 <br> WER with lm: 0.1111 |
+| ES       | CV short (203h)   | Single step with last layer reinitialization, about 18h                                                                                                                                | Eval-Loss: 11.6488 <br> Test-Loss: 13.4355 <br> CER greedy: 0.0643 <br> CER with lm: 0.0478 <br> WER greedy: 0.2163 <br> WER with lm: 0.1166                             |
+|          |                   |                                                                                                                                                                                        |                                                                                                                                                                          |
+| FR       | CV short (364h)   | The fourth iteration with lr=0.01; about 25h on 2xNvidia-V100 for first iteration; test of third iteration                                                                             | Eval-Loss-1: 12.6529 <br> Eval-Loss-2: 11.7833 <br> Eval-Loss-3: 11.7141 <br> Eval-Loss-4: 12.6193                                                                       |
+| FR       | CV short (364h)   | Above, test of third iteration                                                                                                                                                         | Test-Loss: 14.8373 <br> CER greedy: 0.0711 <br> CER with lm: 0.0530 <br> WER greedy: 0.2142 <br> WER with lm: 0.1248                                                     |
+| FR       | D7 + CommonVoice  | Additional training iterations on CV using checkpoint from D7+CV training with WER=0.1167; test of first iteration with PocoLM large; a second iteration with lr=0.01 did not converge | Eval-Loss-1: 9.5452 <br> Eval-Loss-2: 9.5860 <br> Test-Loss: 12.5477 <br> CER greedy: 0.0590 <br> CER with lm: 0.0466 <br> WER greedy: 0.1747 <br> WER with lm:0.1104    |
+|          |                   |                                                                                                                                                                                        |                                                                                                                                                                          |
+| IT       | CommonVoice       | Transfer from English                                                                                                                                                                  | Eval-Loss: 12.7120 <br> Test-Loss: 14.4017 <br> CER greedy: 0.0710 <br> CER with lm: 0.0465 <br> WER greedy: 0.2766 <br> WER with lm: 0.1378                             |
+| IT       | CommonVoice       | Transfer from Spanish with alphabet shrinking                                                                                                                                          | Eval-Loss: 10.7151 <br> Test-Loss: 12.3298 <br> CER greedy: 0.0585 <br> CER with lm: 0.0408 <br> WER greedy: 0.2208 <br> WER with lm: 0.1216                             |
+| IT       | D5 + CommonVoice  | Continuing above from Spanish                                                                                                                                                          | Eval-Loss: 9.3055 <br> Test-Loss: 10.8521 <br> CER greedy: 0.0543 <br> CER with lm: 0.0403 <br> WER greedy: 0.2000 <br> WER with lm: 0.1170                              |
+| IT       | D5 + CommonVoice  | Fine-tuned above checkpoint on CommonVoice again (lr=0.0001)                                                                                                                           | Eval-Loss: 9.3318 <br> Test-Loss: 10.8453 <br> CER greedy: 0.0533 <br> CER with lm: 0.0395 <br> WER greedy: 0.1967 <br> WER with lm: 0.1153                              |
 
 <br/>
 

@@ -184,11 +184,11 @@ def main(
             max_duration_seconds=max_duration_seconds,
         )
 
-        pool = Pool(processes=None)
-        for _ in tqdm.tqdm(
-            pool.imap_unordered(convert_func, filenames), total=len(filenames)
-        ):
-            pass
+        with Pool(processes=None) as pool:
+            for _ in tqdm.tqdm(
+                pool.imap_unordered(convert_func, filenames), total=len(filenames)
+            ):
+                pass
 
 
 # ==================================================================================================

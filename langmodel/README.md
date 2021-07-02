@@ -93,6 +93,8 @@ Building `.arpa` file with PocoLM:
 export LANGUAGE="de"
 cd /data_prepared/langmodel/${LANGUAGE}/
 
+# Make sure to delete all files except the all.txt in this directory
+
 # Use 5% as dev partition and the other 95% for training
 head -n $(expr $(cat all.txt | wc -l) / 100 \* 5) < all.txt > dev.txt
 tail -n +$(expr $(cat all.txt | wc -l) / 100 \* 5) < all.txt > train.txt
@@ -130,8 +132,7 @@ Optimize the model and convert it to _DeepSpeech's_ `.scorer`-format:
 # Optimized scorer alpha and beta values:
 # English (taken from DeepSpeech repo): --default_alpha 0.931289039105002 --default_beta 1.1834137581510284
 # German: --default_alpha 0.7842902115058261 --default_beta 0.6346150241906542
-# Spanish+French: --default_alpha 0.749166959347089 --default_beta 1.6627453128820517
-# Italian: --default_alpha 0.910619981788069 --default_beta 0.15660475671195578
+# Spanish+French+Italian: --default_alpha 0.749166959347089 --default_beta 1.6627453128820517
 # Polish: --default_alpha 1.3060110864019918 --default_beta 3.5010876706821334
 
 export LANGUAGE="de"
