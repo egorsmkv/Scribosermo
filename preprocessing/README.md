@@ -72,9 +72,10 @@ MussteWissen [Deutsch](https://www.youtube.com/c/musstewissenDeutsch/videos) [Ma
 [Voxforge](http://www.voxforge.org/home/) (~37h)
 
 **Italian (it):**
-[Common Voice](https://voice.mozilla.org/) (~149h),
-[LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~0h),
-[M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~127h),
+[Common Voice](https://voice.mozilla.org/) (~157h),
+[LinguaLibre](https://lingualibre.org/wiki/LinguaLibre:Main_Page) (~1h),
+[M-AILABS Speech Dataset](https://www.caito.de/2019/01/the-m-ailabs-speech-dataset/) (~128h),
+[mTEDx](http://www.openslr.org/100/) (~106h),
 [Voxforge](http://www.voxforge.org/home/) (~20h)
 
 **Polish (pl):**
