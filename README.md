@@ -81,8 +81,8 @@ You can find more details about the currently used datasets [here](preprocessing
 |                  |      |     |     |      |     |     |       |
 | ---------------- | ---- | --- | --- | ---- | --- | --- | ----- |
 | Language         | DE   | EN  | ES  | FR   | IT  | PL  | Noise |
-| Duration (hours) | 2370 | 982 | 817 | 1028 | 299 | 169 | 152   |
-| Datasets         | 37   | 1   | 8   | 7    | 4   | 3   | 3     |
+| Duration (hours) | 2370 | 982 | 817 | 1028 | 368 | 169 | 152   |
+| Datasets         | 37   | 1   | 8   | 7    | 5   | 3   | 3     |
 
 <br>
 
