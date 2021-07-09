@@ -397,13 +397,18 @@ def create_optimizer():
 # ==================================================================================================
 
 
-def build_new_model(new_config: dict, print_log: bool = True):
+def build_new_model(
+    new_config: dict, using_config_export: bool = False, print_log: bool = True
+):
     feature_type = new_config["audio_features"]["use_type"]
     c_input = new_config["audio_features"][feature_type]["num_features"]
     c_output = len(utils.load_alphabet(new_config)) + 1
 
-    # Get the model type either from the config or the existing checkpoint
-    if new_config["continue_pretrained"] or not new_config["empty_ckpt_dir"]:
+    # Get the model type either from the given config file (else-case)
+    # or the from the model the training is continued on (if-case)
+    if not using_config_export and (
+        new_config["continue_pretrained"] or not new_config["empty_ckpt_dir"]
+    ):
         path = os.path.join(checkpoint_dir, "config_export.json")
         exported_config = utils.load_json_file(path)
         network_type = exported_config["network"]["name"]
@@ -492,7 +497,9 @@ def load_exported_model(exported_dir: str):
         print("Trying to load weights directly ...")
         path = os.path.join(exported_dir, "config_export.json")
         exported_config = utils.load_json_file(path)
-        exported_model = build_new_model(exported_config, print_log=False)
+        exported_model = build_new_model(
+            exported_config, using_config_export=True, print_log=False
+        )
         exported_model.load_weights(exported_dir)
     except (OSError, NotFoundError):
         # Load old or exported models where not only the weights were saved

@@ -36,7 +36,7 @@ class BaseModule(tfl.Layer):  # pylint: disable=abstract-method
 
         if self.has_relu:
             # Last base module in a block has the relu after the residual connection
-            x = tf.keras.activations.relu(x)
+            x = tf.nn.relu(x)
 
         return x
 
@@ -72,7 +72,7 @@ class BaseBlock(tf.keras.Model):  # pylint: disable=abstract-method
         b = self.convpt(x)
         b = self.bnorm(b)
         x = tfl.Add()([a, b])
-        x = tfl.ReLU()(x)
+        x = tf.nn.relu(x)
         return x
 
 
@@ -138,7 +138,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
         )(x)
 
         x = tfl.BatchNormalization(momentum=0.9)(x)
-        x = tfl.ReLU()(x)
+        x = tf.nn.relu(x)
         x = tfl.Dropout(0.1)(x)
 
         for bparams in block_params:
@@ -158,7 +158,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
             use_bias=False,
         )(x)
         x = tfl.BatchNormalization(momentum=0.9)(x)
-        x = tfl.ReLU()(x)
+        x = tf.nn.relu(x)
 
         x = tfl.Conv1D(
             filters=1024,
@@ -169,7 +169,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
             use_bias=False,
         )(x)
         x = tfl.BatchNormalization(momentum=0.9)(x)
-        x = tfl.ReLU()(x)
+        x = tf.nn.relu(x)
 
         if extra_lstm:
             # Not described in the paper, but added for an additional experiment
