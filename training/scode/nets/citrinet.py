@@ -83,7 +83,7 @@ class BaseModule(tfl.Layer):  # pylint: disable=abstract-method
 
         if not self.convbn_only:
             # Last base module in a block has a different structure
-            x = tf.keras.activations.relu(x)
+            x = tf.nn.relu(x)
             if training:
                 x = tf.nn.dropout(x, rate=0.1)
 
@@ -132,7 +132,7 @@ class BaseBlock(tfl.Layer):  # pylint: disable=abstract-method
         b = self.bnorm(b)
 
         x = tf.add(a, b)
-        x = tf.keras.activations.relu(x)
+        x = tf.nn.relu(x)
         if training:
             x = tf.nn.dropout(x, rate=0.1)
 
@@ -184,7 +184,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
             padding="same",
         )(x)
         x = tfl.BatchNormalization(momentum=0.9)(x)
-        x = tfl.ReLU()(x)
+        x = tf.nn.relu(x)
 
         # Megablock1-3
         # For some reason this model has more params than the model described in CitriNet paper,
@@ -212,7 +212,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
             padding="same",
         )(x)
         x = tfl.BatchNormalization(momentum=0.9)(x)
-        x = tfl.ReLU()(x)
+        x = tf.nn.relu(x)
 
         if extra_lstm:
             # Not described in the paper, but added for an additional experiment

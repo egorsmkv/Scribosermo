@@ -17,14 +17,19 @@ from ds_ctcdecoder import Alphabet, Scorer, ctc_beam_search_decoder
 
 checkpoint_file = "/checkpoints/en/qnetp15/exported/model_quantized.tflite"
 # checkpoint_file = "/checkpoints/en/qnetp15/exported/model_full.tflite"
-test_wav_path = "/Scribosermo/extras/exporting/data/test.wav"
+test_wav_path = "/Scribosermo/extras/exporting/data/test_en.wav"
 alphabet_path = "/Scribosermo/data/en/alphabet.json"
 ds_alphabet_path = "/Scribosermo/data/en/alphabet.txt"
 ds_scorer_path = "/data_prepared/langmodel/en.scorer"
+
 beam_size = 256
+labels_path = "/Scribosermo/extras/exporting/data/labels.json"
 
 with open(alphabet_path, "r", encoding="utf-8") as file:
     alphabet = json.load(file)
+
+with open(labels_path, "r", encoding="utf-8") as file:
+    labels = json.load(file)
 
 ds_alphabet = Alphabet(ds_alphabet_path)
 ds_scorer = Scorer(
@@ -136,7 +141,7 @@ def main():
     )
     print("Input details:", interpreter.get_input_details())
 
-    print("Running some initialization steps ...")
+    print("\nRunning some initialization steps ...")
     # Run some random predictions to initialize the model
     for _ in range(5):
         st = time.time()
@@ -153,8 +158,15 @@ def main():
         print_prediction_scorer(data, print_text=False)
         print("TD:", time.time() - st)
 
+    print("\nTranscribing the audio ...")
+
+    # Print label if one of the test wavs is used
+    if test_wav_path.startswith("/Scribosermo/extras/exporting/data/test_"):
+        lang = test_wav_path[-6:-4]
+        if lang in labels:
+            print("Label:            ", labels[lang])
+
     # Now run the transcription
-    print("")
     timed_transcription(interpreter, test_wav_path)
 
 
@@ -162,4 +174,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    print("FINISHED")
+    print("\nFINISHED")

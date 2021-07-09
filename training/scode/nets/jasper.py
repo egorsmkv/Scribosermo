@@ -26,7 +26,7 @@ class BaseModule(tfl.Layer):  # pylint: disable=abstract-method
 
         if not self.is_last_module:
             # Last base module in a block has relu and dropout after the residual connection
-            x = tf.keras.activations.relu(x)
+            x = tf.nn.relu(x)
 
             if training:
                 x = tf.nn.dropout(x, rate=self.dropout)
@@ -108,7 +108,7 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
             input_tensor
         )
         x = tfl.BatchNormalization()(x)
-        x = tfl.ReLU()(x)
+        x = tf.nn.relu(x)
         x = tfl.Dropout(0.2)(x)
 
         residuals = []
@@ -134,17 +134,17 @@ class MyModel(tf.keras.Model):  # pylint: disable=abstract-method
 
                 conv_resd.append(b)
                 x = tfl.Add()(conv_resd)
-                x = tfl.ReLU()(x)
+                x = tf.nn.relu(x)
                 x = tfl.Dropout(dropout)(x)
 
         x = tfl.Conv1D(filters=896, kernel_size=29, dilation_rate=2, padding="same")(x)
         x = tfl.BatchNormalization()(x)
-        x = tfl.ReLU()(x)
+        x = tf.nn.relu(x)
         x = tfl.Dropout(0.4)(x)
 
         x = tfl.Conv1D(filters=1024, kernel_size=1, padding="valid")(x)
         x = tfl.BatchNormalization()(x)
-        x = tfl.ReLU()(x)
+        x = tf.nn.relu(x)
         x = tfl.Dropout(0.4)(x)
 
         x = tfl.Conv1D(filters=self.n_output, kernel_size=1, padding="valid")(x)

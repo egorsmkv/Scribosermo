@@ -3,8 +3,6 @@
 
 import json
 import multiprocessing as mp
-import random
-import time
 
 import numpy as np
 import soundfile as sf
@@ -19,7 +17,7 @@ from ds_ctcdecoder import Alphabet, Scorer, swigwrapper
 # ==================================================================================================
 
 checkpoint_file = "/checkpoints/en/qnetp15/exported/model_quantized.tflite"
-test_wav_path = "/Scribosermo/extras/exporting/data/test.wav"
+test_wav_path = "/Scribosermo/extras/exporting/data/test_en.wav"
 alphabet_path = "/Scribosermo/data/en/alphabet.json"
 ds_alphabet_path = "/Scribosermo/data/en/alphabet.txt"
 ds_scorer_path = "/data_prepared/langmodel/en.scorer"
