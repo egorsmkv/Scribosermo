@@ -44,7 +44,7 @@ def text_to_ids(sample):
     global char2idx
 
     text = tf.strings.lower(sample["text"])
-    text_as_chars = tf.strings.unicode_split(text, "utf-8")
+    text_as_chars = tf.strings.unicode_split(text, "UTF-8")
     text_as_ints = char2idx.lookup(text_as_chars)
     sample["label"] = text_as_ints
     sample["label_length"] = tf.strings.length(text)
