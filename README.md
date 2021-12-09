@@ -159,6 +159,7 @@ Below models are not compatible to the DeepSpeech client anymore!
 ## Citation
 
 Please cite Scribosermo if you found it helpful for your research or business.
+
 ```bibtex
 @article{
   scribosermo,
