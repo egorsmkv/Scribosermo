@@ -1,6 +1,6 @@
 # Scribosermo
 
-_Train fast Speech-to-Text networks in different languages._
+_Train fast Speech-to-Text networks in different languages._ An overview of the approach can be found in the paper [Scribosermo: Fast Speech-to-Text models for German and other Languages](https://arxiv.org/pdf/2110.07982.pdf).
 
 <div align="center">
     <img src="media/deepspeech1_architecture.png" alt="deepspeech1 graph" width="45%"/>
@@ -19,9 +19,7 @@ _Train fast Speech-to-Text networks in different languages._
 
 ## Usage
 
-Note: This repository is focused on training STT-networks.
-You can find a short and experimental inference example [here](extras/exporting/testing_tflite.py),
-but please try to solve any problems that occur while using the models outside of this repository yourself.
+Note: This repository is focused on training STT-networks, but you can find a short and experimental inference example [here](extras/exporting/testing_tflite.py).
 
 Requirements are:
 
@@ -155,6 +153,21 @@ Below models are not compatible to the DeepSpeech client anymore!
 
 - Quartznet15x5, D5CV (WER: 11.5%): [Link](https://www.mediafire.com/folder/atxlkc8xxzosq/d5cv-wer0115)
 - Scorer: [PocoLg](https://www.mediafire.com/file/cuf9adxqqxbqlbu/it_pocolm_d5cv.scorer/file)
+
+<br/>
+
+## Citation
+
+Please cite Scribosermo if you found it helpful for your research or business.
+```bibtex
+@article{
+  scribosermo,
+  title={Scribosermo: Fast Speech-to-Text models for German and other Languages},
+  author={Bermuth, Daniel and Poeppel, Alexander and Reif, Wolfgang},
+  journal={arXiv preprint arXiv:2110.07982},
+  year={2021}
+}
+```
 
 <br/>
 
