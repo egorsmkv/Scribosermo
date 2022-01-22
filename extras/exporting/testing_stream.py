@@ -56,7 +56,7 @@ def load_audio(wav_path):
     """Load wav file with the required format"""
 
     audio, _ = sf.read(wav_path, dtype="int16")
-    audio = audio / np.iinfo(np.int16).max
+    audio = audio / (np.iinfo(np.int16).max + 1)
     audio = np.expand_dims(audio, axis=0)
     audio = audio.astype(np.float32)
     return audio
